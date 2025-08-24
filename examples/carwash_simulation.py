@@ -1,7 +1,7 @@
 """
-Carwash Simulation using YAML Config Compiler
+Carwash Simulation using Strataregula
 
-This example demonstrates how to use YAML Config Compiler for simulating
+This example demonstrates how to use Strataregula for simulating
 a carwash service with different wash types and customer preferences.
 Based on SimPy's Carwash example.
 """
@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from typing import Dict, Any
 
-from yaml_config_compiler import YAMLConfigCompiler
+from strataregula import Pipeline
 
 
 class CarwashSimulator:
@@ -19,7 +19,7 @@ class CarwashSimulator:
     
     def __init__(self, config_path: Path = None):
         """Initialize the carwash simulator."""
-        self.compiler = YAMLConfigCompiler(config_path)
+        self.compiler = Pipeline(config_path)
         
         # Set up simulation parameters
         self.setup_simulation_data()
@@ -199,7 +199,7 @@ class CarwashSimulator:
 
 def main():
     """Run the carwash simulation."""
-    print("Carwash Simulation using YAML Config Compiler")
+    print("Carwash Simulation using Strataregula")
     print("=" * 60)
     
     # Initialize simulator

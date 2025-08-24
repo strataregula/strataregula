@@ -45,11 +45,6 @@ from .di import (
 # Import CLI system (temporarily disabled due to missing dependencies)
 # from .cli import main
 
-# Backward compatibility aliases
-YAMLConfigCompiler = Pipeline
-PatternCompiler = CommandChain
-YAMLCompiler = Pipeline
-WildcardExpander = CommandChain
 
 __all__ = [
     # Core PiPE system
@@ -75,11 +70,6 @@ __all__ = [
     # CLI (temporarily disabled)
     # 'main',
     
-    # Backward compatibility
-    'YAMLConfigCompiler',
-    'PatternCompiler',
-    'YAMLCompiler',
-    'WildcardExpander',
     
     # Version info
     '__version__',

@@ -1,5 +1,5 @@
-"""Core YAML Config Compiler - Simple and fast pattern expansion."""
+"""Core pattern expansion engine."""
 
-from .compiler import YAMLConfigCompiler, PatternCompiler
+from .compiler import PatternCompiler
 
-__all__ = ['YAMLConfigCompiler', 'PatternCompiler']
+__all__ = ['PatternCompiler']

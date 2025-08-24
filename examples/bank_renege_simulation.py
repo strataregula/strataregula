@@ -1,7 +1,7 @@
 """
-Bank Renege Simulation using YAML Config Compiler
+Bank Renege Simulation using Strataregula
 
-This example demonstrates how to use YAML Config Compiler for simulating
+This example demonstrates how to use Strataregula for simulating
 bank customer behavior with reneging (customers leaving the queue).
 Based on SimPy's Bank Renege example.
 """
@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from typing import Dict, Any
 
-from yaml_config_compiler import YAMLConfigCompiler
+from strataregula import Pipeline
 
 
 class BankSimulator:
@@ -19,7 +19,7 @@ class BankSimulator:
     
     def __init__(self, config_path: Path = None):
         """Initialize the bank simulator."""
-        self.compiler = YAMLConfigCompiler(config_path)
+        self.compiler = Pipeline(config_path)
         
         # Set up simulation parameters
         self.setup_simulation_data()
@@ -163,7 +163,7 @@ class BankSimulator:
 
 def main():
     """Run the bank renege simulation."""
-    print("Bank Renege Simulation using YAML Config Compiler")
+    print("Bank Renege Simulation using Strataregula")
     print("=" * 60)
     
     # Initialize simulator

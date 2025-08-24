@@ -1,7 +1,7 @@
 """
-Machine Shop Simulation using YAML Config Compiler
+Machine Shop Simulation using Strataregula
 
-This example demonstrates how to use YAML Config Compiler for simulating
+This example demonstrates how to use Strataregula for simulating
 a machine shop with different machine types and job processing.
 Based on SimPy's Machine Shop example.
 """
@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from typing import Dict, Any
 
-from yaml_config_compiler import YAMLConfigCompiler
+from strataregula import Pipeline
 
 
 class MachineShopSimulator:
@@ -19,7 +19,7 @@ class MachineShopSimulator:
     
     def __init__(self, config_path: Path = None):
         """Initialize the machine shop simulator."""
-        self.compiler = YAMLConfigCompiler(config_path)
+        self.compiler = Pipeline(config_path)
         
         # Set up simulation parameters
         self.setup_simulation_data()
@@ -222,7 +222,7 @@ class MachineShopSimulator:
 
 def main():
     """Run the machine shop simulation."""
-    print("Machine Shop Simulation using YAML Config Compiler")
+    print("Machine Shop Simulation using Strataregula")
     print("=" * 60)
     
     # Initialize simulator

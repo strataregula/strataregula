@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from functools import lru_cache
 
-from .compiler import PatternCompiler, PatternCache, YAMLConfigCompiler
+from .compiler import PatternCompiler, PatternCache
 
 logger = logging.getLogger(__name__)
 
