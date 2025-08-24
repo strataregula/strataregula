@@ -78,6 +78,9 @@ Input files: {input_files}
 Compilation fingerprint: {fingerprint}
 """
 
+from typing import Dict, Any, List
+import re
+
 # Direct mapping for simple lookups
 DIRECT_MAPPING = {direct_mapping_code}
 
@@ -117,9 +120,8 @@ def list_all_services() -> List[str]:
 
 def get_services_by_pattern(pattern: str) -> Dict[str, float]:
     """Get services matching a pattern."""
-    import re
     regex_pattern = pattern.replace('.', r'\\.').replace('*', r'[^.]*')
-    compiled_regex = re.compile(f"^{regex_pattern}$")
+    compiled_regex = re.compile(f"^{{regex_pattern}}$")
     
     result = {{}}
     
@@ -154,13 +156,13 @@ def get_compilation_stats() -> Dict[str, Any]:
 
     def _get_json_template(self) -> str:
         """Get JSON template."""
-        return '''{
+        return '''{{
   "direct_mapping": {direct_mapping},
   "component_mapping": {component_mapping},
   "metadata": {metadata},
   "generated_at": "{timestamp}",
   "fingerprint": "{fingerprint}"
-}'''
+}}'''
 
     def _get_yaml_template(self) -> str:
         """Get YAML template."""
@@ -393,7 +395,7 @@ class ConfigCompiler:
         if self.config.output_format == 'python':
             return {
                 'timestamp': provenance.timestamp,
-                'input_files': ', '.join(provenance.input_files),
+                'input_files': ', '.join(f.replace('\\', '\\\\') for f in provenance.input_files),
                 'fingerprint': provenance.execution_fingerprint,
                 'direct_mapping_code': self._format_python_dict(direct_mapping),
                 'component_mapping_code': self._format_python_dict(component_mapping),
