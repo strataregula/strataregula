@@ -170,11 +170,14 @@ def get_compilation_stats() -> Dict[str, Any]:
 # Generated at: {timestamp}
 # Fingerprint: {fingerprint}
 
-direct_mapping: {direct_mapping_yaml}
+direct_mapping:
+{direct_mapping_yaml}
 
-component_mapping: {component_mapping_yaml}
+component_mapping:
+{component_mapping_yaml}
 
-metadata: {metadata_yaml}
+metadata:
+{metadata_yaml}
 '''
 
 
@@ -411,12 +414,22 @@ class ConfigCompiler:
                 'metadata': json.dumps(metadata, indent=2)
             }
         else:  # yaml
+            # Indent YAML content properly
+            direct_yaml = yaml.dump(direct_mapping, default_flow_style=False)
+            component_yaml = yaml.dump(component_mapping, default_flow_style=False)
+            metadata_yaml = yaml.dump(metadata, default_flow_style=False)
+            
+            # Add proper indentation for nested YAML
+            direct_yaml = '  ' + direct_yaml.replace('\n', '\n  ').rstrip()
+            component_yaml = '  ' + component_yaml.replace('\n', '\n  ').rstrip()
+            metadata_yaml = '  ' + metadata_yaml.replace('\n', '\n  ').rstrip()
+            
             return {
                 'timestamp': provenance.timestamp,
                 'fingerprint': provenance.execution_fingerprint,
-                'direct_mapping_yaml': yaml.dump(direct_mapping, default_flow_style=False),
-                'component_mapping_yaml': yaml.dump(component_mapping, default_flow_style=False),
-                'metadata_yaml': yaml.dump(metadata, default_flow_style=False)
+                'direct_mapping_yaml': direct_yaml,
+                'component_mapping_yaml': component_yaml,
+                'metadata_yaml': metadata_yaml
             }
     
     def _format_python_dict(self, data: Dict[str, Any], indent: int = 4) -> str:
