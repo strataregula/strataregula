@@ -3,31 +3,44 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-**Strataregula** is a powerful YAML Configuration Pattern Compiler designed for hierarchical configuration management with wildcard pattern expansion.
+**Strataregula** is a YAML Configuration Pattern Compiler for hierarchical configuration management with wildcard pattern expansion.
 
-## 🚀 Features
+## Features
 
-- **Pattern Expansion**: Wildcard pattern expansion (\*, \*\*) for large-scale configurations
-- **Hierarchical Support**: 47 prefectures → 8 regions mapping for Japan
-- **Multiple Formats**: Support for Python, JSON, and YAML output
-- **Static Compilation**: O(1) lookup optimization with static mapping generation
-- **Memory Efficient**: Streaming processing for large datasets
-- **CLI Interface**: Simple `sr compile` command-line interface
+- **🔍 Pattern Expansion**: Wildcard patterns (`*`, `**`) expand to specific configurations
+- **🗾 Hierarchical Mapping**: Built-in support for 47 Japanese prefectures → 8 regions
+- **📄 Multiple Formats**: Generate Python, JSON, or YAML output
+- **⚡ Memory Efficient**: Streaming processing for large configurations
+- **🖥️ Simple CLI**: Single `strataregula compile` command
 
-## 🏗️ Architecture
+## Quick Example
 
-```
-strataregula/
-├── core/           # Pattern expansion engine
-├── cli/            # Command-line interface
-├── hierarchy/      # Hierarchical region mapping
-├── stream/         # Memory-efficient processing
-└── json_processor/ # JSON processing utilities
+**Input** (`config.yaml`):
+```yaml
+services:
+  api-*:
+    port: 8080
+    region: "*"
 ```
 
-## 📦 Installation
+**Command**:
+```bash
+strataregula compile config.yaml --format python
+```
 
-**Note: Not yet published to PyPI. Install from source:**
+**Output**:
+```python
+services = {
+    'api-tokyo': {'port': 8080, 'region': 'tokyo'},
+    'api-osaka': {'port': 8080, 'region': 'osaka'},
+    'api-kyoto': {'port': 8080, 'region': 'kyoto'},
+    # ... expands to all 47 prefectures
+}
+```
+
+## Installation
+
+**Install from source** (not yet on PyPI):
 
 ```bash
 git clone https://github.com/strataregula/strataregula.git
@@ -35,202 +48,91 @@ cd strataregula
 pip install -e .
 ```
 
-For development:
+## Usage
+
+### Basic Compilation
 ```bash
-pip install -e ".[dev,test]"
+# Compile and print to stdout
+strataregula compile config.yaml
+
+# Generate Python format
+strataregula compile config.yaml --format python
+
+# Save to file
+strataregula compile config.yaml --output result.py
+
+# JSON format
+strataregula compile config.yaml --format json --output config.json
+
+# YAML format  
+strataregula compile config.yaml --format yaml --output expanded.yaml
+
+# Verbose output
+strataregula compile config.yaml --verbose
 ```
-
-## 🎯 Quick Start
-
-### Basic Usage
-
-Compile a YAML configuration with pattern expansion:
-```bash
-strataregula compile input.yaml
-```
-
-Specify output format:
-```bash
-strataregula compile input.yaml --format python
-strataregula compile input.yaml --format json
-strataregula compile input.yaml --format yaml
-```
-
-Output to file:
-```bash
-strataregula compile input.yaml --output compiled.py
-```
-
-## 🔧 Advanced Usage
 
 ### Pattern Examples
 
-Input YAML with wildcard patterns:
+**Single wildcard** (`*`): Matches one segment
 ```yaml
-services:
-  web-*-*:
-    port: 8080
-    region: "*"
-  api-**:
-    port: 3000
+web-*:  # → web-tokyo, web-osaka, etc.
 ```
 
-Expands to specific configurations:
-```python
-# Generated Python output
-services = {
-    'web-tokyo-prod': {'port': 8080, 'region': 'tokyo'},
-    'web-osaka-staging': {'port': 8080, 'region': 'osaka'},
-    'api-user-service': {'port': 3000},
-    # ... more expanded entries
-}
-```
-
-## 🎨 CLI Commands
-
-### `compile`
-Compile YAML configuration with pattern expansion:
-```bash
-strataregula compile [OPTIONS] INPUT_FILE
-```
-
-Options:
-- `--output, -o`: Output file (default: stdout)
-- `--format, -f`: Output format (python, json, yaml)
-- `--verbose, -v`: Enable verbose output
-- `--help`: Show help message
-
-## 🔌 Extensibility
-
-Strataregula is designed for extensibility:
-
-- **Pattern Expansion**: Customizable wildcard expansion rules
-- **Output Formats**: Support for Python, JSON, and YAML outputs
-- **Hierarchical Mapping**: Configurable region/prefecture mappings
-- **Streaming Processing**: Memory-efficient handling of large datasets
-
-## 🧪 Examples
-
-### Example 1: Service Configuration
-
+**Double wildcard** (`**`): Matches any segments  
 ```yaml
-# input.yaml
-services:
-  web-*:
-    port: 8080
-    region: "*"
-  api-**-service:
-    port: 3000
-    database: "primary"
+cache-**:  # → cache-redis, cache-memcached, etc.
 ```
 
-Compile to Python:
-```bash
-strataregula compile input.yaml --format python
-```
-
-Output:
-```python
-services = {
-    'web-tokyo': {'port': 8080, 'region': 'tokyo'},
-    'web-osaka': {'port': 8080, 'region': 'osaka'},
-    'api-user-service': {'port': 3000, 'database': 'primary'},
-    'api-auth-service': {'port': 3000, 'database': 'primary'},
-}
-```
-
-### Example 2: Regional Configuration
-
+**Region expansion**:
 ```yaml
-# regional.yaml
-regions:
-  "*":
-    timezone: "Asia/Tokyo"
-    language: "ja"
+"*":
+  timezone: "Asia/Tokyo"
+# Expands to all 47 prefectures with timezone setting
 ```
 
-Expands to all 47 prefectures with hierarchical grouping into 8 regions.
+## Examples
 
-## 🚀 Performance
+See the [`examples/`](examples/) directory:
+- **[sample_prefectures.yaml](examples/sample_prefectures.yaml)** - Prefecture hierarchy example
+- **[sample_traffic.yaml](examples/sample_traffic.yaml)** - Traffic routing patterns
+- **[hierarchy_test.py](examples/hierarchy_test.py)** - Test script for hierarchy mapping
 
-- **Static Compilation**: O(1) lookup with pre-compiled mappings
-- **Memory Efficient**: Streaming processing for large configurations
-- **Fast Pattern Matching**: Optimized wildcard expansion algorithms
-- **Scalable**: Handles thousands of pattern expansions efficiently
+## Architecture
 
-## 🤝 Contributing
+```
+strataregula/
+├── core/           # Pattern expansion engine
+├── cli/            # Command-line interface
+├── hierarchy/      # Prefecture/region mapping
+├── stream/         # Memory-efficient processing
+└── json_processor/ # JSON processing utilities
+```
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+## Performance
 
-### Development Setup
+- **Pattern Processing**: Handles thousands of patterns efficiently
+- **Memory Usage**: Streaming processing keeps memory usage low
+- **Output Generation**: Fast static compilation with O(1) lookups
+
+## Contributing
 
 ```bash
 git clone https://github.com/strataregula/strataregula.git
 cd strataregula
-pip install -e ".[dev]"
+pip install -e ".[dev,test]"
 pytest
 ```
 
-## 📄 License
+## License
 
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+Licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
 
-## 🙏 Acknowledgments
+## Support
 
-- Built with modern Python async/await patterns
-- Inspired by Unix pipeline philosophy
-- Designed for cloud-native configuration management
-- Community-driven development approach
-
-## 📞 Support
-
-- **Documentation**: [https://strataregula.readthedocs.io/](https://strataregula.readthedocs.io/)
 - **Issues**: [GitHub Issues](https://github.com/strataregula/strataregula/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/strataregula/strataregula/discussions)
+- **Discussions**: [GitHub Discussions](https://github.com/strataregula/strataregula/discussions)  
 - **Email**: team@strataregula.com
 
 ---
 
-**Strataregula** - Hierarchical Configuration Management with Pattern Expansion.
-## 📊 Performance Benchmarks
-
-### 🚀 Service Lookup Performance
-
-![Performance Comparison](docs/images/benchmark_performance.png)
-
-**Results:**
-- **Direct Map**: 500,000 ops/sec (50x faster than fnmatch)
-- **Compiled Tree**: 50,000 ops/sec (5x faster than fnmatch) 
-- **fnmatch baseline**: 10,000 ops/sec
-
-# Performance optimized for large-scale pattern processing
-
-### ⚡ Compilation Performance
-
-![Compilation Performance](docs/images/benchmark_compilation.png)
-
-**Compilation Speed:**
-- Small config: 2ms (10 entries)
-- Medium config: 45ms (100 entries)
-- Large config: 180ms (500 entries)
-
-### 💾 Memory Usage
-
-![Memory Usage](docs/images/benchmark_memory.png)
-
-**Memory Efficiency:**
-- Total system memory: 119MB
-- Pattern Expander: 44MB (most intensive component)
-- Core system: 12MB (lightweight base)
-
-### 📋 Performance Dashboard
-
-![Performance Dashboard](docs/images/benchmark_dashboard.png)
-
-**All performance targets achieved:**
-- ✅ Pattern Expansion: >10,000 patterns/sec
-- ✅ Compilation: <100ms for medium configs  
-- ✅ Memory Usage: <200MB total
-- ✅ Service Lookup: >100,000 ops/sec
-
-[View Interactive Analysis (develop branch)](https://github.com/strataregula/strataregula/tree/develop/notebooks/benchmark_results.ipynb) | [Run Benchmarks (develop branch)](https://github.com/strataregula/strataregula/tree/develop/scripts/run_benchmarks.py)
+**Strataregula v0.1.1** - Simple, powerful configuration pattern expansion.
