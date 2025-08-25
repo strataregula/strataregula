@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-08-25T12:09:17.161070",
+  "code_statistics": {
+    "total_files": 209,
+    "total_lines": 49560,
+    "by_language": {
+      "Python": {
+        "files": 134,
+        "lines": 32917
+      },
+      "YAML": {
+        "files": 5,
+        "lines": 440
+      },
+      "Markdown": {
+        "files": 64,
+        "lines": 15555
+      },
+      "JSON": {
+        "files": 6,
+        "lines": 648
+      }
+    }
+  },
+  "test_coverage": {
+    "available": false,
+    "test_files": 37,
+    "source_files": 47,
+    "test_ratio": 0.79
+  },
+  "code_quality": {
+    "ruff_issues": 0,
+    "complexity_warnings": 0,
+    "style_issues": 0
+  },
+  "dependencies": {
+    "requirements": 2,
+    "pyproject_available": true
+  }
+}

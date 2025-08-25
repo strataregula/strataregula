@@ -1,0 +1,171 @@
+site_name: Strataregula Documentation
+site_url: https://strataregula.github.io/strataregula
+repo_url: https://github.com/strataregula/strataregula
+repo_name: strataregula/strataregula
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - search.share
+    - header.autohide
+    - content.code.copy
+    - content.code.annotate
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon:
+    logo: material/library-outline
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Quick Start: examples/getting-started.md
+    - Installation: getting-started/installation.md
+    - First Project: getting-started/first-project.md
+  - User Guide:
+    - Core Concepts: user-guide/concepts.md
+    - Pattern Expansion: user-guide/patterns.md
+    - CLI Commands: user-guide/cli.md
+    - Configuration: user-guide/configuration.md
+  - Plugins:
+    - Overview: plugins/index.md
+    - DOE Runner: plugins/doe-runner.md
+    - Plugin Development: plugins/plugin-development.md
+    - Plugin Integration: plugins/plugin-integration.md
+  - API Reference:
+    - Core API: api/index.md
+    - Plugin API: api/plugin-api.md
+    - Data Models: api/data-models.md
+    - Error Handling: api/errors.md
+  - Tutorials:
+    - Plugin Development: tutorials/plugin-development-tutorial.md
+    - Advanced Patterns: tutorials/advanced-patterns.md
+    - CI/CD Integration: tutorials/cicd.md
+  - Examples:
+    - Basic Examples: examples/basic.md
+    - Real World Cases: examples/real-world.md
+    - Performance Testing: examples/performance.md
+  - Development:
+    - Contributing: development/contributing.md
+    - Architecture: development/architecture.md
+    - Testing: development/testing.md
+    - Release Process: development/releases.md
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - minify:
+      minify_html: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+  - mkdocstrings:
+      handlers:
+        python:
+          setup_commands:
+            - import sys
+            - sys.path.insert(0, ".")
+            - sys.path.insert(0, "strataregula")
+          selection:
+            docstring_style: google
+          rendering:
+            show_source: true
+            show_if_no_docstring: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - admonition
+  - abbr
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      title: On this page
+  - tables
+
+extra:
+  version:
+    provider: mike
+    default: stable
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/strataregula/strataregula
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/strataregula/
+    - icon: fontawesome/solid/paper-plane
+      link: mailto:support@strataregula.dev
+  analytics:
+    provider: google
+    property: G-XXXXXXXXXX
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback!
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >- 
+            Thanks for your feedback! Help us improve this page by
+            <a href="https://github.com/strataregula/strataregula/issues/new/?title=[Docs]+{title}+-+{url}" target="_blank" rel="noopener">telling us what you found lacking</a>.
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js
+
+copyright: Copyright &copy; 2025 Strataregula Team. Licensed under MIT License.
