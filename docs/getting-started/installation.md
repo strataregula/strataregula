@@ -57,35 +57,7 @@ docker pull strataregula/strataregula:latest
 docker run --rm -v $(pwd):/workspace strataregula/strataregula:latest sr --help
 ```
 
-## Plugin Installation
-
-### DOE Runner Plugin
-
-```bash
-# Basic installation
-pip install strataregula-doe-runner
-
-# With Simroute support
-pip install strataregula-doe-runner[simroute]
-
-# Verify installation
-srd --version
-# Output: DOE Runner 0.1.0
-```
-
-### Restaurant Config Plugin
-
-```bash
-# Install restaurant configuration plugin
-pip install strataregula-restaurant-config
-
-# Verify plugin discovery
-python -c "
-import pkg_resources
-eps = list(pkg_resources.iter_entry_points('strataregula.plugins'))
-print([ep.name for ep in eps])
-"
-```
+## Optional Dependencies
 
 ## Optional Dependencies
 
@@ -177,9 +149,8 @@ export STRATAREGULA_CONFIG_DIR="~/.strataregula"
 export STRATAREGULA_CACHE_DIR="~/.strataregula/cache"
 export STRATAREGULA_LOG_LEVEL="INFO"
 
-# DOE Runner specific
-export RUN_LOG_DIR="~/strataregula-logs"
-export DOE_MAX_WORKERS="4"
+# Optional configuration
+export STRATAREGULA_DEBUG="false"
 ```
 
 ## Verification
@@ -200,15 +171,18 @@ print(f'Generated {len(SERVICES)} services')
 "
 ```
 
-### Plugin Integration Test
+### Advanced Pattern Test
 
 ```bash
-# Test DOE Runner plugin
-echo "case_id,backend,cmd_template,timeout_s
-test-01,dummy,\"dummy test\",10" > test-cases.csv
+# Test complex patterns
+echo "services:
+  api-*-*:
+    port: 8080
+  db-**:
+    port: 5432" > complex-test.yaml
 
-srd run --cases test-cases.csv --out test-metrics.csv --dry-run
-echo "✅ DOE Runner plugin working"
+sr compile complex-test.yaml --verbose
+echo "✅ Complex patterns working"
 ```
 
 ### Performance Test
@@ -281,11 +255,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Strataregula ecosystem
-RUN pip install --no-cache-dir \
-    strataregula \
-    strataregula-doe-runner \
-    strataregula-restaurant-config
+# Install Strataregula
+RUN pip install --no-cache-dir strataregula
 
 # Set working directory
 WORKDIR /workspace
@@ -428,14 +399,14 @@ source ~/.bashrc
 setx PATH "%PATH%;%APPDATA%\Python\Python311\Scripts"
 ```
 
-#### Plugin Discovery Issues
+#### Module Import Issues
 ```python
-# Debug plugin discovery
-import pkg_resources
-eps = list(pkg_resources.iter_entry_points('strataregula.plugins'))
-print("Found plugins:")
-for ep in eps:
-    print(f"  {ep.name}: {ep.module_name}")
+# Debug module imports
+try:
+    from strataregula.core import config_compiler
+    print('✅ Core compiler available')
+except ImportError as e:
+    print(f'❌ Import error: {e}')
 ```
 
 ### Performance Issues
@@ -463,22 +434,14 @@ sr compile config.yaml --enable-cache --cache-size 256
 
 #### Check Installation
 ```bash
-# Verify all components
+# Verify installation
 python -c "
 import strataregula
 print(f'Strataregula: {strataregula.__version__}')
-
-try:
-    import strataregula_doe_runner
-    print(f'DOE Runner: {strataregula_doe_runner.__version__}')
-except ImportError:
-    print('DOE Runner: Not installed')
-    
-try:
-    import strataregula_restaurant_config
-    print('Restaurant Config: Available')
-except ImportError:
-    print('Restaurant Config: Not installed')
+from strataregula.cli.main import main
+print('✅ CLI module working')
+from strataregula.core import pattern_expander
+print('✅ Core modules working')
 "
 ```
 
@@ -488,9 +451,10 @@ except ImportError:
 python -c "
 import sys
 import platform
+import strataregula
 print(f'Python: {sys.version}')
 print(f'Platform: {platform.platform()}')
-print(f'Architecture: {platform.architecture()}')
+print(f'Strataregula: {strataregula.__version__}')
 "
 ```
 

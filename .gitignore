@@ -67,7 +67,7 @@ superclaude/
 testscli/
 testsintegration/ 
 testsperformance/
-benchmarks
+# benchmarks/ - allowed in develop branch, excluded from master
 
 # Python virtual environments
 venv/
