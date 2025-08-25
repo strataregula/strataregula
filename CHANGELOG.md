@@ -13,5 +13,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Core pattern expansion engine with wildcard support
 - CLI interface with `strataregula compile` command  
 - Python, JSON, and YAML output formats
-- Comprehensive documentation and examples
-- GitHub Actions CI/CD pipeline
+- Basic documentation and examples

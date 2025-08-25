@@ -1,246 +1,161 @@
 # Strataregula
 
-[![PyPI version](https://badge.fury.io/py/strataregula.svg)](https://badge.fury.io/py/strataregula)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-**Strataregula** is a powerful YAML Configuration Pattern Compiler with PiPE (Pattern Input Processing Engine) command chaining, designed for modern configuration management and automation workflows.
+**Strataregula** is a powerful YAML Configuration Pattern Compiler designed for hierarchical configuration management with wildcard pattern expansion.
 
 ## 🚀 Features
 
-- **PiPE Command Chaining**: Process data through sequential command pipelines
-- **STDIN Support**: Seamless integration with Unix pipes and command chains
-- **Rich Plugin System**: Extensible architecture with hooks, triggers, and callbacks
-- **Dependency Injection**: Modern IoC container for service management
-- **CLI Interface**: Rich command-line interface with interactive features
-- **Multiple Formats**: Support for YAML, JSON, and text processing
-- **Async Support**: Full asynchronous processing capabilities
+- **Pattern Expansion**: Wildcard pattern expansion (\*, \*\*) for large-scale configurations
+- **Hierarchical Support**: 47 prefectures → 8 regions mapping for Japan
+- **Multiple Formats**: Support for Python, JSON, and YAML output
+- **Static Compilation**: O(1) lookup optimization with static mapping generation
+- **Memory Efficient**: Streaming processing for large datasets
+- **CLI Interface**: Simple `sr compile` command-line interface
 
 ## 🏗️ Architecture
 
 ```
 strataregula/
-├── pipe/           # PiPE command chaining system
-├── hooks/          # Event-driven hooks and callbacks
-├── di/             # Dependency injection container
+├── core/           # Pattern expansion engine
 ├── cli/            # Command-line interface
-└── plugins/        # Extensible plugin system
+├── hierarchy/      # Hierarchical region mapping
+└── stream/         # Memory-efficient processing
 ```
 
 ## 📦 Installation
 
+**Note: Not yet published to PyPI. Install from source:**
+
 ```bash
-pip install strataregula
+git clone https://github.com/strataregula/strataregula.git
+cd strataregula
+pip install -e .
 ```
 
-For development dependencies:
+For development:
 ```bash
-pip install strataregula[dev,plugins,performance]
+pip install -e ".[dev,test]"
 ```
 
 ## 🎯 Quick Start
 
 ### Basic Usage
 
-Process a YAML file:
+Compile a YAML configuration with pattern expansion:
 ```bash
-strataregula process config.yaml
+strataregula compile input.yaml
 ```
 
-Process from STDIN:
+Specify output format:
 ```bash
-cat config.yaml | strataregula process --stdin
+strataregula compile input.yaml --format python
+strataregula compile input.yaml --format json
+strataregula compile input.yaml --format yaml
 ```
 
-### Command Chaining
-
-Apply multiple commands:
+Output to file:
 ```bash
-strataregula process config.yaml \
-  -c "filter:condition='item.active'" \
-  -c "transform:expression='data.items'"
-```
-
-### Pipeline Creation
-
-Create a reusable pipeline:
-```bash
-strataregula create my-pipeline \
-  -d "Process user configs" \
-  -c "filter:condition='user.enabled'" \
-  -s pipeline.yaml
-```
-
-Run the pipeline:
-```bash
-strataregula run my-pipeline config.yaml
+strataregula compile input.yaml --output compiled.py
 ```
 
 ## 🔧 Advanced Usage
 
-### Custom Commands
+### Pattern Examples
 
-Create custom commands by extending `BaseCommand`:
-
-```python
-from strataregula.pipe.commands import BaseCommand
-
-class CustomFilterCommand(BaseCommand):
-    name = 'custom_filter'
-    description = 'Custom filtering logic'
-    category = 'custom'
-    
-    async def execute(self, data, *args, **kwargs):
-        # Your custom logic here
-        return filtered_data
+Input YAML with wildcard patterns:
+```yaml
+services:
+  web-*-*:
+    port: 8080
+    region: "*"
+  api-**:
+    port: 3000
 ```
 
-### Hooks and Callbacks
-
-Register hooks for custom behavior:
-
+Expands to specific configurations:
 ```python
-from strataregula.hooks import HookManager
-
-hook_manager = HookManager()
-
-@hook_manager.register('pre_process')
-def pre_process_hook(data, context):
-    print(f"Processing {len(data)} items")
-    return data
-
-@hook_manager.register('post_process')
-def post_process_hook(result, context):
-    print(f"Processed {len(result)} items")
-    return result
-```
-
-### Dependency Injection
-
-Use the IoC container for service management:
-
-```python
-from strataregula.di import Container, ServiceLifetime
-
-container = Container()
-
-# Register services
-container.register_singleton(MyService, MyServiceImpl)
-container.register_transient(DataProcessor, DataProcessorImpl)
-
-# Resolve services
-my_service = container.resolve(MyService)
-processor = container.resolve(DataProcessor)
+# Generated Python output
+services = {
+    'web-tokyo-prod': {'port': 8080, 'region': 'tokyo'},
+    'web-osaka-staging': {'port': 8080, 'region': 'osaka'},
+    'api-user-service': {'port': 3000},
+    # ... more expanded entries
+}
 ```
 
 ## 🎨 CLI Commands
 
-### `process`
-Process input data through commands or pipeline:
+### `compile`
+Compile YAML configuration with pattern expansion:
 ```bash
-strataregula process [OPTIONS] [INPUT_FILE]
+strataregula compile [OPTIONS] INPUT_FILE
 ```
 
 Options:
-- `--stdin, -i`: Read from STDIN
-- `--format, -f`: Input format (yaml, json, text, auto)
-- `--output, -o`: Output file
-- `--command, -c`: Command to execute (can be multiple)
+- `--output, -o`: Output file (default: stdout)
+- `--format, -f`: Output format (python, json, yaml)
+- `--verbose, -v`: Enable verbose output
+- `--help`: Show help message
 
-### `create`
-Create a new pipeline:
-```bash
-strataregula create [OPTIONS] NAME
-```
+## 🔌 Extensibility
 
-Options:
-- `--description, -d`: Pipeline description
-- `--input-format, -if`: Input format
-- `--output-format, -of`: Output format
-- `--command, -c`: Command to add (can be multiple)
-- `--save, -s`: Save pipeline to file
+Strataregula is designed for extensibility:
 
-### `run`
-Run a saved pipeline:
-```bash
-strataregula run [OPTIONS] PIPELINE_NAME [INPUT_FILE]
-```
-
-Options:
-- `--stdin, -i`: Read from STDIN
-- `--output, -o`: Output file
-
-### `list`
-List available commands and pipelines:
-```bash
-strataregula list [OPTIONS]
-```
-
-Options:
-- `--category, -c`: Filter by category
-- `--search, -s`: Search commands
-
-## 🔌 Plugin System
-
-Strataregula provides a rich plugin architecture:
-
-- **Command Plugins**: Extend functionality with custom commands
-- **Hook Plugins**: Add custom processing hooks
-- **Service Plugins**: Register custom services in the DI container
-- **Format Plugins**: Support additional input/output formats
+- **Pattern Expansion**: Customizable wildcard expansion rules
+- **Output Formats**: Support for Python, JSON, and YAML outputs
+- **Hierarchical Mapping**: Configurable region/prefecture mappings
+- **Streaming Processing**: Memory-efficient handling of large datasets
 
 ## 🧪 Examples
 
-### Example 1: User Configuration Processing
+### Example 1: Service Configuration
 
 ```yaml
-# users.yaml
-users:
-  - name: "Alice"
-    active: true
-    role: "admin"
-  - name: "Bob"
-    active: false
-    role: "user"
-  - name: "Charlie"
-    active: true
-    role: "moderator"
+# input.yaml
+services:
+  web-*:
+    port: 8080
+    region: "*"
+  api-**-service:
+    port: 3000
+    database: "primary"
 ```
 
-Process active users:
+Compile to Python:
 ```bash
-strataregula process users.yaml \
-  -c "filter:condition='user.active'" \
-  -c "transform:expression='[u for u in data.users if u[\"active\"]]'"
+strataregula compile input.yaml --format python
 ```
 
-### Example 2: Configuration Validation
-
-```bash
-cat config.yaml | strataregula process --stdin \
-  -c "validate:schema='schema.yaml'" \
-  -c "transform:expression='data if data.valid else None'"
+Output:
+```python
+services = {
+    'web-tokyo': {'port': 8080, 'region': 'tokyo'},
+    'web-osaka': {'port': 8080, 'region': 'osaka'},
+    'api-user-service': {'port': 3000, 'database': 'primary'},
+    'api-auth-service': {'port': 3000, 'database': 'primary'},
+}
 ```
 
-### Example 3: Multi-format Pipeline
+### Example 2: Regional Configuration
 
-```bash
-strataregula create config-pipeline \
-  -d "Process and transform configurations" \
-  -if "yaml" \
-  -of "json" \
-  -c "validate" \
-  -c "transform:expression='data.config'" \
-  -c "format:output='json'" \
-  -s "pipeline.yaml"
+```yaml
+# regional.yaml
+regions:
+  "*":
+    timezone: "Asia/Tokyo"
+    language: "ja"
 ```
+
+Expands to all 47 prefectures with hierarchical grouping into 8 regions.
 
 ## 🚀 Performance
 
-- **Async Processing**: Full asynchronous support for high-performance processing
-- **Streaming**: Efficient memory usage with streaming processors
-- **Caching**: Built-in caching for repeated operations
-- **Parallel Execution**: Support for parallel command execution
+- **Static Compilation**: O(1) lookup with pre-compiled mappings
+- **Memory Efficient**: Streaming processing for large configurations
+- **Fast Pattern Matching**: Optimized wildcard expansion algorithms
+- **Scalable**: Handles thousands of pattern expansions efficiently
 
 ## 🤝 Contributing
 
@@ -249,7 +164,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ### Development Setup
 
 ```bash
-git clone https://github.com/username/strataregula.git
+git clone https://github.com/strataregula/strataregula.git
 cd strataregula
 pip install -e ".[dev]"
 pytest
@@ -257,7 +172,7 @@ pytest
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -269,13 +184,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - **Documentation**: [https://strataregula.readthedocs.io/](https://strataregula.readthedocs.io/)
-- **Issues**: [GitHub Issues](https://github.com/username/strataregula/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/username/strataregula/discussions)
+- **Issues**: [GitHub Issues](https://github.com/strataregula/strataregula/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/strataregula/strataregula/discussions)
 - **Email**: support@strataregula.dev
 
 ---
 
-**Strataregula** - Where configuration meets automation, powered by PiPE command chaining.
+**Strataregula** - Hierarchical Configuration Management with Pattern Expansion.
 ## 📊 Performance Benchmarks
 
 ### 🚀 Service Lookup Performance

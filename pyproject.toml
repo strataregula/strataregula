@@ -70,29 +70,16 @@ docs = [
     "mkdocs-material>=9.0.0",
     "mkdocstrings[python]>=0.24.0"
 ]
-performance = [
-    "matplotlib>=3.7.0",
-    "seaborn>=0.12.0",
-    "pandas>=2.0.0",
-    "jupyter>=1.0.0",
-    "nbconvert>=7.0.0"
-]
-plugins = [
-    "defusedxml>=0.7.1"  # For secure XML processing
-]
-api = [
-    "requests>=2.28.0",  # For HTTP API data sources
-    "httpx>=0.24.0"      # Alternative async HTTP client
-]
+# Future extensions (not yet implemented)
+# performance = ["matplotlib>=3.7.0", "pandas>=2.0.0"]
+# plugins = ["defusedxml>=0.7.1"]
+# api = ["requests>=2.28.0"]
 
 [project.urls]
 Homepage = "https://github.com/strataregula/strataregula"
-Documentation = "https://strataregula.readthedocs.io/"
 Repository = "https://github.com/strataregula/strataregula"
 "Bug Tracker" = "https://github.com/strataregula/strataregula/issues"
-"Discussions" = "https://github.com/strataregula/strataregula/discussions"
 Changelog = "https://github.com/strataregula/strataregula/blob/main/CHANGELOG.md"
-"Performance Benchmarks" = "https://strataregula.github.io/strataregula/benchmark.html"
 
 [project.scripts]
 sr = "strataregula.cli.main:main"
