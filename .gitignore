@@ -49,6 +49,18 @@ dist/
 # Auto-generated package directories
 yaml_config_compiler/
 
+# Test output files (development artifacts)
+test_output.py
+test_output.json
+
+# SuperClaude development artifacts
+superclaude/
+
+# Development folders
+testscli/
+testsintegration/ 
+testsperformance/
+
 # Python virtual environments
 venv/
 env/
