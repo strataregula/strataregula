@@ -42,7 +42,7 @@ recursive-exclude superclaude *
 
 # Exclude build artifacts
 exclude test_output.py test_output.json metrics_report.json
-exclude MILESTONES.md
+exclude MILESTONES.md TODO.md
 
 # Exclude auto-generated benchmark files (keep docs/images/ only)
 exclude benchmark_results.json

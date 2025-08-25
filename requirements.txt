@@ -1,5 +1,6 @@
 # Core requirements
 PyYAML>=6.0
 
-# Optional for API data sources
-requests>=2.28.0
+# Note: Additional dependencies defined in pyproject.toml
+# Optional dependencies can be installed with:
+# pip install strataregula[api]  # For future API data sources
