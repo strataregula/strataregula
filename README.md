@@ -40,8 +40,12 @@ services = {
 
 ## Installation
 
-**Install from source** (not yet on PyPI):
+**From PyPI**:
+```bash
+pip install strataregula
+```
 
+**From source**:
 ```bash
 git clone https://github.com/strataregula/strataregula.git
 cd strataregula
