@@ -287,14 +287,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Compiled Tree**: 50,000 ops/sec (5x faster than fnmatch) 
 - **fnmatch baseline**: 10,000 ops/sec
 
-### 📈 DOE Runner Scalability
-
-![Scalability Analysis](docs/images/benchmark_scalability.png)
-
-**Scalability:**
-- Handles 1,000 test cases in 41.2 seconds
-- Near-linear scaling up to 100 cases
-- Efficient parallel execution with configurable workers
+# Performance optimized for large-scale pattern processing
 
 ### ⚡ Compilation Performance
 
