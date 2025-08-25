@@ -1,0 +1,58 @@
+# Include package metadata
+include LICENSE
+include README.md
+include CHANGELOG.md
+include pyproject.toml
+
+# Include configuration files
+include pytest.ini
+include mkdocs.yml
+include Makefile
+
+# Include examples and documentation
+recursive-include examples *.py *.yaml *.yml *.md
+recursive-include docs *.md *.css *.js *.png *.jpg *.html
+
+# Include benchmark data and visualizations
+include benchmark_results.json
+include performance_trend.png
+include benchmark_dashboard.png
+recursive-include docs/images *.png *.jpg
+
+# Include notebooks
+recursive-include notebooks *.ipynb *.html
+
+# Include templates and schemas
+recursive-include strataregula/templates *.j2 *.yaml *.yml
+recursive-include strataregula/schemas *.json *.yaml *.yml
+
+# Include type information
+recursive-include strataregula *.py *.pyi
+include strataregula/py.typed
+
+# Exclude test files and development artifacts
+recursive-exclude tests *
+recursive-exclude benchmarks *
+recursive-exclude scripts *
+recursive-exclude TO_DELETE *
+recursive-exclude idea *
+recursive-exclude testscli *
+recursive-exclude testsintegration *
+recursive-exclude testsperformance *
+recursive-exclude superclaude *
+
+# Exclude build artifacts
+exclude test_output.py test_output.json
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.egg-info
+global-exclude __pycache__
+global-exclude .pytest_cache
+global-exclude htmlcov
+global-exclude .coverage
+global-exclude .mypy_cache
+global-exclude .ruff_cache
+global-exclude node_modules
+global-exclude dist
+global-exclude build
+global-exclude *.log

@@ -4,35 +4,41 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "strataregula"
-version = "0.1.1"
-description = "YAML Configuration Pattern Compiler with PiPE Command Chaining"
+dynamic = ["version"]
+description = "Layered Configuration Management with Strata Rules Architecture"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = {text = "Apache-2.0"}
 authors = [
-    {name = "Strataregula Team", email = "support@strataregula.dev"}
+    {name = "Strataregula Team", email = "team@strataregula.com"}
 ]
 maintainers = [
-    {name = "Strataregula Team", email = "support@strataregula.dev"}
+    {name = "Strataregula Team", email = "team@strataregula.com"}
 ]
 keywords = [
     "yaml", "configuration", "pattern", "compiler", "expansion", 
-    "infrastructure", "automation", "cli", "streaming"
+    "infrastructure", "automation", "cli", "streaming", "pipe",
+    "strata", "layered", "hierarchical", "rules", "engine"
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Code Generators",
     "Topic :: System :: Systems Administration",
     "Topic :: Utilities",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Markup",
     "Typing :: Typed"
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.8"
 dependencies = [
     "click>=8.0.0",
     "rich>=13.0.0", 
@@ -48,18 +54,31 @@ dev = [
     "mypy>=1.0.0",
     "ruff>=0.1.0",
     "bandit>=1.7.0",
-    "pre-commit>=3.0.0"
+    "pre-commit>=3.0.0",
+    "build>=0.10.0",
+    "twine>=4.0.0"
 ]
 test = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "pytest-mock>=3.10.0",
-    "pytest-asyncio>=0.21.0"
+    "pytest-asyncio>=0.21.0",
+    "pytest-benchmark>=4.0.0"
 ]
 docs = [
     "mkdocs>=1.5.0",
     "mkdocs-material>=9.0.0",
     "mkdocstrings[python]>=0.24.0"
+]
+performance = [
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "pandas>=2.0.0",
+    "jupyter>=1.0.0",
+    "nbconvert>=7.0.0"
+]
+plugins = [
+    "defusedxml>=0.7.1"  # For secure XML processing
 ]
 
 [project.urls]
@@ -67,7 +86,9 @@ Homepage = "https://github.com/strataregula/strataregula"
 Documentation = "https://strataregula.readthedocs.io/"
 Repository = "https://github.com/strataregula/strataregula"
 "Bug Tracker" = "https://github.com/strataregula/strataregula/issues"
+"Discussions" = "https://github.com/strataregula/strataregula/discussions"
 Changelog = "https://github.com/strataregula/strataregula/blob/main/CHANGELOG.md"
+"Performance Benchmarks" = "https://strataregula.github.io/strataregula/benchmark.html"
 
 [project.scripts]
 sr = "strataregula.cli.main:main"
@@ -80,7 +101,10 @@ include-package-data = true
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["strataregula*"]
-exclude = ["tests*", "examples*", "docs*"]
+exclude = ["tests*", "examples*", "docs*", "benchmarks*", "scripts*", "TO_DELETE*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "strataregula.__version__"}
 
 [tool.setuptools.package-data]
 strataregula = [
@@ -144,7 +168,7 @@ exclude_lines = [
 
 # MyPy configuration
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.8"
 strict = true
 warn_return_any = true
 warn_unused_configs = true
@@ -172,7 +196,7 @@ ignore_missing_imports = true
 
 # Ruff configuration
 [tool.ruff]
-target-version = "py311"
+target-version = "py38"
 line-length = 88
 indent-width = 4
 
@@ -224,7 +248,7 @@ combine-as-imports = true
 # Black compatibility (if needed)
 [tool.black]
 line-length = 88
-target-version = ['py311']
+target-version = ['py38']
 include = '\.pyi?$'
 extend-exclude = '''
 /(

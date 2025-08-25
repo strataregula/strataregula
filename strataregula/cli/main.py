@@ -14,7 +14,7 @@ console = Console()
 
 
 @click.group()
-@click.version_option(version="2.0.0", prog_name="strataregula")
+@click.version_option(version="0.1.1", prog_name="strataregula")
 @click.option('--verbose', '-v', is_flag=True, help='Enable verbose output')
 @click.option('--quiet', '-q', is_flag=True, help='Suppress output')
 @click.pass_context

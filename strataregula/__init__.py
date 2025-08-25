@@ -14,7 +14,7 @@ Features:
 
 __version__ = "0.1.1"
 __author__ = "Strataregula Team"
-__email__ = "support@strataregula.dev"
+__email__ = "team@strataregula.com"
 
 # Import core PiPE system
 from .pipe import (
