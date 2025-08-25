@@ -1,3 +1,0 @@
-"""
-Tests for json_processor module
-"""

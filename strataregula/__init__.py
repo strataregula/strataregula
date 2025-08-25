@@ -1,76 +1,39 @@
 """
-Strataregula - YAML Configuration Pattern Compiler with PiPE Command Chaining.
+Strataregula - YAML Configuration Pattern Compiler.
 
-A powerful pattern expansion engine for configuration generation,
-infrastructure automation, and dynamic configuration management.
+A hierarchical configuration management tool with pattern expansion
+for large-scale configuration generation.
 
 Features:
-- PiPE (Pattern Input Processing Engine) command chaining
-- STDIN and file processing support
-- Rich plugin system with hooks and callbacks
-- Dependency injection container
-- CLI interface with rich output
+- Wildcard pattern expansion (* and **)
+- Hierarchical mapping (47 prefectures → 8 regions)
+- Multiple output formats (Python, JSON, YAML)
+- Memory-efficient streaming processing
+- Simple CLI interface
 """
 
 __version__ = "0.1.1"
 __author__ = "Strataregula Team"
 __email__ = "team@strataregula.com"
 
-# Import core PiPE system
-from .pipe import (
-    CommandChain,
-    ChainExecutor,
-    STDINProcessor,
-    StreamProcessor,
-    BaseCommand,
-    CommandRegistry,
-    Pipeline,
-    PipelineBuilder,
-    PipelineManager
-)
+# Only import what actually works and is tested
+try:
+    from .core.pattern_expander import (
+        PatternExpander,
+        EnhancedPatternExpander
+    )
+except ImportError:
+    pass
 
-# Import hook system
-from .hooks import (
-    HookManager,
-    HookCallback,
-    HookRegistry
-)
-
-# Import dependency injection system
-from .di import (
-    Container,
-    ServiceLifetime
-)
-
-# Import CLI system (temporarily disabled due to missing dependencies)
-# from .cli import main
-
+try:
+    from .core.config_compiler import (
+        ConfigCompiler,
+        CompilationConfig
+    )
+except ImportError:
+    pass
 
 __all__ = [
-    # Core PiPE system
-    'CommandChain',
-    'ChainExecutor',
-    'STDINProcessor',
-    'StreamProcessor',
-    'BaseCommand',
-    'CommandRegistry',
-    'Pipeline',
-    'PipelineBuilder',
-    'PipelineManager',
-    
-    # Hook system
-    'HookManager',
-    'HookCallback',
-    'HookRegistry',
-    
-    # Dependency injection
-    'Container',
-    'ServiceLifetime',
-    
-    # CLI (temporarily disabled)
-    # 'main',
-    
-    
     # Version info
     '__version__',
 ]
