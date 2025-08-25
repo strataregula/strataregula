@@ -58,5 +58,5 @@ ENV/
 *.swp
 *.swo
 *~
-docs/
+idea/
 TO_DELETE/
