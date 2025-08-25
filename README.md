@@ -324,4 +324,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ✅ Memory Usage: <200MB total
 - ✅ Service Lookup: >100,000 ops/sec
 
-[View Interactive Analysis](notebooks/benchmark_results.ipynb) | [Run Benchmarks](scripts/run_benchmarks.py)
+[View Interactive Analysis (develop branch)](https://github.com/strataregula/strataregula/tree/develop/notebooks/benchmark_results.ipynb) | [Run Benchmarks (develop branch)](https://github.com/strataregula/strataregula/tree/develop/scripts/run_benchmarks.py)
