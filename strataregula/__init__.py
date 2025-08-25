@@ -1,5 +1,5 @@
 """
-Strataregula - YAML Configuration Pattern Compiler.
+Strataregula - Layered Configuration Management with Strata Rules Architecture.
 
 A hierarchical configuration management tool with pattern expansion
 for large-scale configuration generation.

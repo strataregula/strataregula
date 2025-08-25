@@ -19,10 +19,10 @@ console = Console()
 @click.option('--quiet', '-q', is_flag=True, help='Suppress output')
 @click.pass_context
 def cli(ctx, verbose, quiet):
-    """Strataregula - YAML Configuration Pattern Compiler with PiPE Command Chaining.
+    """Strataregula - Layered Configuration Management with Strata Rules Architecture.
     
-    A powerful tool for processing YAML configurations through command chains,
-    supporting STDIN input, hooks, and plugin-based transformations.
+    A powerful tool for hierarchical configuration pattern expansion,
+    supporting wildcard patterns and regional mapping.
     """
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
@@ -34,7 +34,7 @@ def cli(ctx, verbose, quiet):
     if not quiet:
         console.print(Panel(
             Text("Strataregula", style="bold blue"),
-            subtitle="YAML Configuration Pattern Compiler",
+            subtitle="Layered Configuration Management with Strata Rules Architecture",
             border_style="blue"
         ))
 
