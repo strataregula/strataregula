@@ -206,11 +206,50 @@ class FilterCommand(BaseCommand):
             return data
     
     def _evaluate_condition(self, item: Any, condition: str) -> bool:
-        """Evaluate a condition against an item."""
+        """Safely evaluate a condition against an item."""
         try:
-            return eval(condition, {"__builtins__": {}}, {'item': item})
+            import ast
+            import operator
+            
+            # Define safe operators
+            ops = {
+                ast.Eq: operator.eq,
+                ast.NotEq: operator.ne,
+                ast.Lt: operator.lt,
+                ast.LtE: operator.le,
+                ast.Gt: operator.gt,
+                ast.GtE: operator.ge,
+                ast.In: lambda x, y: x in y,
+                ast.NotIn: lambda x, y: x not in y,
+            }
+            
+            # Parse and evaluate safely
+            node = ast.parse(condition, mode='eval')
+            return self._eval_node_safe(node.body, {'item': item}, ops)
         except:
             return False
+    
+    def _eval_node_safe(self, node, context, ops):
+        """Safely evaluate AST node."""
+        if isinstance(node, ast.Compare):
+            left = self._eval_node_safe(node.left, context, ops)
+            for op, comparator in zip(node.ops, node.comparators):
+                right = self._eval_node_safe(comparator, context, ops)
+                if type(op) not in ops:
+                    raise ValueError(f"Unsupported operator: {type(op)}")
+                if not ops[type(op)](left, right):
+                    return False
+                left = right
+            return True
+        elif isinstance(node, ast.Name):
+            return context.get(node.id)
+        elif isinstance(node, ast.Constant):
+            return node.value
+        elif isinstance(node, ast.Attribute):
+            obj = self._eval_node_safe(node.value, context, ops)
+            return getattr(obj, node.attr) if hasattr(obj, node.attr) else None
+        else:
+            raise ValueError(f"Unsupported node type: {type(node)}")
 
 
 class TransformCommand(BaseCommand):
@@ -229,10 +268,30 @@ class TransformCommand(BaseCommand):
             return data
             
         try:
-            # Simple expression evaluation - can be extended
-            return eval(expression, {"__builtins__": {}}, {'data': data})
+            # Safe expression evaluation using ast.literal_eval
+            import ast
+            
+            # Only allow basic mathematical operations and data access
+            node = ast.parse(expression, mode='eval')
+            return self._eval_transform_node(node.body, {'data': data})
         except Exception as e:
             raise ValueError(f"Invalid transform expression: {e}")
+    
+    def _eval_transform_node(self, node, context):
+        """Safely evaluate transform expression node."""
+        if isinstance(node, ast.Name):
+            return context.get(node.id)
+        elif isinstance(node, ast.Constant):
+            return node.value
+        elif isinstance(node, ast.Attribute):
+            obj = self._eval_transform_node(node.value, context)
+            return getattr(obj, node.attr) if hasattr(obj, node.attr) else None
+        elif isinstance(node, ast.Subscript):
+            obj = self._eval_transform_node(node.value, context)
+            key = self._eval_transform_node(node.slice, context)
+            return obj[key] if obj and key is not None else None
+        else:
+            raise ValueError(f"Unsupported transform operation: {type(node)}")
 
 
 # Auto-register built-in commands

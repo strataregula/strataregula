@@ -55,19 +55,42 @@ test-all: ## Run comprehensive test suite
 .PHONY: benchmark
 benchmark: ## Run all benchmarks and generate report
 	@echo "⚡ Running Performance Benchmarks..."
-	@mkdir -p notebooks scripts
+	@mkdir -p notebooks scripts docs/images
 	python scripts/run_benchmarks.py
-	@echo "📊 Generating visualization..."
-	@echo "📈 Benchmark complete! View results with 'make benchmark-notebook'"
+	@echo "📊 Generating visualizations..."
+	python scripts/generate_benchmark_images.py
+	@echo "📈 Benchmark complete! View results with 'make benchmark-view'"
 
 .PHONY: benchmark-notebook
 benchmark-notebook: ## Open benchmark visualization in Jupyter
 	@echo "📊 Opening benchmark results in Jupyter Notebook..."
 	jupyter notebook notebooks/benchmark_results.ipynb
 
+.PHONY: benchmark-view
+benchmark-view: ## View benchmark results in browser
+	@echo "📊 Converting notebook to HTML..."
+	python scripts/convert_notebook.py
+	@echo "🌐 Opening benchmark results in browser..."
+	@python -c "import webbrowser; webbrowser.open('docs/benchmark.html')" || echo "Open docs/benchmark.html in your browser"
+
 .PHONY: benchmark-simple
 benchmark-simple: ## Run simple benchmark tests only
 	python -m pytest tests/benchmarks/ -v
+
+.PHONY: benchmark-images
+benchmark-images: ## Generate benchmark visualization images
+	@echo "📊 Generating benchmark visualizations..."
+	python scripts/generate_benchmark_images.py
+	@echo "✅ Images saved to docs/images/"
+
+.PHONY: benchmark-publish
+benchmark-publish: ## Publish benchmarks to GitHub Pages
+	@echo "🌐 Publishing benchmarks to GitHub Pages..."
+	python scripts/convert_notebook.py
+	git add docs/images/*.png docs/benchmark.html README.md
+	git commit -m "Update benchmark visualizations" || echo "No changes to commit"
+	git push
+	@echo "🚀 Published! Will be available at GitHub Pages shortly"
 
 # ===== 🛡️ Security Expert Commands =====
 .PHONY: security-check

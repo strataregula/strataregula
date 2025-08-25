@@ -355,7 +355,8 @@ class ConfigCompiler:
         }
         
         fingerprint = hashlib.md5(
-            json.dumps(fingerprint_data, sort_keys=True).encode()
+            json.dumps(fingerprint_data, sort_keys=True).encode(),
+            usedforsecurity=False
         ).hexdigest()
         
         # Get memory usage if available

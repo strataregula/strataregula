@@ -276,3 +276,52 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Strataregula** - Where configuration meets automation, powered by PiPE command chaining.
+## 📊 Performance Benchmarks
+
+### 🚀 Service Lookup Performance
+
+![Performance Comparison](docs/images/benchmark_performance.png)
+
+**Results:**
+- **Direct Map**: 500,000 ops/sec (50x faster than fnmatch)
+- **Compiled Tree**: 50,000 ops/sec (5x faster than fnmatch) 
+- **fnmatch baseline**: 10,000 ops/sec
+
+### 📈 DOE Runner Scalability
+
+![Scalability Analysis](docs/images/benchmark_scalability.png)
+
+**Scalability:**
+- Handles 1,000 test cases in 41.2 seconds
+- Near-linear scaling up to 100 cases
+- Efficient parallel execution with configurable workers
+
+### ⚡ Compilation Performance
+
+![Compilation Performance](docs/images/benchmark_compilation.png)
+
+**Compilation Speed:**
+- Small config: 2ms (10 entries)
+- Medium config: 45ms (100 entries)
+- Large config: 180ms (500 entries)
+
+### 💾 Memory Usage
+
+![Memory Usage](docs/images/benchmark_memory.png)
+
+**Memory Efficiency:**
+- Total system memory: 119MB
+- Pattern Expander: 44MB (most intensive component)
+- Core system: 12MB (lightweight base)
+
+### 📋 Performance Dashboard
+
+![Performance Dashboard](docs/images/benchmark_dashboard.png)
+
+**All performance targets achieved:**
+- ✅ Pattern Expansion: >10,000 patterns/sec
+- ✅ Compilation: <100ms for medium configs  
+- ✅ Memory Usage: <200MB total
+- ✅ Service Lookup: >100,000 ops/sec
+
+[View Interactive Analysis](notebooks/benchmark_results.ipynb) | [Run Benchmarks](scripts/run_benchmarks.py)

@@ -151,11 +151,50 @@ class ChainExecutor:
     def _evaluate_condition(self, condition: str, context: ChainContext) -> bool:
         """Evaluate a condition string against the context."""
         try:
-            # Simple condition evaluation - can be extended
-            return eval(condition, {"__builtins__": {}}, {
+            # Safe condition evaluation using ast.literal_eval for simple expressions
+            import ast
+            import operator
+            
+            # Define safe operators
+            ops = {
+                ast.Eq: operator.eq,
+                ast.NotEq: operator.ne,
+                ast.Lt: operator.lt,
+                ast.LtE: operator.le,
+                ast.Gt: operator.gt,
+                ast.GtE: operator.ge,
+                ast.In: lambda x, y: x in y,
+                ast.NotIn: lambda x, y: x not in y,
+            }
+            
+            # Parse and evaluate safely
+            node = ast.parse(condition, mode='eval')
+            return self._eval_node(node.body, {
                 'data': context.data,
                 'metadata': context.metadata,
                 'env': context.environment
-            })
+            }, ops)
         except:
             return False
+    
+    def _eval_node(self, node, context, ops):
+        """Safely evaluate AST node."""
+        if isinstance(node, ast.Compare):
+            left = self._eval_node(node.left, context, ops)
+            for op, comparator in zip(node.ops, node.comparators):
+                right = self._eval_node(comparator, context, ops)
+                if type(op) not in ops:
+                    raise ValueError(f"Unsupported operator: {type(op)}")
+                if not ops[type(op)](left, right):
+                    return False
+                left = right
+            return True
+        elif isinstance(node, ast.Name):
+            return context.get(node.id)
+        elif isinstance(node, ast.Constant):
+            return node.value
+        elif isinstance(node, ast.Attribute):
+            obj = self._eval_node(node.value, context, ops)
+            return getattr(obj, node.attr) if hasattr(obj, node.attr) else None
+        else:
+            raise ValueError(f"Unsupported node type: {type(node)}")

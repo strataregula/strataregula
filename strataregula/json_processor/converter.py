@@ -17,8 +17,8 @@ except ImportError:
     YAML_AVAILABLE = False
 
 try:
-    import xml.etree.ElementTree as ET
-    from xml.dom import minidom
+    import defusedxml.ElementTree as ET
+    import defusedxml.minidom as minidom
     XML_AVAILABLE = True
 except ImportError:
     XML_AVAILABLE = False
