@@ -21,7 +21,8 @@ strataregula/
 ├── core/           # Pattern expansion engine
 ├── cli/            # Command-line interface
 ├── hierarchy/      # Hierarchical region mapping
-└── stream/         # Memory-efficient processing
+├── stream/         # Memory-efficient processing
+└── json_processor/ # JSON processing utilities
 ```
 
 ## 📦 Installation
@@ -186,7 +187,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - **Documentation**: [https://strataregula.readthedocs.io/](https://strataregula.readthedocs.io/)
 - **Issues**: [GitHub Issues](https://github.com/strataregula/strataregula/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/strataregula/strataregula/discussions)
-- **Email**: support@strataregula.dev
+- **Email**: team@strataregula.com
 
 ---
 
