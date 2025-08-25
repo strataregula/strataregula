@@ -271,7 +271,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: [https://strataregula.readthedocs.io/](https://strataregula.readthedocs.io/)
 - **Issues**: [GitHub Issues](https://github.com/username/strataregula/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/username/strataregula/discussions)
-- **Email**: support@strataregula.dev
+- **Email**: team@strataregula.com
 
 ---
 

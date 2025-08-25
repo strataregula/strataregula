@@ -238,10 +238,6 @@ Create `.vscode/settings.json`:
 # Core Strataregula
 docker pull strataregula/strataregula:latest
 docker pull strataregula/strataregula:0.1.1
-
-# DOE Runner
-docker pull strataregula/doe-runner:latest
-docker pull strataregula/doe-runner:0.1.0
 ```
 
 ### Custom Dockerfile
@@ -278,17 +274,7 @@ services:
       - ./output:/workspace/output
     environment:
       - STRATAREGULA_LOG_LEVEL=INFO
-      - DOE_MAX_WORKERS=4
     working_dir: /workspace
-    
-  doe-runner:
-    image: strataregula/doe-runner:latest
-    volumes:
-      - ./cases:/workspace/cases
-      - ./results:/workspace/results
-      - ./logs:/workspace/logs
-    environment:
-      - RUN_LOG_DIR=/workspace/logs
 ```
 
 ## Platform-Specific Instructions
@@ -484,4 +470,4 @@ If you encounter installation issues:
 - **Documentation**: Continue reading this guide
 - **GitHub Issues**: [Report Installation Problems](https://github.com/strataregula/strataregula/issues)
 - **Discussions**: [Community Support](https://github.com/strataregula/strataregula/discussions)
-- **Email**: support@strataregula.dev
+- **Email**: team@strataregula.com
