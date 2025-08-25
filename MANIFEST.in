@@ -7,24 +7,23 @@ include pyproject.toml
 # Include configuration files
 include pytest.ini
 include mkdocs.yml
-include Makefile
+
+# Include GitHub configuration
+recursive-include .github *.yml *.yaml *.md
 
 # Include examples and documentation
 recursive-include examples *.py *.yaml *.yml *.md
 recursive-include docs *.md *.css *.js *.png *.jpg *.html
 
-# Include benchmark data and visualizations
-include benchmark_results.json
-include performance_trend.png
-include benchmark_dashboard.png
+# Include benchmark data and visualizations (docs only)
 recursive-include docs/images *.png *.jpg
 
 # Include notebooks
 recursive-include notebooks *.ipynb *.html
 
-# Include templates and schemas
-recursive-include strataregula/templates *.j2 *.yaml *.yml
-recursive-include strataregula/schemas *.json *.yaml *.yml
+# Include templates and schemas (if they exist)
+graft strataregula/templates
+graft strataregula/schemas
 
 # Include type information
 recursive-include strataregula *.py *.pyi
@@ -42,7 +41,13 @@ recursive-exclude testsperformance *
 recursive-exclude superclaude *
 
 # Exclude build artifacts
-exclude test_output.py test_output.json
+exclude test_output.py test_output.json metrics_report.json
+exclude MILESTONES.md
+
+# Exclude auto-generated benchmark files (keep docs/images/ only)
+exclude benchmark_results.json
+exclude benchmark_dashboard.png  
+exclude performance_trend.png
 global-exclude *.pyc
 global-exclude *.pyo
 global-exclude *.egg-info

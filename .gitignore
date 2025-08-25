@@ -52,6 +52,12 @@ yaml_config_compiler/
 # Test output files (development artifacts)
 test_output.py
 test_output.json
+metrics_report.json
+
+# Benchmark results (auto-generated)
+benchmark_results.json
+benchmark_dashboard.png
+performance_trend.png
 
 # SuperClaude development artifacts
 superclaude/
