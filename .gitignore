@@ -103,3 +103,11 @@ strataregula-vscode/
 coverage.json
 dump.json
 test_*.yaml
+
+# Development scripts and test files (move to idea/dev/)
+*_test.py
+*_review.py
+quickstart*.py
+generate_*.py
+demo_*.py
+sample_*.py
