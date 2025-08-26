@@ -1,0 +1,15 @@
+# Test configuration for --dump-compiled-config feature
+service_times:
+  "prod.frontend.timeout": 5000
+  "prod.backend.timeout": 3000
+  "staging.*.memory": 512
+  "dev.api.cpu": 2.0
+  "*.worker.replicas": 3
+
+database_config:
+  "prod.*.connection_timeout": 30
+  "staging.db.query_timeout": 15
+  
+monitoring:
+  "*.*.health_check": 60
+  "prod.monitoring.alert_threshold": 0.8

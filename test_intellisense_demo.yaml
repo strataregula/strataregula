@@ -1,0 +1,25 @@
+# StrataRegula IntelliSense Demo
+# Test file to demonstrate dot-triggered completions
+
+service_times:
+  # Try typing these patterns and press "." to see completions:
+  # prod.
+  # staging.frontend.
+  # *.backend.
+  
+  prod.frontend.timeout: 5000
+  prod.backend.timeout: 3000
+  staging.*.memory: 512
+  
+database_config:
+  # More patterns to test:
+  # dev.
+  # *.api.
+  
+  dev.api.timeout: 1000
+  
+monitoring:
+  # Advanced patterns:
+  # *.*.cpu
+  
+  *.worker.replicas: 2

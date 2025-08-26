@@ -89,3 +89,17 @@ security_review.py
 test_doc_examples.py
 quickstart_test.py
 demo.yaml
+# Coverage reports and UML diagrams (development artifacts)
+htmlcov/
+htmlcov_core/
+uml_diagrams/
+
+# Separate LSP and VS Code repositories (not part of core release)
+strataregula-lsp/
+strataregula-vscode/
+
+# Development test files and artifacts
+.coverage
+coverage.json
+dump.json
+test_*.yaml

@@ -1,0 +1,49 @@
+{
+  "metadata": {
+    "source_files": {
+      "traffic": "test_config_dump.yaml",
+      "prefectures": null
+    },
+    "compilation_timestamp": "unknown",
+    "total_patterns": 5,
+    "total_direct_mappings": 0,
+    "total_component_mappings": 5,
+    "expansion_ratio": 1.0
+  },
+  "original_patterns": {
+    "prod.frontend.timeout": 5000,
+    "prod.backend.timeout": 3000,
+    "staging.*.memory": 512,
+    "dev.api.cpu": 2.0,
+    "*.worker.replicas": 3
+  },
+  "compiled_mappings": {
+    "direct_mapping": {},
+    "component_mapping": {
+      "staging.*.memory": 512,
+      "*.worker.replicas": 3,
+      "prod.frontend.timeout": 5000,
+      "prod.backend.timeout": 3000,
+      "dev.api.cpu": 2.0
+    }
+  },
+  "hierarchy_info": {
+    "regions": 6,
+    "prefectures": 47,
+    "cities": 0,
+    "services": 6,
+    "roles": 5
+  },
+  "pattern_analysis": {
+    "pattern_types": {
+      "3-part": 5
+    },
+    "wildcard_usage": 2,
+    "most_expanded_patterns": [],
+    "complexity_metrics": {
+      "expansion_factor": 1.0,
+      "wildcard_percentage": 40.0,
+      "average_parts_per_pattern": 3.0
+    }
+  }
+}
