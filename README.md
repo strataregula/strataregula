@@ -1,10 +1,10 @@
-# Strataregula
+# StrataRegula
 
 [![PyPI version](https://badge.fury.io/py/strataregula.svg)](https://badge.fury.io/py/strataregula)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-**Strataregula** (strata + regula) is a layered configuration management tool with wildcard pattern expansion, designed for hierarchical configuration processing.
+**StrataRegula** (strata + regula) is a YAML Configuration Pattern Compiler for hierarchical configuration management with wildcard pattern expansion, designed for enterprise-scale configuration processing.
 
 ## Features
 
@@ -359,4 +359,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Strataregula** - Layered Configuration Management with Strata Rules Architecture
+**StrataRegula v0.2.0** - Enterprise-ready pattern expansion with plugin extensibility.
