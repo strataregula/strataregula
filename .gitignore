@@ -67,7 +67,7 @@ superclaude/
 testscli/
 testsintegration/ 
 testsperformance/
-benchmarks
+# benchmarks/ - allowed in develop branch, excluded from master
 
 # Python virtual environments
 venv/
@@ -78,5 +78,14 @@ ENV/
 *.swp
 *.swo
 *~
-idea/
+idea/                    # Future concepts and brainstorming - NOT FOR RELEASE
+experiments/            # Technical experiments and prototypes  
+research/               # R&D documentation and findings
 TO_DELETE/
+
+# Development test files (created during conversations)
+test_performance.py
+security_review.py  
+test_doc_examples.py
+quickstart_test.py
+demo.yaml

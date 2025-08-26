@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>StrataRegula_Component_Architecture</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .diagram { text-align: center; margin: 20px 0; }
+        .plantuml-code { 
+            background: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .download-link { 
+            display: inline-block; 
+            background: #007acc; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin: 10px;
+        }
+        .download-link:hover { background: #005a9e; }
+    </style>
+</head>
+<body>
+    <h1>StrataRegula_Component_Architecture</h1>
+    
+    <div class="diagram">
+        <img src="http://www.plantuml.com/plantuml/img/dLPTRzis57tdh-3oqWHRktTX218eMLlK7Omuo51WWC18Dp9HYTH8ogaozB_tyakYP3aRvWTRllUGElVmyf1NsZ1b-hOXL_69xenYXjr1tJUio6NRIG725DUgt7C3fUaL4F9J1KzS0BsxpU-l_tY_kQLbmxGcf6FbLrO3FNlOqLnMG6_5WIifMfpZZFv3A7wcGMUttmm8pQNuIvn3V7vdzCKPPPgEsJ3GVdvcfU47Pk3yOeefgBase91koqIbqvmhRCD4tIEl7QW3g93-xhwNbBOA3XoUwLR90wz08RFEXs9avBUTnrEMUY-VjymW9n5GAQU-gx22bOG2WHFz2OyFK-84JJyvQjGn4MZwK8oCD1zsstac9Gek5W0fbHgCmrlzSzaBiqY68Rk-ha4R1EcHx_Ua3wBor4jlPIr1Qtg-sMqlLZe2mm6A5MdtC1Q2kJ1BKe1brtODM0efHIa-o6cjG-Y1DHobNq3tg403DxBiRPlc-BU6LyN_SlrvGwy5QuONntDWRHF_ZcmjA0Pd3UnZyNKf4Tm22lixIAj_LxBzWbEda0OOjfG7sFmd6DBqOy-RAfVYYTSskx5eBkh_r4ffnyVMNNRyF9wMrVdOj1XwtZ02q5TEfKi5c4oyubMSRG9UhiprUdttyYi8_f8ME8QM5Ow9MObCQGW0rDZWSgNaJ1Yplfb2z0Owir_TATl1xD7gSgciQzPeholRmozjhrmF1nYMKxhmksxmHNYKpwO5D99LXSVEL4KXUGD546Mc-C7l62Zq80pxzZyzgO1eIf6Yh_PVZIboMgDhP87cRdXPjAphfYwFYXTuHDMWEiN7NRREE_SJqd1yE3tzAqeVIOHryG1CwLPzsnLXs9h6JrArp1H60HIoDrrlZhPjhDM1LbjajsSAAdg31pJTi07Kce7QBO-WQ29OZSK_CWt1HJqWvkSDxc8PrGP5gnFs2lxkGPH3HaNVFe9ALyDjXECnU24mEm2S3TyFhyX_CmZMyf9-u6WHUCqOaFAipptl01jHisQPd4DdU7wOtpoRo-H4zgPnAkrNx7xeJYBYxiZePzQ5z2yBDI-dHNj3xw1nzFMUTvfCbvctRo-FhWuPxJKiGSS7TqQvu8RZddmvGa-derqBlFHeUk2CVjpcX4mvYvoTJ1cje84QbqXJTpHfhXVufUjdrBM3nZUKamUJ9ImPEjbfHfsBsf6kRmYPiN65B1hKbeEcg7zLWAB30Ii_6dFK71brUmglfCSgdXY0PqlbU64Za7L_iYDdvceNn42jd7pFtEm9MNY4Ks5rCh_c59s1MlSWiubF2E4D8BOY8LTuONJtT__x0m==" alt="StrataRegula_Component_Architecture" style="max-width: 100%; height: auto;">
+    </div>
+    
+    <div style="text-align: center;">
+        <a href="http://www.plantuml.com/plantuml/img/dLPTRzis57tdh-3oqWHRktTX218eMLlK7Omuo51WWC18Dp9HYTH8ogaozB_tyakYP3aRvWTRllUGElVmyf1NsZ1b-hOXL_69xenYXjr1tJUio6NRIG725DUgt7C3fUaL4F9J1KzS0BsxpU-l_tY_kQLbmxGcf6FbLrO3FNlOqLnMG6_5WIifMfpZZFv3A7wcGMUttmm8pQNuIvn3V7vdzCKPPPgEsJ3GVdvcfU47Pk3yOeefgBase91koqIbqvmhRCD4tIEl7QW3g93-xhwNbBOA3XoUwLR90wz08RFEXs9avBUTnrEMUY-VjymW9n5GAQU-gx22bOG2WHFz2OyFK-84JJyvQjGn4MZwK8oCD1zsstac9Gek5W0fbHgCmrlzSzaBiqY68Rk-ha4R1EcHx_Ua3wBor4jlPIr1Qtg-sMqlLZe2mm6A5MdtC1Q2kJ1BKe1brtODM0efHIa-o6cjG-Y1DHobNq3tg403DxBiRPlc-BU6LyN_SlrvGwy5QuONntDWRHF_ZcmjA0Pd3UnZyNKf4Tm22lixIAj_LxBzWbEda0OOjfG7sFmd6DBqOy-RAfVYYTSskx5eBkh_r4ffnyVMNNRyF9wMrVdOj1XwtZ02q5TEfKi5c4oyubMSRG9UhiprUdttyYi8_f8ME8QM5Ow9MObCQGW0rDZWSgNaJ1Yplfb2z0Owir_TATl1xD7gSgciQzPeholRmozjhrmF1nYMKxhmksxmHNYKpwO5D99LXSVEL4KXUGD546Mc-C7l62Zq80pxzZyzgO1eIf6Yh_PVZIboMgDhP87cRdXPjAphfYwFYXTuHDMWEiN7NRREE_SJqd1yE3tzAqeVIOHryG1CwLPzsnLXs9h6JrArp1H60HIoDrrlZhPjhDM1LbjajsSAAdg31pJTi07Kce7QBO-WQ29OZSK_CWt1HJqWvkSDxc8PrGP5gnFs2lxkGPH3HaNVFe9ALyDjXECnU24mEm2S3TyFhyX_CmZMyf9-u6WHUCqOaFAipptl01jHisQPd4DdU7wOtpoRo-H4zgPnAkrNx7xeJYBYxiZePzQ5z2yBDI-dHNj3xw1nzFMUTvfCbvctRo-FhWuPxJKiGSS7TqQvu8RZddmvGa-derqBlFHeUk2CVjpcX4mvYvoTJ1cje84QbqXJTpHfhXVufUjdrBM3nZUKamUJ9ImPEjbfHfsBsf6kRmYPiN65B1hKbeEcg7zLWAB30Ii_6dFK71brUmglfCSgdXY0PqlbU64Za7L_iYDdvceNn42jd7pFtEm9MNY4Ks5rCh_c59s1MlSWiubF2E4D8BOY8LTuONJtT__x0m==" class="download-link" download="StrataRegula_Component_Architecture.png">PNGとして保存</a>
+        <a href="data:text/plain;charset=utf-8,@startuml
+@startuml StrataRegula_Component_Architecture
+
+!define RECTANGLE class
+
+package &quot;VS Code Environment&quot; {
+    RECTANGLE &quot;Extension\n(extension.ts)&quot; as Extension {
+        +activate()
+        +registerCommands()
+        +startLanguageServer()
+    }
+    
+    RECTANGLE &quot;Preview Provider\n(previewProvider.ts)&quot; as PreviewProvider {
+        +showPatternPreview()
+        +updatePreview()
+        +renderWebView()
+    }
+    
+    RECTANGLE &quot;Pattern Expander\n(patternExpander.ts)&quot; as VSPatternExpander {
+        +expandPattern()
+        +getExpansionCount()
+        +getPatternSuggestions()
+    }
+}
+
+package &quot;Language Server Process (LSP)&quot; {
+    RECTANGLE &quot;LSP Server\n(server.ts)&quot; as LSPServer {
+        +onCompletion()
+        +onHover()
+        +onValidation()
+        +handleDocumentChange()
+    }
+    
+    RECTANGLE &quot;YAML Analyzer\n(yamlAnalyzer.ts)&quot; as YAMLAnalyzer {
+        +analyzeDocument()
+        +extractPatternsFromYaml()
+        +learnPatternFromKey()
+        +buildConfigFromLearning()
+    }
+    
+    RECTANGLE &quot;Pattern Provider\n(patternProvider.ts)&quot; as PatternProvider {
+        +provideCompletions()
+        +generateCompletions()
+        +createEnvironmentCompletions()
+        +createServiceCompletions()
+    }
+    
+    RECTANGLE &quot;Pattern Tokenizer\n(patternTokenizer.ts)&quot; as PatternTokenizer {
+        +parsePatternContext()
+        +tokenizePattern()
+        +getPatternDepth()
+    }
+}
+
+package &quot;Python Core Engine&quot; {
+    RECTANGLE &quot;Configuration Engine\n(config.py)&quot; as ConfigEngine {
+        +load_config()
+        +compile_patterns()
+        +validate_syntax()
+    }
+    
+    RECTANGLE &quot;Pattern Expander\n(pattern_expander.py)&quot; as PythonPatternExpander {
+        +expand_pattern()
+        +compile_to_static_mapping()
+        +get_fingerprint()
+    }
+    
+    RECTANGLE &quot;Compile Command\n(compile_command.py)&quot; as CompileCommand {
+        +dump_compiled_config()
+        +format_tree_output()
+        +build_pattern_tree()
+    }
+}
+
+package &quot;Shared Data Layer&quot; {
+    RECTANGLE &quot;Learned Patterns\n(Database)&quot; as LearnedPatterns {
+        +pattern: string
+        +frequency: number
+        +context: string
+        +lastSeen: Date
+    }
+    
+    RECTANGLE &quot;Dynamic Hierarchy\n(Configuration)&quot; as DynamicHierarchy {
+        +environments: Set<string>
+        +services: Set<string>
+        +configTypes: Set<string>
+        +patterns: Map<string, LearnedPattern>
+    }
+}
+
+' Relationships
+Extension --> PreviewProvider : uses
+Extension --> VSPatternExpander : initializes
+Extension --> LSPServer : starts via IPC
+
+LSPServer --> YAMLAnalyzer : delegates analysis
+LSPServer --> PatternProvider : requests completions
+PatternProvider --> PatternTokenizer : parses context
+
+YAMLAnalyzer --> LearnedPatterns : stores/retrieves
+YAMLAnalyzer --> DynamicHierarchy : builds
+
+VSPatternExpander --> DynamicHierarchy : reads config
+PythonPatternExpander --> ConfigEngine : integrates with
+
+CompileCommand --> PythonPatternExpander : uses for dump
+ConfigEngine --> LearnedPatterns : shared patterns
+
+@enduml
+@enduml" class="download-link" download="StrataRegula_Component_Architecture.puml">PlantUMLコードとして保存</a>
+    </div>
+    
+    <h2>PlantUMLコード:</h2>
+    <div class="plantuml-code">@startuml
+@startuml StrataRegula_Component_Architecture
+
+!define RECTANGLE class
+
+package "VS Code Environment" {
+    RECTANGLE "Extension\n(extension.ts)" as Extension {
+        +activate()
+        +registerCommands()
+        +startLanguageServer()
+    }
+    
+    RECTANGLE "Preview Provider\n(previewProvider.ts)" as PreviewProvider {
+        +showPatternPreview()
+        +updatePreview()
+        +renderWebView()
+    }
+    
+    RECTANGLE "Pattern Expander\n(patternExpander.ts)" as VSPatternExpander {
+        +expandPattern()
+        +getExpansionCount()
+        +getPatternSuggestions()
+    }
+}
+
+package "Language Server Process (LSP)" {
+    RECTANGLE "LSP Server\n(server.ts)" as LSPServer {
+        +onCompletion()
+        +onHover()
+        +onValidation()
+        +handleDocumentChange()
+    }
+    
+    RECTANGLE "YAML Analyzer\n(yamlAnalyzer.ts)" as YAMLAnalyzer {
+        +analyzeDocument()
+        +extractPatternsFromYaml()
+        +learnPatternFromKey()
+        +buildConfigFromLearning()
+    }
+    
+    RECTANGLE "Pattern Provider\n(patternProvider.ts)" as PatternProvider {
+        +provideCompletions()
+        +generateCompletions()
+        +createEnvironmentCompletions()
+        +createServiceCompletions()
+    }
+    
+    RECTANGLE "Pattern Tokenizer\n(patternTokenizer.ts)" as PatternTokenizer {
+        +parsePatternContext()
+        +tokenizePattern()
+        +getPatternDepth()
+    }
+}
+
+package "Python Core Engine" {
+    RECTANGLE "Configuration Engine\n(config.py)" as ConfigEngine {
+        +load_config()
+        +compile_patterns()
+        +validate_syntax()
+    }
+    
+    RECTANGLE "Pattern Expander\n(pattern_expander.py)" as PythonPatternExpander {
+        +expand_pattern()
+        +compile_to_static_mapping()
+        +get_fingerprint()
+    }
+    
+    RECTANGLE "Compile Command\n(compile_command.py)" as CompileCommand {
+        +dump_compiled_config()
+        +format_tree_output()
+        +build_pattern_tree()
+    }
+}
+
+package "Shared Data Layer" {
+    RECTANGLE "Learned Patterns\n(Database)" as LearnedPatterns {
+        +pattern: string
+        +frequency: number
+        +context: string
+        +lastSeen: Date
+    }
+    
+    RECTANGLE "Dynamic Hierarchy\n(Configuration)" as DynamicHierarchy {
+        +environments: Set<string>
+        +services: Set<string>
+        +configTypes: Set<string>
+        +patterns: Map<string, LearnedPattern>
+    }
+}
+
+' Relationships
+Extension --> PreviewProvider : uses
+Extension --> VSPatternExpander : initializes
+Extension --> LSPServer : starts via IPC
+
+LSPServer --> YAMLAnalyzer : delegates analysis
+LSPServer --> PatternProvider : requests completions
+PatternProvider --> PatternTokenizer : parses context
+
+YAMLAnalyzer --> LearnedPatterns : stores/retrieves
+YAMLAnalyzer --> DynamicHierarchy : builds
+
+VSPatternExpander --> DynamicHierarchy : reads config
+PythonPatternExpander --> ConfigEngine : integrates with
+
+CompileCommand --> PythonPatternExpander : uses for dump
+ConfigEngine --> LearnedPatterns : shared patterns
+
+@enduml
+@enduml</div>
+</body>
+</html>

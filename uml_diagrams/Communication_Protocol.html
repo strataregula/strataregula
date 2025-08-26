@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Communication_Protocol</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .diagram { text-align: center; margin: 20px 0; }
+        .plantuml-code { 
+            background: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .download-link { 
+            display: inline-block; 
+            background: #007acc; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin: 10px;
+        }
+        .download-link:hover { background: #005a9e; }
+    </style>
+</head>
+<body>
+    <h1>Communication_Protocol</h1>
+    
+    <div class="diagram">
+        <img src="http://www.plantuml.com/plantuml/img/TLJ1Zjem4BtdAqPxOgNItbUY0b6eg2XDIRMhIfKgrymIjuwTsXCW-_KTEmaaTE625R-PUVFcUQQUXAEgqCcqEy7S5aLbb1IahFcPEajMMfqa9TyhgKfX2EuUCyRj41OdGkCP-CECljKbPjAfakxlGFXmDmnQ2xEln1uXGtT0no4Rpl7sjuTrbZOnV1Z6f3Nbrd0nXuoVM_Eizh0mUsMmYGWtmv2bqboYzeG5Xwoj51eoieuhDo7BB4ac4rWPHKfezH8xXJGN7c4oIPWtZDy7Al30WPmwdajd9NeFerKwlq_25mOjCyQihTW1dfGdPVQWKJY3EoW54JhZEsWWok0j_gtG4_XSE4R9s57b8eSaOiwrjqYLCv0hTCB9l6x1aNpQP8Trg1RAdkapfNE6A8NCMNS4OqazjsFjE3MecH6wVa7uFlky3ZLuf3HeCAY7DniBUZt0lDy8LELE46C7HGDlTbUfCM8w9LuNdl147woi2YRpJbwYHf-oBvlnjZU31fyAnrbwmDZ8QTZ8rmfTVREH9j57DAmt8IYErrhjcK0lxrNRxOnwTHNxpZSpSdXGUEmotZRPlF9a2tPOWtUDC4DQYnEx-ymPZehoSoEijNYLLeV64EmZ-xPm1pCxTDmfFE6lHwxTpgW_ogmsyiAxSsYKapbPHrSUxkkzAlu7jDwuqd4JZ59V8HldifXi8mJBEoEWtuG73FoRQHs4lsmho4LPyZu27HwzhYDgOxdze0Al0ODqjEvFfx2FWDIfWv3rcENtl9Z2OmhFZUSeMKHCMAFWOqoIAH_Zicp-_m4=" alt="Communication_Protocol" style="max-width: 100%; height: auto;">
+    </div>
+    
+    <div style="text-align: center;">
+        <a href="http://www.plantuml.com/plantuml/img/TLJ1Zjem4BtdAqPxOgNItbUY0b6eg2XDIRMhIfKgrymIjuwTsXCW-_KTEmaaTE625R-PUVFcUQQUXAEgqCcqEy7S5aLbb1IahFcPEajMMfqa9TyhgKfX2EuUCyRj41OdGkCP-CECljKbPjAfakxlGFXmDmnQ2xEln1uXGtT0no4Rpl7sjuTrbZOnV1Z6f3Nbrd0nXuoVM_Eizh0mUsMmYGWtmv2bqboYzeG5Xwoj51eoieuhDo7BB4ac4rWPHKfezH8xXJGN7c4oIPWtZDy7Al30WPmwdajd9NeFerKwlq_25mOjCyQihTW1dfGdPVQWKJY3EoW54JhZEsWWok0j_gtG4_XSE4R9s57b8eSaOiwrjqYLCv0hTCB9l6x1aNpQP8Trg1RAdkapfNE6A8NCMNS4OqazjsFjE3MecH6wVa7uFlky3ZLuf3HeCAY7DniBUZt0lDy8LELE46C7HGDlTbUfCM8w9LuNdl147woi2YRpJbwYHf-oBvlnjZU31fyAnrbwmDZ8QTZ8rmfTVREH9j57DAmt8IYErrhjcK0lxrNRxOnwTHNxpZSpSdXGUEmotZRPlF9a2tPOWtUDC4DQYnEx-ymPZehoSoEijNYLLeV64EmZ-xPm1pCxTDmfFE6lHwxTpgW_ogmsyiAxSsYKapbPHrSUxkkzAlu7jDwuqd4JZ59V8HldifXi8mJBEoEWtuG73FoRQHs4lsmho4LPyZu27HwzhYDgOxdze0Al0ODqjEvFfx2FWDIfWv3rcENtl9Z2OmhFZUSeMKHCMAFWOqoIAH_Zicp-_m4=" class="download-link" download="Communication_Protocol.png">PNGとして保存</a>
+        <a href="data:text/plain;charset=utf-8,@startuml
+@startuml Communication_Protocol
+
+participant &quot;VS Code Extension\n(TypeScript)&quot; as Ext
+participant &quot;Language Server\n(Node.js LSP)&quot; as LSP
+participant &quot;Python Core\n(Config Engine)&quot; as Core
+participant &quot;File System\n(Local Storage)&quot; as FS
+
+== Initialization Phase ==
+Ext -> LSP : Start LSP process (IPC)
+LSP -> FS : Load existing learned patterns
+LSP -> Core : Request shared configuration
+Core -> LSP : Return hierarchy config
+
+== Pattern Learning Phase ==
+FS -> LSP : File change notification
+LSP -> LSP : Analyze YAML content
+LSP -> FS : Store learned patterns
+LSP -> Ext : Configuration updated notification
+
+== Completion Request Phase ==
+Ext -> LSP : textDocument/completion (JSON-RPC)
+LSP -> LSP : Parse completion context
+LSP -> FS : Query learned patterns
+LSP -> LSP : Generate intelligent completions
+LSP -> Ext : Return completion items
+
+== Preview Generation Phase ==
+Ext -> LSP : Custom preview request
+LSP -> LSP : Expand pattern with learned data
+LSP -> Ext : Return pattern expansions
+Ext -> Ext : Render in WebView
+
+== Configuration Sync Phase ==
+Core -> FS : Export configuration
+LSP -> FS : Import configuration updates
+LSP -> Ext : Notify configuration changes
+
+note over Ext, FS
+    All communication happens locally
+    No external network requests
+    Privacy-preserving architecture
+end note
+
+@enduml
+@enduml" class="download-link" download="Communication_Protocol.puml">PlantUMLコードとして保存</a>
+    </div>
+    
+    <h2>PlantUMLコード:</h2>
+    <div class="plantuml-code">@startuml
+@startuml Communication_Protocol
+
+participant "VS Code Extension\n(TypeScript)" as Ext
+participant "Language Server\n(Node.js LSP)" as LSP
+participant "Python Core\n(Config Engine)" as Core
+participant "File System\n(Local Storage)" as FS
+
+== Initialization Phase ==
+Ext -> LSP : Start LSP process (IPC)
+LSP -> FS : Load existing learned patterns
+LSP -> Core : Request shared configuration
+Core -> LSP : Return hierarchy config
+
+== Pattern Learning Phase ==
+FS -> LSP : File change notification
+LSP -> LSP : Analyze YAML content
+LSP -> FS : Store learned patterns
+LSP -> Ext : Configuration updated notification
+
+== Completion Request Phase ==
+Ext -> LSP : textDocument/completion (JSON-RPC)
+LSP -> LSP : Parse completion context
+LSP -> FS : Query learned patterns
+LSP -> LSP : Generate intelligent completions
+LSP -> Ext : Return completion items
+
+== Preview Generation Phase ==
+Ext -> LSP : Custom preview request
+LSP -> LSP : Expand pattern with learned data
+LSP -> Ext : Return pattern expansions
+Ext -> Ext : Render in WebView
+
+== Configuration Sync Phase ==
+Core -> FS : Export configuration
+LSP -> FS : Import configuration updates
+LSP -> Ext : Notify configuration changes
+
+note over Ext, FS
+    All communication happens locally
+    No external network requests
+    Privacy-preserving architecture
+end note
+
+@enduml
+@enduml</div>
+</body>
+</html>

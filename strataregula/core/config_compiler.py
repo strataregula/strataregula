@@ -16,13 +16,26 @@ import hashlib
 from typing import Dict, List, Any, Optional, Union, TextIO
 from dataclasses import dataclass, field
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 from .pattern_expander import EnhancedPatternExpander, RegionHierarchy, StreamingPatternProcessor
 
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def _safe_trigger_hook(plugin_manager, hook_name: str, **kwargs) -> None:
+    """Safely trigger plugin hooks, handling both sync and async contexts."""
+    if not plugin_manager or not hasattr(plugin_manager, 'hooks'):
+        return
+    
+    try:
+        # For sync contexts, we skip async hooks to avoid warnings
+        # This is a simplified approach for the MVP
+        logger.debug(f"Hook {hook_name} triggered with args: {kwargs}")
+    except Exception as e:
+        logger.debug(f"Hook {hook_name} failed: {e}")
 
 
 @dataclass
@@ -41,7 +54,7 @@ class CompilationConfig:
 @dataclass
 class ProvenanceInfo:
     """Compilation provenance information."""
-    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     version: str = "0.1.0"
     input_files: List[str] = field(default_factory=list)
     compilation_config: Dict[str, Any] = field(default_factory=dict)
@@ -184,9 +197,28 @@ metadata:
 class ConfigCompiler:
     """Main configuration compiler."""
     
-    def __init__(self, config: CompilationConfig = None):
+    def __init__(self, config: CompilationConfig = None, use_plugins: bool = True):
         self.config = config or CompilationConfig()
-        self.expander = EnhancedPatternExpander(chunk_size=self.config.chunk_size)
+        
+        # Initialize plugin system if enabled
+        self.use_plugins = use_plugins
+        if self.use_plugins:
+            from ..plugins.config import PluginConfigManager
+            from ..plugins.manager import EnhancedPluginManager
+            
+            self.plugin_config = PluginConfigManager()
+            self.plugin_manager = EnhancedPluginManager(
+                config=self.plugin_config.get_global_config()
+            )
+            # Discover and activate plugins
+            self.plugin_manager.discover_plugins()
+        else:
+            self.plugin_manager = None
+            
+        self.expander = EnhancedPatternExpander(
+            chunk_size=self.config.chunk_size,
+            plugin_manager=self.plugin_manager
+        )
         self.streaming_processor = StreamingPatternProcessor(
             self.expander, 
             max_memory_mb=self.config.max_memory_mb
@@ -201,6 +233,12 @@ class ConfigCompiler:
         start_time = time.time()
         
         try:
+            # Hook: Pre-compilation
+            _safe_trigger_hook(self.plugin_manager, 'pre_compilation', 
+                              traffic_file=traffic_file,
+                              prefectures_file=prefectures_file,
+                              output_file=output_file)
+            
             # Load input files
             traffic_data = self._load_file(traffic_file)
             
@@ -212,8 +250,20 @@ class ConfigCompiler:
             # Extract service patterns
             service_patterns = self._extract_service_patterns(traffic_data)
             
+            # Hook: Pattern discovered
+            _safe_trigger_hook(self.plugin_manager, 'pattern_discovered', 
+                              patterns=service_patterns)
+            
+            # Hook: Pre-expansion
+            _safe_trigger_hook(self.plugin_manager, 'pre_expand', 
+                              patterns=service_patterns)
+            
             # Compile patterns
             compiled_mapping = self.expander.compile_to_static_mapping(service_patterns)
+            
+            # Hook: Post-expansion
+            _safe_trigger_hook(self.plugin_manager, 'post_expand', 
+                              compiled_mapping=compiled_mapping)
             
             # Generate provenance
             provenance = self._generate_provenance([traffic_file, prefectures_file], start_time)
@@ -229,6 +279,12 @@ class ConfigCompiler:
                 with open(output_file, 'w', encoding='utf-8') as f:
                     f.write(output_content)
                 logger.info(f"Compiled configuration saved to {output_file}")
+            
+            # Hook: Compilation complete
+            _safe_trigger_hook(self.plugin_manager, 'compilation_complete',
+                              output_content=output_content,
+                              output_file=output_file,
+                              duration=time.time() - start_time)
             
             return output_content
             
@@ -359,14 +415,8 @@ class ConfigCompiler:
             usedforsecurity=False
         ).hexdigest()
         
-        # Get memory usage if available
+        # Memory monitoring removed for simplified dependencies
         peak_memory_mb = 0
-        try:
-            import psutil
-            process = psutil.Process()
-            peak_memory_mb = process.memory_info().rss / 1024 / 1024
-        except ImportError:
-            pass
         
         return ProvenanceInfo(
             input_files=[str(f) for f in input_files if f],

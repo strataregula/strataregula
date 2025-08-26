@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Pattern_Learning_Sequence</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .diagram { text-align: center; margin: 20px 0; }
+        .plantuml-code { 
+            background: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .download-link { 
+            display: inline-block; 
+            background: #007acc; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin: 10px;
+        }
+        .download-link:hover { background: #005a9e; }
+    </style>
+</head>
+<body>
+    <h1>Pattern_Learning_Sequence</h1>
+    
+    <div class="diagram">
+        <img src="http://www.plantuml.com/plantuml/img/VLJRQXin47tNLmnviX_I3yX3SHBN5EfIaoM6G25CLkErg5RQIbetsw_lwERO8Qx1h5PppjcPqHajV40NnbwBHLt11aCWPvxNXCueqpqtz7iaqv8Gs0RhuD6J4mEZLQi6D06kjWtSMqbNW1wsJLoUnx-y1Z9UMPCG_7OUNgFfHkm86d87SWcqRZRdeAVRxskuDQYdlmLINzw9nRH9rZByJxF4W2_eSthBktDuWS76sOEIHRc-215hXUlFfIguWHy3Lm8fcPtI94g08LmMnrUy2PP1d08To0GHzpdC1N5uQTknvzqACJQedMenS7E4Y1Y6ri8OZtbPQJDP5lDu5kg0WTxQ88wySuq9U_r9MvIprfgGo1UGz1eSwzRMhPpjdvWyYmgnYtCXjBK3hDW5XEqUVj44ogHs2E3V1Ltb6nOE-43TgB78pvWyJopK0RQebOIXdCREZaQcs7zKTJpf8XPJ_KRJh0ZCF-GkxvZrECZOjUENN7RtT9dHiEdV23q5P0LCUE8iu_zIGrz6fUMzDJlLnGphICrEJ-3eZTCUPOwGzC4n5vTKap9pJ3LbJZnaVimpxEZB71nTSbeXoEpDKti_4Cg9s--WjVsWAQAz46nJ0gUwFHjt5sSe5bzj0ZusIC8V5VOtAN8DgzfMrXbv2FBk6dq0JsGWg9xunkc74hcFpkHabE5lztaSSkIh8eUktVEGQ1YiLod6JO-pmtVIWfVf0ilFVm==" alt="Pattern_Learning_Sequence" style="max-width: 100%; height: auto;">
+    </div>
+    
+    <div style="text-align: center;">
+        <a href="http://www.plantuml.com/plantuml/img/VLJRQXin47tNLmnviX_I3yX3SHBN5EfIaoM6G25CLkErg5RQIbetsw_lwERO8Qx1h5PppjcPqHajV40NnbwBHLt11aCWPvxNXCueqpqtz7iaqv8Gs0RhuD6J4mEZLQi6D06kjWtSMqbNW1wsJLoUnx-y1Z9UMPCG_7OUNgFfHkm86d87SWcqRZRdeAVRxskuDQYdlmLINzw9nRH9rZByJxF4W2_eSthBktDuWS76sOEIHRc-215hXUlFfIguWHy3Lm8fcPtI94g08LmMnrUy2PP1d08To0GHzpdC1N5uQTknvzqACJQedMenS7E4Y1Y6ri8OZtbPQJDP5lDu5kg0WTxQ88wySuq9U_r9MvIprfgGo1UGz1eSwzRMhPpjdvWyYmgnYtCXjBK3hDW5XEqUVj44ogHs2E3V1Ltb6nOE-43TgB78pvWyJopK0RQebOIXdCREZaQcs7zKTJpf8XPJ_KRJh0ZCF-GkxvZrECZOjUENN7RtT9dHiEdV23q5P0LCUE8iu_zIGrz6fUMzDJlLnGphICrEJ-3eZTCUPOwGzC4n5vTKap9pJ3LbJZnaVimpxEZB71nTSbeXoEpDKti_4Cg9s--WjVsWAQAz46nJ0gUwFHjt5sSe5bzj0ZusIC8V5VOtAN8DgzfMrXbv2FBk6dq0JsGWg9xunkc74hcFpkHabE5lztaSSkIh8eUktVEGQ1YiLod6JO-pmtVIWfVf0ilFVm==" class="download-link" download="Pattern_Learning_Sequence.png">PNGとして保存</a>
+        <a href="data:text/plain;charset=utf-8,@startuml
+@startuml Pattern_Learning_Sequence
+
+actor User
+participant &quot;VS Code&quot; as VSCode
+participant &quot;Extension&quot; as Ext
+participant &quot;Language Server&quot; as LSP
+participant &quot;YAML Analyzer&quot; as Analyzer
+participant &quot;Learned Patterns\nDatabase&quot; as DB
+participant &quot;Pattern Provider&quot; as Provider
+
+User -> VSCode : Opens YAML file
+VSCode -> Ext : File opened event
+Ext -> LSP : Document opened notification
+
+LSP -> Analyzer : analyzeDocument(document)
+activate Analyzer
+
+Analyzer -> Analyzer : yaml.load(content)
+Analyzer -> Analyzer : extractPatternsFromYaml(yamlData)
+
+loop For each key in YAML
+    Analyzer -> Analyzer : isStrataRegulaPattern(key)
+    alt Valid pattern found
+        Analyzer -> Analyzer : learnPatternFromKey(pattern)
+        Analyzer -> DB : Update pattern frequency
+        Analyzer -> DB : Store pattern metadata
+    end
+end
+
+Analyzer -> Analyzer : buildConfigFromLearning()
+Analyzer --> LSP : StrataRegulaConfig
+deactivate Analyzer
+
+LSP -> Provider : updateConfig(config)
+LSP --> Ext : Configuration updated
+Ext --> VSCode : Ready for completions
+
+note right of DB
+    Patterns stored with:
+    - Frequency count
+    - Last seen timestamp
+    - Context information
+    - Hierarchical position
+end note
+
+@enduml
+@enduml" class="download-link" download="Pattern_Learning_Sequence.puml">PlantUMLコードとして保存</a>
+    </div>
+    
+    <h2>PlantUMLコード:</h2>
+    <div class="plantuml-code">@startuml
+@startuml Pattern_Learning_Sequence
+
+actor User
+participant "VS Code" as VSCode
+participant "Extension" as Ext
+participant "Language Server" as LSP
+participant "YAML Analyzer" as Analyzer
+participant "Learned Patterns\nDatabase" as DB
+participant "Pattern Provider" as Provider
+
+User -> VSCode : Opens YAML file
+VSCode -> Ext : File opened event
+Ext -> LSP : Document opened notification
+
+LSP -> Analyzer : analyzeDocument(document)
+activate Analyzer
+
+Analyzer -> Analyzer : yaml.load(content)
+Analyzer -> Analyzer : extractPatternsFromYaml(yamlData)
+
+loop For each key in YAML
+    Analyzer -> Analyzer : isStrataRegulaPattern(key)
+    alt Valid pattern found
+        Analyzer -> Analyzer : learnPatternFromKey(pattern)
+        Analyzer -> DB : Update pattern frequency
+        Analyzer -> DB : Store pattern metadata
+    end
+end
+
+Analyzer -> Analyzer : buildConfigFromLearning()
+Analyzer --> LSP : StrataRegulaConfig
+deactivate Analyzer
+
+LSP -> Provider : updateConfig(config)
+LSP --> Ext : Configuration updated
+Ext --> VSCode : Ready for completions
+
+note right of DB
+    Patterns stored with:
+    - Frequency count
+    - Last seen timestamp
+    - Context information
+    - Hierarchical position
+end note
+
+@enduml
+@enduml</div>
+</body>
+</html>

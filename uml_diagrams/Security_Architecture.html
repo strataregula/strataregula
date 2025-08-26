@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Security_Architecture</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .diagram { text-align: center; margin: 20px 0; }
+        .plantuml-code { 
+            background: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .download-link { 
+            display: inline-block; 
+            background: #007acc; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin: 10px;
+        }
+        .download-link:hover { background: #005a9e; }
+    </style>
+</head>
+<body>
+    <h1>Security_Architecture</h1>
+    
+    <div class="diagram">
+        <img src="http://www.plantuml.com/plantuml/img/bLLTRnen47o_Nx7AIzi7alSgYa89bP1IG25jfIIeChxDOSMtllg3v5JbltTj3hW0bwht01Ot7i_Ex9fBvuNreTJPvMO5CvJ1Ab__wbkvL1wb3nQph1BoIHG89rEhLaBMyCK4oeLLw4xWJmRyf0_B6mGLcf7NHWeDKsiaEgUeW3j3k077Hvgouf_8m_sF6GnCZZ1yyKXE6PeVGrqpSuWgPcXNQ3VSHx7JsYyDCIizgY9OuPaKXbGemXq-5ruiX4EcJcA_AXO-gvt7SWVQBeweX5xlebiNV8RHT00V4_cd7KydFh6zfvmPayRHsUH_QGyhPB8R5FdPJyuR3-Ys2pByTc6yDoNlw6iDrIxJfQWgzWAUbLygUg3Wq7vmeDDXI2jb3PKSI69xFTedO_JFnZvjEghkQ94HURI4VWxdv_WIrq9VN1n33hG9UJ91iSn_uuVDM-XFHrtm3ZV64w16lZH4N1I7vHxeqVBhcUVmn0qMGGjmoVF6XjSiQnbmnQWObbzlXsye70zTvs2zxOouksrPZyyr5lDr1he6GxfklHqRO5taIkLY2uC9tYbkwbBml1EsaDyvonwNvQtHcWajSjl7CrkOVc0ZM8W4gL5GgC1KoODt0fyA7_s5QnIMOXCTbd25VCtmaSd7fgVCCy4ZjwzxMymch3JCu4omyWrawzQ2pwwQsykXztno6pUfV8-zW1BbKf1ovNibh2S8HixebC9U08BoXNbX_NiZkQTSuqfuHaLLN5Y1Zi_u7HIdrqB66Ut54478E7RWJLFcWHsto4rjUORMPZIHx9hk_kYTF8VJK9to5R4_YVDrXmycu_5mS3kQZ3i9qWtJrSUHHfMLndWHk2oxHChJdyxw-oy=" alt="Security_Architecture" style="max-width: 100%; height: auto;">
+    </div>
+    
+    <div style="text-align: center;">
+        <a href="http://www.plantuml.com/plantuml/img/bLLTRnen47o_Nx7AIzi7alSgYa89bP1IG25jfIIeChxDOSMtllg3v5JbltTj3hW0bwht01Ot7i_Ex9fBvuNreTJPvMO5CvJ1Ab__wbkvL1wb3nQph1BoIHG89rEhLaBMyCK4oeLLw4xWJmRyf0_B6mGLcf7NHWeDKsiaEgUeW3j3k077Hvgouf_8m_sF6GnCZZ1yyKXE6PeVGrqpSuWgPcXNQ3VSHx7JsYyDCIizgY9OuPaKXbGemXq-5ruiX4EcJcA_AXO-gvt7SWVQBeweX5xlebiNV8RHT00V4_cd7KydFh6zfvmPayRHsUH_QGyhPB8R5FdPJyuR3-Ys2pByTc6yDoNlw6iDrIxJfQWgzWAUbLygUg3Wq7vmeDDXI2jb3PKSI69xFTedO_JFnZvjEghkQ94HURI4VWxdv_WIrq9VN1n33hG9UJ91iSn_uuVDM-XFHrtm3ZV64w16lZH4N1I7vHxeqVBhcUVmn0qMGGjmoVF6XjSiQnbmnQWObbzlXsye70zTvs2zxOouksrPZyyr5lDr1he6GxfklHqRO5taIkLY2uC9tYbkwbBml1EsaDyvonwNvQtHcWajSjl7CrkOVc0ZM8W4gL5GgC1KoODt0fyA7_s5QnIMOXCTbd25VCtmaSd7fgVCCy4ZjwzxMymch3JCu4omyWrawzQ2pwwQsykXztno6pUfV8-zW1BbKf1ovNibh2S8HixebC9U08BoXNbX_NiZkQTSuqfuHaLLN5Y1Zi_u7HIdrqB66Ut54478E7RWJLFcWHsto4rjUORMPZIHx9hk_kYTF8VJK9to5R4_YVDrXmycu_5mS3kQZ3i9qWtJrSUHHfMLndWHk2oxHChJdyxw-oy=" class="download-link" download="Security_Architecture.png">PNGとして保存</a>
+        <a href="data:text/plain;charset=utf-8,@startuml
+@startuml Security_Architecture
+
+package &quot;Privacy Boundaries&quot; {
+    
+    rectangle &quot;Local Processing Zone&quot; {
+        component [VS Code Extension]
+        component [Language Server Process]
+        component [Python Configuration Engine]
+        database [Local File System]
+        
+        [VS Code Extension] --> [Language Server Process] : IPC (Local)
+        [Language Server Process] --> [Python Configuration Engine] : File I/O (Local)
+        [Language Server Process] --> [Local File System] : Read/Write (Local)
+        
+        note bottom : All processing happens within\nuser's local environment
+    }
+    
+    rectangle &quot;Network Boundary&quot; {
+        component [Internet] <<external>>
+        component [Cloud Services] <<external>>
+        component [External APIs] <<external>>
+        
+        note bottom : NO network connections\nfrom StrataRegula system
+    }
+}
+
+rectangle &quot;Data Protection Measures&quot; {
+    
+    rectangle &quot;Configuration Data&quot; {
+        - Stored locally only
+        - No transmission outside machine
+        - User-controlled retention
+        - Automatic cleanup options
+    }
+    
+    rectangle &quot;Pattern Learning Data&quot; {
+        - Derived from user's own files
+        - No external data sources
+        - Configurable privacy settings
+        - Opt-out mechanisms
+    }
+    
+    rectangle &quot;System Isolation&quot; {
+        - Sandboxed Language Server
+        - No elevated privileges required
+        - Read-only access to source files
+        - Temporary data cleanup
+    }
+}
+
+[Local Processing Zone] .up.> [Network Boundary] : NO CONNECTION
+[Local Processing Zone] --> [Data Protection Measures] : implements
+
+@enduml
+@enduml" class="download-link" download="Security_Architecture.puml">PlantUMLコードとして保存</a>
+    </div>
+    
+    <h2>PlantUMLコード:</h2>
+    <div class="plantuml-code">@startuml
+@startuml Security_Architecture
+
+package "Privacy Boundaries" {
+    
+    rectangle "Local Processing Zone" {
+        component [VS Code Extension]
+        component [Language Server Process]
+        component [Python Configuration Engine]
+        database [Local File System]
+        
+        [VS Code Extension] --> [Language Server Process] : IPC (Local)
+        [Language Server Process] --> [Python Configuration Engine] : File I/O (Local)
+        [Language Server Process] --> [Local File System] : Read/Write (Local)
+        
+        note bottom : All processing happens within\nuser's local environment
+    }
+    
+    rectangle "Network Boundary" {
+        component [Internet] <<external>>
+        component [Cloud Services] <<external>>
+        component [External APIs] <<external>>
+        
+        note bottom : NO network connections\nfrom StrataRegula system
+    }
+}
+
+rectangle "Data Protection Measures" {
+    
+    rectangle "Configuration Data" {
+        - Stored locally only
+        - No transmission outside machine
+        - User-controlled retention
+        - Automatic cleanup options
+    }
+    
+    rectangle "Pattern Learning Data" {
+        - Derived from user's own files
+        - No external data sources
+        - Configurable privacy settings
+        - Opt-out mechanisms
+    }
+    
+    rectangle "System Isolation" {
+        - Sandboxed Language Server
+        - No elevated privileges required
+        - Read-only access to source files
+        - Temporary data cleanup
+    }
+}
+
+[Local Processing Zone] .up.> [Network Boundary] : NO CONNECTION
+[Local Processing Zone] --> [Data Protection Measures] : implements
+
+@enduml
+@enduml</div>
+</body>
+</html>

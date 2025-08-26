@@ -21,7 +21,14 @@ try:
     import defusedxml.minidom as minidom
     XML_AVAILABLE = True
 except ImportError:
-    XML_AVAILABLE = False
+    try:
+        import xml.etree.ElementTree as ET
+        import xml.dom.minidom as minidom
+        XML_AVAILABLE = True
+    except ImportError:
+        XML_AVAILABLE = False
+        ET = None
+        minidom = None
 
 try:
     import orjson
@@ -143,7 +150,7 @@ class FormatConverter:
         except ET.ParseError as e:
             raise ValueError(f"Invalid XML: {e}")
     
-    def _xml_element_to_dict(self, element: ET.Element) -> Dict[str, Any]:
+    def _xml_element_to_dict(self, element) -> Dict[str, Any]:
         """XML要素を辞書に変換"""
         result = {}
         
@@ -181,7 +188,7 @@ class FormatConverter:
     
     def _format_xml(self, data: Any, **options) -> str:
         """辞書をXMLに変換"""
-        if not XML_AVAILABLE:
+        if not XML_AVAILABLE or ET is None:
             raise ValueError("XML support not available")
         
         root_name = options.get('root', 'root')
@@ -199,7 +206,7 @@ class FormatConverter:
         reparsed = minidom.parseString(rough_string)
         return reparsed.toprettyxml(indent="  ").strip()
     
-    def _dict_to_xml_element(self, parent: ET.Element, data: Any):
+    def _dict_to_xml_element(self, parent, data: Any):
         """辞書をXML要素に変換"""
         if isinstance(data, dict):
             for key, value in data.items():

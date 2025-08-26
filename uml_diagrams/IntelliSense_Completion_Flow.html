@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>IntelliSense_Completion_Flow</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .diagram { text-align: center; margin: 20px 0; }
+        .plantuml-code { 
+            background: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .download-link { 
+            display: inline-block; 
+            background: #007acc; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin: 10px;
+        }
+        .download-link:hover { background: #005a9e; }
+    </style>
+</head>
+<body>
+    <h1>IntelliSense_Completion_Flow</h1>
+    
+    <div class="diagram">
+        <img src="http://www.plantuml.com/plantuml/img/ZLJBRjim4BppAnOwsO3R8ZqQQE67Ki103YwKvf840IEk5S8ogPAK7odwxrrArCkms-eYIfmPxWvtTsOTDwxSvMpMh62b7EQvJ51PV5dgNP6ZargzVClrWJ6UEctWXqN32YB8L1PSEOWU4bXgWK_gLaX2HC0jrCiXxlReI9ZqQiJH3RVlkCfAdY4aQFPOozmbwo5epPr3es1jz5wAW6e-BaFlzHQLV0_OzkliSEH6eO10iaygvew_SeiLArumvXE73rz3QZ25-rE15gB2QF4nOk6t1nmTxNRsWS6V9Lh7cDyX06L508T75-kqtA5odz8MxMsMU-wmIfvvB56Q58bNrCjEtuv4a9b0eQtq_yQTJEiEQqM6WjAkr0FFIrm7yiY7ji2DDhWiZTLcFA2s5lfWkB4OJ5jgvOaNs6qidVkiKpcJd2kUdzwHfElx4rYuj-jmyjIGFgIbCMH1G-iJXkaEe_rLoK_XPj8eXFrfVRFHRoRmKlnzH-85wNulqPmW3uL4nRANATK7-H2K6C7EOdcCDiR7eKGqWUYLfzkmv8NqhuCsMohSvwjtbw52Gv7rgo6jCnjJn-OEOfyVV84R62KXfZ43UguefWP9Bq3xidzbpOM0Wyn5oeq0NLI5ZBd5zlZFC2B7DpAhs-O_GgZX7ZsCefATYprNAOf_opJ8Cn4b-fwsJTcXLWvtZy_zo-yQgMhAovrk2pe0-xIgZQlExm-FMDeYvoVe6j-s8uHmrR2PGlAc3nPaFPOpNzwsp3AQ9HMUpIYDQeBNxpy=" alt="IntelliSense_Completion_Flow" style="max-width: 100%; height: auto;">
+    </div>
+    
+    <div style="text-align: center;">
+        <a href="http://www.plantuml.com/plantuml/img/ZLJBRjim4BppAnOwsO3R8ZqQQE67Ki103YwKvf840IEk5S8ogPAK7odwxrrArCkms-eYIfmPxWvtTsOTDwxSvMpMh62b7EQvJ51PV5dgNP6ZargzVClrWJ6UEctWXqN32YB8L1PSEOWU4bXgWK_gLaX2HC0jrCiXxlReI9ZqQiJH3RVlkCfAdY4aQFPOozmbwo5epPr3es1jz5wAW6e-BaFlzHQLV0_OzkliSEH6eO10iaygvew_SeiLArumvXE73rz3QZ25-rE15gB2QF4nOk6t1nmTxNRsWS6V9Lh7cDyX06L508T75-kqtA5odz8MxMsMU-wmIfvvB56Q58bNrCjEtuv4a9b0eQtq_yQTJEiEQqM6WjAkr0FFIrm7yiY7ji2DDhWiZTLcFA2s5lfWkB4OJ5jgvOaNs6qidVkiKpcJd2kUdzwHfElx4rYuj-jmyjIGFgIbCMH1G-iJXkaEe_rLoK_XPj8eXFrfVRFHRoRmKlnzH-85wNulqPmW3uL4nRANATK7-H2K6C7EOdcCDiR7eKGqWUYLfzkmv8NqhuCsMohSvwjtbw52Gv7rgo6jCnjJn-OEOfyVV84R62KXfZ43UguefWP9Bq3xidzbpOM0Wyn5oeq0NLI5ZBd5zlZFC2B7DpAhs-O_GgZX7ZsCefATYprNAOf_opJ8Cn4b-fwsJTcXLWvtZy_zo-yQgMhAovrk2pe0-xIgZQlExm-FMDeYvoVe6j-s8uHmrR2PGlAc3nPaFPOpNzwsp3AQ9HMUpIYDQeBNxpy=" class="download-link" download="IntelliSense_Completion_Flow.png">PNGとして保存</a>
+        <a href="data:text/plain;charset=utf-8,@startuml
+@startuml IntelliSense_Completion_Flow
+
+actor User
+participant &quot;VS Code\nEditor&quot; as Editor
+participant &quot;Extension&quot; as Ext
+participant &quot;Language Server&quot; as LSP
+participant &quot;Pattern Provider&quot; as Provider
+participant &quot;Pattern Tokenizer&quot; as Tokenizer
+participant &quot;Learned Patterns\nDatabase&quot; as DB
+
+User -> Editor : Types &quot;prod.&quot;
+Editor -> Ext : Completion request
+
+Ext -> LSP : textDocument/completion
+activate LSP
+
+LSP -> Provider : provideCompletions(document, position)
+activate Provider
+
+Provider -> Provider : isInValuePosition(textBeforeCursor)
+Provider -> Tokenizer : parsePatternContext(textBeforeCursor)
+activate Tokenizer
+
+Tokenizer -> Tokenizer : Analyze pattern depth
+Tokenizer -> Tokenizer : Extract current pattern
+Tokenizer --> Provider : PatternContext{depth: 1, currentPattern: &quot;prod&quot;}
+deactivate Tokenizer
+
+Provider -> DB : Query learned services for &quot;prod&quot;
+DB --> Provider : [&quot;frontend&quot;, &quot;backend&quot;, &quot;api&quot;, &quot;worker&quot;]
+
+Provider -> Provider : generateCompletions(context)
+
+alt Depth = 1 (Services)
+    Provider -> Provider : createServiceCompletions()
+    Provider -> Provider : Add wildcard option
+else Depth = 2 (Config Types)
+    Provider -> Provider : createConfigTypeCompletions()
+else Advanced
+    Provider -> Provider : createAdvancedCompletions()
+end
+
+Provider --> LSP : CompletionItem[]
+deactivate Provider
+
+LSP --> Ext : Completion response
+deactivate LSP
+
+Ext --> Editor : Display completions
+Editor --> User : Shows intelligent suggestions
+
+@enduml
+@enduml" class="download-link" download="IntelliSense_Completion_Flow.puml">PlantUMLコードとして保存</a>
+    </div>
+    
+    <h2>PlantUMLコード:</h2>
+    <div class="plantuml-code">@startuml
+@startuml IntelliSense_Completion_Flow
+
+actor User
+participant "VS Code\nEditor" as Editor
+participant "Extension" as Ext
+participant "Language Server" as LSP
+participant "Pattern Provider" as Provider
+participant "Pattern Tokenizer" as Tokenizer
+participant "Learned Patterns\nDatabase" as DB
+
+User -> Editor : Types "prod."
+Editor -> Ext : Completion request
+
+Ext -> LSP : textDocument/completion
+activate LSP
+
+LSP -> Provider : provideCompletions(document, position)
+activate Provider
+
+Provider -> Provider : isInValuePosition(textBeforeCursor)
+Provider -> Tokenizer : parsePatternContext(textBeforeCursor)
+activate Tokenizer
+
+Tokenizer -> Tokenizer : Analyze pattern depth
+Tokenizer -> Tokenizer : Extract current pattern
+Tokenizer --> Provider : PatternContext{depth: 1, currentPattern: "prod"}
+deactivate Tokenizer
+
+Provider -> DB : Query learned services for "prod"
+DB --> Provider : ["frontend", "backend", "api", "worker"]
+
+Provider -> Provider : generateCompletions(context)
+
+alt Depth = 1 (Services)
+    Provider -> Provider : createServiceCompletions()
+    Provider -> Provider : Add wildcard option
+else Depth = 2 (Config Types)
+    Provider -> Provider : createConfigTypeCompletions()
+else Advanced
+    Provider -> Provider : createAdvancedCompletions()
+end
+
+Provider --> LSP : CompletionItem[]
+deactivate Provider
+
+LSP --> Ext : Completion response
+deactivate LSP
+
+Ext --> Editor : Display completions
+Editor --> User : Shows intelligent suggestions
+
+@enduml
+@enduml</div>
+</body>
+</html>

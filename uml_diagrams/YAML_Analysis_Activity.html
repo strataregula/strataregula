@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>YAML_Analysis_Activity</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .diagram { text-align: center; margin: 20px 0; }
+        .plantuml-code { 
+            background: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .download-link { 
+            display: inline-block; 
+            background: #007acc; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin: 10px;
+        }
+        .download-link:hover { background: #005a9e; }
+    </style>
+</head>
+<body>
+    <h1>YAML_Analysis_Activity</h1>
+    
+    <div class="diagram">
+        <img src="http://www.plantuml.com/plantuml/img/fPJDafim3CVlVWeTayE-01msQQUtRAUpwSVqjECQ0MwCJML1ozjNcC2I8RENzG6C_DVFI9PyYAo9kyQfmpo3dyUdqylHQpT46r-EXcrlUL0g2PJAVWIwn5ORXD8w15DhNs6Hg-nZZUO2jfpiDYPIhfHOTkCqsH_tm3Lws0qOzmfaPAUWYoihU4RF-MJ_eYbYWa1awWntXDDIUepOxzhP8acstCJuIhh71HD-_KR3m8HNq08R1s6BcfVFvF_f7vCMbmiE3xrs7KAhBUMteYLmKK6ZsTGOHSUCv6-bDnzZ06V1itx6gdDwThaVohBRb9QhLbBMjC5BqcA-bSv_NriaJQOU01qszyKRGoddl34cxBUsq8o0lhSKVE91HDuoHmJeIbl_9YWYzTRW-o1IEwMjW8VsdQ0vioNXdmwz6RQa97z64wW0foFBVd9UR1kK9cdQhGFwudu-jsTsva083ZLvBEvNaT1iUR-kfXg6l_NOJhkd4IL56H_tstBFFdJM5T2bg8jh_ZefHnjM-sMV0zjoW9DqUQShXBCS5guwu3N_JUjmT8QMGc-BjIXDq4dTxdnOjUSfL18YHUihGAAmvfuljatNmcHx3LhTWYQX3_vXkMHoDQbLDjzZy-_9KkJGAdKGHRhtflT_" alt="YAML_Analysis_Activity" style="max-width: 100%; height: auto;">
+    </div>
+    
+    <div style="text-align: center;">
+        <a href="http://www.plantuml.com/plantuml/img/fPJDafim3CVlVWeTayE-01msQQUtRAUpwSVqjECQ0MwCJML1ozjNcC2I8RENzG6C_DVFI9PyYAo9kyQfmpo3dyUdqylHQpT46r-EXcrlUL0g2PJAVWIwn5ORXD8w15DhNs6Hg-nZZUO2jfpiDYPIhfHOTkCqsH_tm3Lws0qOzmfaPAUWYoihU4RF-MJ_eYbYWa1awWntXDDIUepOxzhP8acstCJuIhh71HD-_KR3m8HNq08R1s6BcfVFvF_f7vCMbmiE3xrs7KAhBUMteYLmKK6ZsTGOHSUCv6-bDnzZ06V1itx6gdDwThaVohBRb9QhLbBMjC5BqcA-bSv_NriaJQOU01qszyKRGoddl34cxBUsq8o0lhSKVE91HDuoHmJeIbl_9YWYzTRW-o1IEwMjW8VsdQ0vioNXdmwz6RQa97z64wW0foFBVd9UR1kK9cdQhGFwudu-jsTsva083ZLvBEvNaT1iUR-kfXg6l_NOJhkd4IL56H_tstBFFdJM5T2bg8jh_ZefHnjM-sMV0zjoW9DqUQShXBCS5guwu3N_JUjmT8QMGc-BjIXDq4dTxdnOjUSfL18YHUihGAAmvfuljatNmcHx3LhTWYQX3_vXkMHoDQbLDjzZy-_9KkJGAdKGHRhtflT_" class="download-link" download="YAML_Analysis_Activity.png">PNGとして保存</a>
+        <a href="data:text/plain;charset=utf-8,@startuml
+@startuml YAML_Analysis_Activity
+
+start
+
+:Workspace file changed;
+:Check if file is YAML;
+
+if (YAML file?) then (yes)
+    :Load file content;
+    :Parse YAML structure;
+    
+    if (Valid YAML?) then (yes)
+        :Traverse YAML object tree;
+        
+        repeat
+            :Extract key-value pair;
+            :Check if key matches pattern;
+            
+            if (StrataRegula pattern?) then (yes)
+                :Parse pattern components;
+                :Extract hierarchy elements;
+                
+                fork
+                    :Update environments set;
+                fork again
+                    :Update services set;
+                fork again
+                    :Update config types set;
+                fork again
+                    :Update pattern frequency;
+                    :Record last seen timestamp;
+                end fork
+                
+                :Store learned pattern;
+            endif
+            
+        repeat while (More keys?)
+        
+        :Build updated configuration;
+        :Notify Language Server;
+        :Update completion provider;
+        
+    else (no)
+        :Log parsing error;
+        :Skip file;
+    endif
+    
+else (no)
+    :Skip non-YAML file;
+endif
+
+:Analysis complete;
+stop
+
+@enduml
+@enduml" class="download-link" download="YAML_Analysis_Activity.puml">PlantUMLコードとして保存</a>
+    </div>
+    
+    <h2>PlantUMLコード:</h2>
+    <div class="plantuml-code">@startuml
+@startuml YAML_Analysis_Activity
+
+start
+
+:Workspace file changed;
+:Check if file is YAML;
+
+if (YAML file?) then (yes)
+    :Load file content;
+    :Parse YAML structure;
+    
+    if (Valid YAML?) then (yes)
+        :Traverse YAML object tree;
+        
+        repeat
+            :Extract key-value pair;
+            :Check if key matches pattern;
+            
+            if (StrataRegula pattern?) then (yes)
+                :Parse pattern components;
+                :Extract hierarchy elements;
+                
+                fork
+                    :Update environments set;
+                fork again
+                    :Update services set;
+                fork again
+                    :Update config types set;
+                fork again
+                    :Update pattern frequency;
+                    :Record last seen timestamp;
+                end fork
+                
+                :Store learned pattern;
+            endif
+            
+        repeat while (More keys?)
+        
+        :Build updated configuration;
+        :Notify Language Server;
+        :Update completion provider;
+        
+    else (no)
+        :Log parsing error;
+        :Skip file;
+    endif
+    
+else (no)
+    :Skip non-YAML file;
+endif
+
+:Analysis complete;
+stop
+
+@enduml
+@enduml</div>
+</body>
+</html>

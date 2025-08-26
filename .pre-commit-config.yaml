@@ -1,0 +1,41 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-format
+        name: ruff-format
+        description: "Run 'ruff format' for extremely fast Python formatting"
+        entry: ruff format --force-exclude
+        language: system
+        types: [python]
+        require_serial: true
+        
+      - id: ruff-check
+        name: ruff-lint
+        description: "Run 'ruff check' for extremely fast Python linting"
+        entry: ruff check --force-exclude --fix
+        language: system
+        types: [python]
+        require_serial: true
+        
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+        args: [--strict, --ignore-missing-imports]
+        additional_dependencies: [types-all]
+        exclude: ^(tests/|examples/|benchmarks/)
+        
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: ["-r", "strataregula/"]
+        exclude: ^tests/
+
+default_language_version:
+  python: python3.9
+
+ci:
+  autofix_prs: true
+  autoupdate_branch: develop
+  skip: [mypy]  # Skip mypy in CI (run in GitHub Actions instead)

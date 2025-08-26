@@ -12,7 +12,7 @@ Features:
 - Simple CLI interface
 """
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 __author__ = "Strataregula Team"
 __email__ = "team@strataregula.com"
 

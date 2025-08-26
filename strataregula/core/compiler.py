@@ -104,6 +104,7 @@ class PatternCompiler:
         # Get pattern rule if it exists
         rule = self._find_matching_rule(pattern)
         if not rule:
+            logger.debug(f"No expansion rule found for pattern: {pattern}")
             return {pattern: value}  # No expansion
         
         # Get data source
@@ -136,12 +137,13 @@ class PatternCompiler:
             return True
         
         # Convert wildcard pattern to regex
-        regex_pattern = rule_pattern.replace('.', r'\.').replace('*', r'[^.]*')
+        regex_pattern = rule_pattern.replace('.', r'\.').replace('*', r'.*')
         regex_pattern = f"^{regex_pattern}$"
         
         try:
             return bool(re.match(regex_pattern, pattern))
-        except re.error:
+        except re.error as e:
+            logger.warning(f"Invalid regex pattern '{regex_pattern}' for rule pattern '{rule_pattern}': {e}")
             return False
     
     def _expand_with_template(self, pattern: str, template: str, data_items: List[str], value: Any) -> Dict[str, Any]:

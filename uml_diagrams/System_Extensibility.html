@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>System_Extensibility</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .diagram { text-align: center; margin: 20px 0; }
+        .plantuml-code { 
+            background: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .download-link { 
+            display: inline-block; 
+            background: #007acc; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin: 10px;
+        }
+        .download-link:hover { background: #005a9e; }
+    </style>
+</head>
+<body>
+    <h1>System_Extensibility</h1>
+    
+    <div class="diagram">
+        <img src="http://www.plantuml.com/plantuml/img/dLPRRzCm57xthx3wGWVhVa24og0CCMb8qmfxcIRa9QUTjTI9OhSimFuxjkDxt6YY3sbolkDp-VpvSiu5wSH-LwDp-uRNFHUm-tdnB81n-a1hAdg4Mb8-aItWsQhf01kmOVYweKpm6Vw3iFpfXpH0jo6bTBwkzrlAyAMrp33XU30wcncgVkyeeuAIclw6-OctjbrJ0kVNHCWXB4JA6WZRjyRqagtXQzCy9HKeKpR_0snaUoRHHqRgdbCU9YGRYKpW3JFW5P2EGJLPcMSnBi_PipM2GgjLisjh4D8fob_kkMXsahzRoM9551wLNrKhxM6gvAw-bs2ApQmDGeYcjgm9vtZsYN0mqwWBLjzcK50e8pieC1STPLjlFK2dMXi35V2oewt8WK47fQ078gG-2dneQ1MEps8le-fDxs43nZJkeHs0xtqBlC1h4E-7ofOfvORlffDktqXht4wnioyppNImfTmBIcMP2_cm_OzwTFFdmivDXNR8AJvOgF39fmdHAoHWGtsFgNXKLhtQZn51wlf1QYXXuCkUbMfIfmXG6USkWU_5XYnSb14by0pbNi2n2B9zKc32-XFzpAZThy8RNKtNvoHl-F0kRYEpfaWs6ac8yAjacUZPc8yGcz6BTfyFMOeWy5WmPacO4U6Id5X0h_7UWiYx-Me-JEajOb9PSZog2KrOzEAyk_yVILdIV9mfIV5NQEhkVb9LLtG3PIzFgaXMyhWLiLj3AXbTqs7U0oRktjxZnM9fLxGXsC6nMNkg69-XbKS5i982TxufeBqltS6RH4u1xNrZE7Rdauy-XlG8MNygXX435vfs-MOEGVELOK7DZCCT6bcrdztMX_j3UA2C4EqVxQrXw1HuTK-huOAYEpBlcNxMv01hDTGXpgBn7wmxpdWEDBCa4tAu0TxiktYEOY3fHihuZVBHdV97sd8K7F1dPt-NwHKEnUVdOY5T_10Kd2SfX98zL5KI92lmZZ2vdZYATWYhWP4NIk-MojFDXXjVO4iPnx-eU4JnXT26F-wFx0eTublD5LXqHARIn67He5YELW0ZDtGkLwE-XG___m0=" alt="System_Extensibility" style="max-width: 100%; height: auto;">
+    </div>
+    
+    <div style="text-align: center;">
+        <a href="http://www.plantuml.com/plantuml/img/dLPRRzCm57xthx3wGWVhVa24og0CCMb8qmfxcIRa9QUTjTI9OhSimFuxjkDxt6YY3sbolkDp-VpvSiu5wSH-LwDp-uRNFHUm-tdnB81n-a1hAdg4Mb8-aItWsQhf01kmOVYweKpm6Vw3iFpfXpH0jo6bTBwkzrlAyAMrp33XU30wcncgVkyeeuAIclw6-OctjbrJ0kVNHCWXB4JA6WZRjyRqagtXQzCy9HKeKpR_0snaUoRHHqRgdbCU9YGRYKpW3JFW5P2EGJLPcMSnBi_PipM2GgjLisjh4D8fob_kkMXsahzRoM9551wLNrKhxM6gvAw-bs2ApQmDGeYcjgm9vtZsYN0mqwWBLjzcK50e8pieC1STPLjlFK2dMXi35V2oewt8WK47fQ078gG-2dneQ1MEps8le-fDxs43nZJkeHs0xtqBlC1h4E-7ofOfvORlffDktqXht4wnioyppNImfTmBIcMP2_cm_OzwTFFdmivDXNR8AJvOgF39fmdHAoHWGtsFgNXKLhtQZn51wlf1QYXXuCkUbMfIfmXG6USkWU_5XYnSb14by0pbNi2n2B9zKc32-XFzpAZThy8RNKtNvoHl-F0kRYEpfaWs6ac8yAjacUZPc8yGcz6BTfyFMOeWy5WmPacO4U6Id5X0h_7UWiYx-Me-JEajOb9PSZog2KrOzEAyk_yVILdIV9mfIV5NQEhkVb9LLtG3PIzFgaXMyhWLiLj3AXbTqs7U0oRktjxZnM9fLxGXsC6nMNkg69-XbKS5i982TxufeBqltS6RH4u1xNrZE7Rdauy-XlG8MNygXX435vfs-MOEGVELOK7DZCCT6bcrdztMX_j3UA2C4EqVxQrXw1HuTK-huOAYEpBlcNxMv01hDTGXpgBn7wmxpdWEDBCa4tAu0TxiktYEOY3fHihuZVBHdV97sd8K7F1dPt-NwHKEnUVdOY5T_10Kd2SfX98zL5KI92lmZZ2vdZYATWYhWP4NIk-MojFDXXjVO4iPnx-eU4JnXT26F-wFx0eTublD5LXqHARIn67He5YELW0ZDtGkLwE-XG___m0=" class="download-link" download="System_Extensibility.png">PNGとして保存</a>
+        <a href="data:text/plain;charset=utf-8,@startuml
+@startuml System_Extensibility
+
+package &quot;Core Extension Points&quot; {
+    
+    interface &quot;Plugin Interface&quot; as PluginInterface {
+        +initialize()
+        +processPattern()
+        +cleanup()
+    }
+    
+    interface &quot;Hook Interface&quot; as HookInterface {
+        +beforePatternAnalysis()
+        +afterPatternAnalysis()
+        +onPatternLearned()
+    }
+    
+    interface &quot;Extension Interface&quot; as ExtensionInterface {
+        +extendCompletions()
+        +customizeValidation()
+        +addCustomPatterns()
+    }
+}
+
+package &quot;Plugin System&quot; {
+    
+    class &quot;Base Plugin&quot; as BasePlugin {
+        +name: string
+        +version: string
+        +description: string
+        
+        +activate(): void
+        +deactivate(): void
+    }
+    
+    class &quot;Pattern Plugin&quot; as PatternPlugin {
+        +patternTypes: Set<string>
+        +customValidators: Map<string, Validator>
+        
+        +registerPatternType(type: string): void
+        +addCustomValidator(pattern: string, validator: Validator): void
+    }
+    
+    class &quot;Hook Plugin&quot; as HookPlugin {
+        +hookPoints: Set<string>
+        +callbacks: Map<string, Function>
+        
+        +registerHook(hookPoint: string, callback: Function): void
+        +executeHook(hookPoint: string, data: any): any
+    }
+}
+
+package &quot;Extension Registry&quot; {
+    
+    class &quot;Plugin Registry&quot; as PluginRegistry {
+        +plugins: Map<string, BasePlugin>
+        +activePlugins: Set<string>
+        
+        +registerPlugin(plugin: BasePlugin): void
+        +activatePlugin(name: string): void
+        +deactivatePlugin(name: string): void
+        +getPlugin(name: string): BasePlugin?
+    }
+    
+    class &quot;Hook Registry&quot; as HookRegistry {
+        +hooks: Map<string, HookPlugin[]>
+        
+        +registerHook(hookPoint: string, plugin: HookPlugin): void
+        +executeHooks(hookPoint: string, data: any): any[]
+    }
+}
+
+package &quot;Extension Lifecycle&quot; {
+    
+    state &quot;Extension Loading&quot; as Loading {
+        [*] --> ValidatePlugin
+        ValidatePlugin --> LoadDependencies
+        LoadDependencies --> InitializePlugin
+        InitializePlugin --> RegisterInterfaces
+        RegisterInterfaces --> [*]
+    }
+    
+    state &quot;Extension Execution&quot; as Execution {
+        [*] --> HookExecution
+        HookExecution --> PatternProcessing
+        PatternProcessing --> CustomValidation
+        CustomValidation --> [*]
+    }
+    
+    state &quot;Extension Cleanup&quot; as Cleanup {
+        [*] --> SaveState
+        SaveState --> UnregisterInterfaces
+        UnregisterInterfaces --> ReleaseResources
+        ReleaseResources --> [*]
+    }
+}
+
+' Relationships
+BasePlugin ..|> PluginInterface
+PatternPlugin --|> BasePlugin
+HookPlugin --|> BasePlugin
+
+PluginRegistry --> BasePlugin : manages
+HookRegistry --> HookPlugin : manages
+
+PluginInterface --> ExtensionRegistry : registers with
+HookInterface --> HookRegistry : registers with
+
+Loading --> Execution : transitions to
+Execution --> Cleanup : transitions to
+
+@enduml
+@enduml" class="download-link" download="System_Extensibility.puml">PlantUMLコードとして保存</a>
+    </div>
+    
+    <h2>PlantUMLコード:</h2>
+    <div class="plantuml-code">@startuml
+@startuml System_Extensibility
+
+package "Core Extension Points" {
+    
+    interface "Plugin Interface" as PluginInterface {
+        +initialize()
+        +processPattern()
+        +cleanup()
+    }
+    
+    interface "Hook Interface" as HookInterface {
+        +beforePatternAnalysis()
+        +afterPatternAnalysis()
+        +onPatternLearned()
+    }
+    
+    interface "Extension Interface" as ExtensionInterface {
+        +extendCompletions()
+        +customizeValidation()
+        +addCustomPatterns()
+    }
+}
+
+package "Plugin System" {
+    
+    class "Base Plugin" as BasePlugin {
+        +name: string
+        +version: string
+        +description: string
+        
+        +activate(): void
+        +deactivate(): void
+    }
+    
+    class "Pattern Plugin" as PatternPlugin {
+        +patternTypes: Set<string>
+        +customValidators: Map<string, Validator>
+        
+        +registerPatternType(type: string): void
+        +addCustomValidator(pattern: string, validator: Validator): void
+    }
+    
+    class "Hook Plugin" as HookPlugin {
+        +hookPoints: Set<string>
+        +callbacks: Map<string, Function>
+        
+        +registerHook(hookPoint: string, callback: Function): void
+        +executeHook(hookPoint: string, data: any): any
+    }
+}
+
+package "Extension Registry" {
+    
+    class "Plugin Registry" as PluginRegistry {
+        +plugins: Map<string, BasePlugin>
+        +activePlugins: Set<string>
+        
+        +registerPlugin(plugin: BasePlugin): void
+        +activatePlugin(name: string): void
+        +deactivatePlugin(name: string): void
+        +getPlugin(name: string): BasePlugin?
+    }
+    
+    class "Hook Registry" as HookRegistry {
+        +hooks: Map<string, HookPlugin[]>
+        
+        +registerHook(hookPoint: string, plugin: HookPlugin): void
+        +executeHooks(hookPoint: string, data: any): any[]
+    }
+}
+
+package "Extension Lifecycle" {
+    
+    state "Extension Loading" as Loading {
+        [*] --> ValidatePlugin
+        ValidatePlugin --> LoadDependencies
+        LoadDependencies --> InitializePlugin
+        InitializePlugin --> RegisterInterfaces
+        RegisterInterfaces --> [*]
+    }
+    
+    state "Extension Execution" as Execution {
+        [*] --> HookExecution
+        HookExecution --> PatternProcessing
+        PatternProcessing --> CustomValidation
+        CustomValidation --> [*]
+    }
+    
+    state "Extension Cleanup" as Cleanup {
+        [*] --> SaveState
+        SaveState --> UnregisterInterfaces
+        UnregisterInterfaces --> ReleaseResources
+        ReleaseResources --> [*]
+    }
+}
+
+' Relationships
+BasePlugin ..|> PluginInterface
+PatternPlugin --|> BasePlugin
+HookPlugin --|> BasePlugin
+
+PluginRegistry --> BasePlugin : manages
+HookRegistry --> HookPlugin : manages
+
+PluginInterface --> ExtensionRegistry : registers with
+HookInterface --> HookRegistry : registers with
+
+Loading --> Execution : transitions to
+Execution --> Cleanup : transitions to
+
+@enduml
+@enduml</div>
+</body>
+</html>

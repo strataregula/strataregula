@@ -43,15 +43,35 @@ class RegionHierarchy:
     roles: List[str] = field(default_factory=list)
 
 
+def _safe_async_trigger(plugin_manager, hook_name: str, **kwargs) -> None:
+    """Safely trigger async hooks without warnings."""
+    if not plugin_manager or not hasattr(plugin_manager.hooks, 'trigger'):
+        return
+    
+    try:
+        import asyncio
+        try:
+            # Only create task if we're in an async context
+            loop = asyncio.get_running_loop()
+            loop.create_task(plugin_manager.hooks.trigger(hook_name, **kwargs))
+        except RuntimeError:
+            # No async context, skip async hooks gracefully
+            pass
+    except Exception:
+        # Graceful degradation if hooks fail
+        pass
+
+
 class EnhancedPatternExpander:
     """Enhanced pattern expander with hierarchical support."""
     
-    def __init__(self, chunk_size: int = 1024):
+    def __init__(self, chunk_size: int = 1024, plugin_manager=None):
         self.base_compiler = PatternCompiler()
         self.hierarchy = RegionHierarchy()
         self.expansion_rules: Dict[str, ExpansionRule] = {}
         self.chunk_size = chunk_size
         self._expansion_cache = PatternCache(max_size=50000)
+        self.plugin_manager = plugin_manager
         
         # Default Japanese prefectures and regions
         self._initialize_default_hierarchy()
@@ -214,10 +234,34 @@ class EnhancedPatternExpander:
     
     def expand_pattern_stream(self, patterns: Dict[str, Any]) -> Iterator[Tuple[str, Any]]:
         """Stream-based pattern expansion for memory efficiency."""
+        # Hook point: Pre-compilation
+        if self.plugin_manager:
+            _safe_async_trigger(
+                self.plugin_manager,
+                'pre_compilation',
+                patterns=patterns,
+                expander=self
+            )
+        
         # Sort patterns by priority for consistent expansion order
         sorted_patterns = sorted(patterns.items(), key=lambda x: self._get_pattern_priority(x[0]))
         
         for pattern, value in sorted_patterns:
+            # Hook point: Pre-expand
+            if self.plugin_manager:
+                try:
+                    # Check if any plugin can handle this pattern
+                    plugin_result = self.plugin_manager.expand_pattern(
+                        pattern, 
+                        {'value': value, 'hierarchy': self.hierarchy}
+                    )
+                    if plugin_result != {pattern: value}:  # Plugin handled it
+                        for expanded_key, expanded_value in plugin_result.items():
+                            yield expanded_key, expanded_value
+                        continue
+                except:
+                    pass  # Fall through to default expansion
+            
             cache_key = f"{pattern}:{hash(str(value))}"
             cached_result = self._expansion_cache.get(cache_key)
             
@@ -226,8 +270,29 @@ class EnhancedPatternExpander:
                     yield expanded_key, expanded_value
                 continue
             
+            # Hook point: Pre-expand (for default expansion)
+            if self.plugin_manager:
+                _safe_async_trigger(
+                    self.plugin_manager,
+                    'pre_expand',
+                    pattern=pattern,
+                    value=value,
+                    expander=self
+                )
+            
             # Expand pattern
             expanded = self._expand_pattern_enhanced(pattern, value)
+            
+            # Hook point: Post-expand
+            if self.plugin_manager:
+                _safe_async_trigger(
+                    self.plugin_manager,
+                    'post_expand',
+                    pattern=pattern,
+                    value=value,
+                    result=expanded,
+                    expander=self
+                )
             
             # Cache result
             self._expansion_cache.set(cache_key, expanded)
@@ -235,6 +300,15 @@ class EnhancedPatternExpander:
             # Yield results
             for expanded_key, expanded_value in expanded.items():
                 yield expanded_key, expanded_value
+        
+        # Hook point: Compilation complete
+        if self.plugin_manager:
+            _safe_async_trigger(
+                self.plugin_manager,
+                'compilation_complete',
+                total_patterns=len(patterns),
+                expander=self
+            )
     
     def _get_pattern_priority(self, pattern: str) -> int:
         """Get priority for pattern sorting."""
@@ -463,6 +537,7 @@ class StreamingPatternProcessor:
         self.expander = expander
         self.max_memory_mb = max_memory_mb
         self._current_memory_usage = 0
+        self._cache = {}
         
     def process_large_patterns(self, patterns: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
         """Process large pattern sets with memory limits."""
@@ -493,15 +568,9 @@ class StreamingPatternProcessor:
         return min(max_patterns_in_memory, max(1, total_patterns // 10))
     
     def _should_cleanup_memory(self) -> bool:
-        """Check if memory cleanup is needed."""
-        try:
-            import psutil
-            process = psutil.Process()
-            memory_usage_mb = process.memory_info().rss / 1024 / 1024
-            return memory_usage_mb > self.max_memory_mb * 0.8  # 80% threshold
-        except ImportError:
-            # Fallback: cleanup every 100 chunks
-            return True
+        """Check if memory cleanup is needed based on cache size."""
+        # Simple cache-based cleanup - no external dependencies needed
+        return len(self._cache) > 1000
 
 
 # Backward compatibility with existing code

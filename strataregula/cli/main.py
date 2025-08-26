@@ -3,18 +3,51 @@ Main CLI entry point for strataregula.
 """
 
 import sys
+import warnings
+
+# Early compatibility check before heavy imports
+def check_basic_compatibility():
+    """Basic compatibility check before importing heavy dependencies."""
+    if sys.version_info < (3, 8):
+        print(f"❌ Error: Python {sys.version_info[0]}.{sys.version_info[1]} is not supported.")
+        print("   Strataregula requires Python 3.8 or newer.")
+        if "pyenv" in sys.executable:
+            print("   💡 Detected pyenv. Try:")
+            print("      pyenv install 3.9.16")
+            print("      pyenv global 3.9.16")
+            print("      pip install --upgrade strataregula")
+        sys.exit(1)
+
+check_basic_compatibility()
+
+# Now safe to import dependencies
 import click
-from rich.console import Console
-from rich.panel import Panel
-from rich.text import Text
+
+# Safe imports with fallbacks
+try:
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.text import Text
+    RICH_AVAILABLE = True
+except ImportError:
+    warnings.warn("Rich not available. Using basic console output.", RuntimeWarning)
+    RICH_AVAILABLE = False
+    # Fallback console class
+    class Console:
+        def print(self, *args, **kwargs):
+            print(*args)
+        def print_exception(self):
+            import traceback
+            traceback.print_exc()
 
 from .compile_command import compile_cmd
+from ..core.compatibility import check_environment_compatibility
 
 console = Console()
 
 
 @click.group()
-@click.version_option(version="0.1.1", prog_name="strataregula")
+@click.version_option(version="0.2.0", prog_name="strataregula")
 @click.option('--verbose', '-v', is_flag=True, help='Enable verbose output')
 @click.option('--quiet', '-q', is_flag=True, help='Suppress output')
 @click.pass_context
@@ -131,7 +164,90 @@ def examples():
   cat data.yaml | strataregula process --stdin | jq '.items[] | select(.active)'
     """
     
-    console.print(Panel(examples_text, title="Usage Examples", border_style="blue"))
+    if RICH_AVAILABLE:
+        console.print(Panel(examples_text, title="Usage Examples", border_style="blue"))
+    else:
+        print("Usage Examples:")
+        print("=" * 50)
+        print(examples_text.replace("[bold]", "").replace("[/bold]", "").replace("[blue]", "").replace("[/blue]", ""))
+
+
+@cli.command()
+@click.option('--fix-suggestions', '-f', is_flag=True, help='Show fix suggestions for issues')
+@click.option('--verbose', '-v', is_flag=True, help='Show detailed diagnostic information')
+def doctor(fix_suggestions, verbose):
+    """Check environment compatibility and diagnose issues."""
+    if RICH_AVAILABLE:
+        console.print("[bold blue]🔍 Running Strataregula Environment Check...[/bold blue]\n")
+    else:
+        print("🔍 Running Strataregula Environment Check...\n")
+    
+    try:
+        from ..core.compatibility import print_compatibility_report, check_environment_compatibility
+        
+        if verbose:
+            # Show detailed report
+            is_compatible = print_compatibility_report()
+        else:
+            # Show basic compatibility info
+            report = check_environment_compatibility()
+            is_compatible = report['compatible']
+            
+            if is_compatible:
+                console.print("✅ [bold green]Environment is compatible![/bold green]")
+            else:
+                console.print("❌ [bold red]Environment issues detected[/bold red]")
+                for issue in report['issues'][:3]:  # Show first 3 issues
+                    console.print(f"   • {issue}")
+                if len(report['issues']) > 3:
+                    console.print(f"   • ... and {len(report['issues']) - 3} more issues")
+        
+        if not is_compatible and (fix_suggestions or click.confirm('\n❓ Would you like to see detailed fix suggestions?')):
+            show_fix_suggestions()
+        elif is_compatible and verbose:
+            console.print("\n[green]All checks passed! Your environment is ready for StrataRegula.[/green]")
+            
+    except ImportError as e:
+        console.print(f"[red]Could not run full compatibility check: {e}[/red]")
+        console.print("[yellow]Basic check passed, but some features may be unavailable.[/yellow]")
+
+
+def show_fix_suggestions():
+    """Show detailed fix suggestions for common issues."""
+    suggestions = """
+🛠️  FIX SUGGESTIONS:
+
+For pyenv users:
+1. Update to a newer Python version:
+   pyenv install 3.9.16
+   pyenv global 3.9.16
+
+2. Recreate your environment:
+   pyenv virtualenv 3.9.16 strataregula-clean
+   pyenv activate strataregula-clean
+   pip install --upgrade pip
+   pip install strataregula
+
+3. If using an older pyenv Python:
+   pip install --upgrade --force-reinstall strataregula
+
+For conda users:
+   conda update python
+   pip install --upgrade strataregula
+
+For system Python:
+   python -m pip install --upgrade pip
+   python -m pip install --upgrade strataregula
+
+If problems persist:
+   pip uninstall strataregula
+   pip install strataregula --no-cache-dir
+    """
+    
+    if RICH_AVAILABLE:
+        console.print(Panel(suggestions, title="Fix Suggestions", border_style="yellow"))
+    else:
+        print(suggestions)
 
 
 # Add compile command to CLI
