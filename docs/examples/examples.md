@@ -1,5 +1,7 @@
 # Examples
 
+Real-world usage patterns and configuration examples for StrataRegula v0.2.0.
+
 ## Configuration Files
 
 ### Prefecture Hierarchy Example
@@ -56,3 +58,10 @@ python examples/bank_renege_simulation.py
 python examples/carwash_simulation.py
 python examples/machine_shop_simulation.py
 ```
+
+## Quick Navigation
+
+- [← Back to Documentation Index](../index.md)
+- [User Guide](../user-guide/)  
+- [Developer Guide](../developer-guide/)
+- [API Reference](../api-reference/)

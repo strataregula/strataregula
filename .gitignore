@@ -94,9 +94,21 @@ htmlcov/
 htmlcov_core/
 uml_diagrams/
 
-# Separate LSP and VS Code repositories (not part of core release)
-strataregula-lsp/
-strataregula-vscode/
+# Separate LSP and VS Code repositories (not part of core release) - REMOVED
+# strataregula-lsp/
+# strataregula-vscode/
+
+# Root-level documentation duplicates (moved to docs/)
+API_REFERENCE.md
+CLI_REFERENCE.md
+MIGRATION_GUIDE.md
+PLUGIN_QUICKSTART.md
+RELEASE_SCOPE.md
+
+# HTML coverage reports (moved to idea/dev/)
+htmlcov/
+htmlcov_core/
+uml_diagrams/
 
 # Development test files and artifacts
 .coverage

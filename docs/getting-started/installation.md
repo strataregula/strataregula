@@ -458,10 +458,10 @@ tail -f debug.log
 
 After successful installation:
 
-1. **[First Project](first-project.md)** - Create your first Strataregula project
-2. **[Core Concepts](../user-guide/concepts.md)** - Understanding key concepts
-3. **[Examples](../examples/getting-started.md)** - Practical usage examples
-4. **[CLI Reference](../user-guide/cli.md)** - Complete command reference
+1. **[Examples](../examples/examples.md)** - Real-world usage patterns
+2. **[CLI Reference](../user-guide/CLI_REFERENCE.md)** - Complete command reference
+3. **[Plugin Development](../developer-guide/PLUGIN_QUICKSTART.md)** - Create custom plugins
+4. **[API Reference](../api-reference/API_REFERENCE.md)** - Complete Python API documentation
 
 ## Support
 
