@@ -1,9 +1,9 @@
-# Strataregula
+# StrataRegula
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-**Strataregula** is a YAML Configuration Pattern Compiler for hierarchical configuration management with wildcard pattern expansion.
+**StrataRegula** is a YAML Configuration Pattern Compiler for hierarchical configuration management with wildcard pattern expansion.
 
 ## Features
 
