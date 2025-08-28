@@ -253,6 +253,42 @@ If problems persist:
 # Add compile command to CLI
 cli.add_command(compile_cmd, name='compile')
 
+# Add index command to CLI
+@cli.command()
+@click.option('--provider', help='Index provider to use')
+@click.option('--format', 'output_format', default='text', 
+              type=click.Choice(['text', 'json']), 
+              help='Output format')
+@click.option('--verbose', '-v', is_flag=True, help='Verbose output')
+def index(provider, output_format, verbose):
+    """Index diagnostics and statistics."""
+    try:
+        from .index_cli import main as index_main
+        # Pass arguments to index CLI
+        import sys
+        old_argv = sys.argv
+        sys.argv = ['strataregula', 'index']
+        if provider:
+            sys.argv.extend(['--provider', provider])
+        if output_format != 'text':
+            sys.argv.extend(['--format', output_format])
+        if verbose:
+            sys.argv.append('--verbose')
+        
+        try:
+            index_main()
+        finally:
+            sys.argv = old_argv
+            
+    except ImportError as e:
+        console.print(f"[red]Index functionality not available: {e}[/red]")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"[red]Index command failed: {e}[/red]")
+        if verbose:
+            console.print_exception()
+        sys.exit(1)
+
 
 def main():
     """Main entry point."""
