@@ -81,8 +81,7 @@ class TestMergeCommand:
         # Should default to SMART strategy
         result = await self.command.execute(
             base_data, 
-            with=merge_data, 
-            strategy="invalid_strategy"
+            **{"with": merge_data, "strategy": "invalid_strategy"}
         )
         
         assert result["app"] == "merged"
