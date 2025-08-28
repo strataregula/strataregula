@@ -55,6 +55,7 @@ strataregula compile --traffic config.yaml
 - **[Contributing Guidelines](#contributing)** - How to contribute
 
 ### 📚 **Reference**
+- **[Hash Architecture Hub](hash/README.md)** - Hashing/Interning design patterns and modern approaches
 - **[Release Scope](RELEASE_SCOPE.md)** - What's included in v0.2.0
 - **[Changelog](../CHANGELOG.md)** - Version history
 - **[GitHub Repository](https://github.com/strataregula/strataregula)** - Source code
