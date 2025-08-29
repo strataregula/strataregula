@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 """
 Strataregula - Layered Configuration Management with Strata Rules Architecture.
 
@@ -6,7 +8,7 @@ for large-scale configuration generation.
 
 Features:
 - Wildcard pattern expansion (* and **)
-- Hierarchical mapping (47 prefectures → 8 regions)  
+- Hierarchical mapping (47 prefectures → 8 regions)
 - Multiple output formats (Python, JSON, YAML)
 - Memory-efficient streaming processing
 - Simple CLI interface
@@ -20,37 +22,23 @@ __author__ = "Strataregula Team"
 __email__ = "team@strataregula.com"
 
 # Only import what actually works and is tested
-try:
-    from .core.pattern_expander import (
-        PatternExpander,
-        EnhancedPatternExpander
-    )
-except ImportError:
-    pass
+with suppress(ImportError):
+    from .core.pattern_expander import EnhancedPatternExpander, PatternExpander
 
-try:
-    from .core.config_compiler import (
-        ConfigCompiler,
-        CompilationConfig
-    )
-except ImportError:
-    pass
+with suppress(ImportError):
+    from .core.config_compiler import CompilationConfig, ConfigCompiler
 
 # v0.3.0 New Architecture
-try:
-    from .kernel import Kernel, CacheStats, LRUCacheBackend
-except ImportError:
-    pass
+with suppress(ImportError):
+    from .kernel import CacheStats, Kernel, LRUCacheBackend
 
-try:
+with suppress(ImportError):
     from .passes import InternPass
-except ImportError:
-    pass
 
 __all__ = [
     # Version info
-    '__version__',
+    "__version__",
     # v0.3.0 New Architecture
-    'Kernel',
-    'InternPass',
+    "Kernel",
+    "InternPass",
 ]

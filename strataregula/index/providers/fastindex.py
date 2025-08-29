@@ -1,24 +1,28 @@
 from __future__ import annotations
-from typing import List, Dict, Any, Set, Iterable, Optional
-from pathlib import Path
-import subprocess
-import os
-import json
-import time
+
 import hashlib
+import json
+import os
+import subprocess
+import time
+from collections.abc import Iterable
+from pathlib import Path
+from typing import Any
+
 
 class Provider:
     """
     既定の軽量インデックス（パス列挙に特化）。capabilities={'paths'}。
     """
+
     name = "fastindex"
     version = "0.1.0"
-    capabilities: Set[str] = {"paths"}
+    capabilities: set[str] = {"paths"}
 
     def __init__(self) -> None:
-        self._last_stats: Dict[str, Any] = {}
-        self._cache_dir: Optional[Path] = None
-        self._lock_file: Optional[Path] = None
+        self._last_stats: dict[str, Any] = {}
+        self._cache_dir: Path | None = None
+        self._lock_file: Path | None = None
 
     # no-op
     def build(self, entries: Iterable[Path] | None = None) -> None:
@@ -35,10 +39,10 @@ class Provider:
         """Simple PID-based lock to avoid concurrent builds."""
         if not self._lock_file:
             return True
-        
+
         start = time.time()
         my_pid = str(os.getpid())
-        
+
         while time.time() - start < timeout:
             try:
                 # Check if lock exists and is stale
@@ -48,10 +52,11 @@ class Provider:
                         try:
                             lock_pid = int(lock_data)
                             # Check if process is still running (platform-specific)
-                            if os.name == 'nt':  # Windows
+                            if os.name == "nt":  # Windows
                                 result = subprocess.run(
                                     ["tasklist", "/FI", f"PID eq {lock_pid}"],
-                                    capture_output=True, text=True
+                                    check=False, capture_output=True,
+                                    text=True,
                                 )
                                 if str(lock_pid) not in result.stdout:
                                     # Process not running, remove stale lock
@@ -65,18 +70,18 @@ class Provider:
                         except (ValueError, subprocess.SubprocessError):
                             # Invalid lock file, remove it
                             self._lock_file.unlink()
-                
+
                 # Try to create lock
                 if not self._lock_file.exists():
                     self._lock_file.parent.mkdir(parents=True, exist_ok=True)
                     self._lock_file.write_text(my_pid)
                     return True
-                    
+
             except Exception:
                 pass
-            
+
             time.sleep(0.5)
-        
+
         return False
 
     def _release_lock(self) -> None:
@@ -89,19 +94,19 @@ class Provider:
             except Exception:
                 pass
 
-    def _get_cache_key(self, base: str, roots: List[str]) -> str:
+    def _get_cache_key(self, base: str, roots: list[str]) -> str:
         """Generate cache key from base and roots."""
         key_data = f"{base}:{':'.join(sorted(roots))}"
         return hashlib.md5(key_data.encode()).hexdigest()
 
-    def _load_cache(self, base: str, roots: List[str]) -> Optional[List[Path]]:
+    def _load_cache(self, base: str, roots: list[str]) -> list[Path] | None:
         """Load cached file list if valid."""
         if not self._cache_dir or not base:
             return None
-        
+
         cache_key = self._get_cache_key(base, roots)
         cache_file = self._cache_dir / f"{cache_key}.json"
-        
+
         if cache_file.exists():
             try:
                 data = json.loads(cache_file.read_text())
@@ -109,40 +114,40 @@ class Provider:
                 current_head = subprocess.check_output(
                     ["git", "rev-parse", "HEAD"], text=True
                 ).strip()
-                
+
                 if data.get("head") == current_head:
                     return [Path(p) for p in data.get("files", [])]
             except Exception:
                 pass
-        
+
         return None
 
-    def _save_cache(self, base: str, roots: List[str], files: List[Path]) -> None:
+    def _save_cache(self, base: str, roots: list[str], files: list[Path]) -> None:
         """Save file list to cache."""
         if not self._cache_dir or not base:
             return
-        
+
         try:
             current_head = subprocess.check_output(
                 ["git", "rev-parse", "HEAD"], text=True
             ).strip()
-            
+
             cache_key = self._get_cache_key(base, roots)
             cache_file = self._cache_dir / f"{cache_key}.json"
-            
+
             data = {
                 "base": base,
                 "head": current_head,
                 "roots": roots,
                 "files": [str(p) for p in files],
-                "timestamp": time.time()
+                "timestamp": time.time(),
             }
-            
+
             cache_file.write_text(json.dumps(data, indent=2))
         except Exception:
             pass
 
-    def _auto_base(self, repo_root: Path, verbose: bool = False) -> Optional[str]:
+    def _auto_base(self, repo_root: Path, verbose: bool = False) -> str | None:
         # 可能な限り“現在の環境だけ”で解決。originが無くてもOK。
         # 1) PRイベントのpayload（省略：ここでは簡略化）
         # 2) merge-base (main/master/upstream) が無理なら
@@ -152,7 +157,9 @@ class Provider:
             try:
                 sha = subprocess.check_output(
                     ["git", "merge-base", cand, "HEAD"],
-                    cwd=repo_root, text=True, stderr=subprocess.DEVNULL
+                    cwd=repo_root,
+                    text=True,
+                    stderr=subprocess.DEVNULL,
                 ).strip()
                 if sha:
                     return sha
@@ -168,47 +175,59 @@ class Provider:
 
     def changed_py(
         self,
-        base: Optional[str],
-        roots: List[str],
+        base: str | None,
+        roots: list[str],
         repo_root: Path,
         verbose: bool = False,
-    ) -> List[Path]:
+    ) -> list[Path]:
         repo_root = repo_root.resolve()
-        
+
         # Initialize cache on first use
         if self._cache_dir is None:
             self._init_cache(repo_root)
-        
+
         base = base if base and base != "auto" else self._auto_base(repo_root, verbose)
-        
+
         # Try to load from cache first
         if base:
             cached_files = self._load_cache(base, roots)
             if cached_files is not None:
-                self._last_stats.update({
-                    "base": base,
-                    "files": len(cached_files),
-                    "roots": roots,
-                    "cache_hit": True,
-                })
+                self._last_stats.update(
+                    {
+                        "base": base,
+                        "files": len(cached_files),
+                        "roots": roots,
+                        "cache_hit": True,
+                    }
+                )
                 return cached_files
-        
+
         # Acquire lock for git operations
         lock_acquired = self._acquire_lock()
-        
+
         try:
-            files: List[Path] = []
+            files: list[Path] = []
 
             if base:
                 try:
                     out = subprocess.check_output(
-                        ["git", "diff", "--name-only", "--diff-filter=ACMRTUXB", f"{base}..HEAD"],
-                        cwd=repo_root, text=True, stderr=subprocess.DEVNULL
+                        [
+                            "git",
+                            "diff",
+                            "--name-only",
+                            "--diff-filter=ACMRTUXB",
+                            f"{base}..HEAD",
+                        ],
+                        cwd=repo_root,
+                        text=True,
+                        stderr=subprocess.DEVNULL,
                     )
                     for rel in out.splitlines():
                         p = (repo_root / rel.strip()).resolve()
                         if p.suffix == ".py" and p.exists():
-                            if not roots or any((repo_root / r) in p.parents for r in roots):
+                            if not roots or any(
+                                (repo_root / r) in p.parents for r in roots
+                            ):
                                 files.append(p)
                 except Exception:
                     files = []
@@ -221,27 +240,29 @@ class Provider:
                         files.extend(p for p in root_dir.rglob("*.py"))
 
             files = sorted(set(files))
-            
+
             # Save to cache if we have a base
             if base and files:
                 self._save_cache(base, roots, files)
-            
-            self._last_stats.update({
-                "base": base or "none",
-                "files": len(files),
-                "roots": roots,
-                "cache_hit": False,
-                "lock_acquired": lock_acquired,
-            })
-            
+
+            self._last_stats.update(
+                {
+                    "base": base or "none",
+                    "files": len(files),
+                    "roots": roots,
+                    "cache_hit": False,
+                    "lock_acquired": lock_acquired,
+                }
+            )
+
             return files
-        
+
         finally:
             self._release_lock()
 
-    def search(self, pattern: str, paths: List[Path]) -> List[str]:
+    def search(self, pattern: str, paths: list[Path]) -> list[str]:
         # content検索capabilityは持たない → 空返却（上位でrg/grepにフォールバックさせる想定）
         return []
 
-    def stats(self) -> Dict[str, Any]:
+    def stats(self) -> dict[str, Any]:
         return {"provider": self.name, "version": self.version, **self._last_stats}

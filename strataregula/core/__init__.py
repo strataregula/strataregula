@@ -2,4 +2,4 @@
 
 from .compiler import PatternCompiler
 
-__all__ = ['PatternCompiler']
+__all__ = ["PatternCompiler"]
