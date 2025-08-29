@@ -16,7 +16,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import yaml
 
@@ -317,7 +317,7 @@ class ConfigCompiler:
         self,
         input_file: Path,
         output_file: Path,
-        progress_callback: callable | None = None,
+        progress_callback: Optional[callable] = None,
     ) -> None:
         """Compile large configuration files with streaming."""
         start_time = time.time()
