@@ -1,0 +1,20 @@
+{
+  "services": {
+    "web": {
+      "timeout": 30,
+      "retries": 3
+    }
+  },
+  "routes": {
+    "api": {
+      "path": "/api/v1", 
+      "methods": ["GET", "POST"]
+    }
+  },
+  "compilation_info": {
+    "version": "v0.3.0",
+    "kernel_used": true,
+    "passes_applied": ["intern", "validate"],
+    "output_format": "json"
+  }
+}

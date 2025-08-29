@@ -39,6 +39,16 @@ package.json
 .claude-history-v8
 .benchmarks
 
+# Golden Metrics reports (throw-away artifacts)
+reports/current/
+reports/diff/
+reports/junit/
+reports/history/
+# Keep golden baseline for reference
+!reports/golden/
+!reports/.gitkeep
+!reports/README.md
+
 # Python package build artifacts
 *.egg-info/
 *.egg

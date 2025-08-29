@@ -269,3 +269,22 @@ extend-exclude = '''
   | dist
 )/
 '''
+
+# Golden Metrics Guard configuration
+[tool.strataregula.golden-metrics]
+mode = "fixed"  # Will change to "adaptive" in v0.4.0
+enabled = true
+report_dir = "reports"
+
+[tool.strataregula.golden-metrics.thresholds]
+# Performance regression thresholds (fixed mode)
+latency = 1.05      # +5% tolerance for latency increase
+throughput = 0.97   # -3% tolerance for throughput decrease  
+error_rate = 1.02   # +2% tolerance for error rate increase
+memory = 1.10       # +10% tolerance for memory usage increase
+cache_hit_rate = 0.98  # -2% tolerance for cache hit rate decrease
+
+[tool.strataregula.golden-metrics.critical]
+# Critical metrics with stricter thresholds
+kernel_latency = 1.01     # Kernel operations must be fast
+config_intern_ratio = 0.95  # Config interning efficiency
