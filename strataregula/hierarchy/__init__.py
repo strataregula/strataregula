@@ -7,14 +7,14 @@ Provides functionality for:
 - Automatic conflict resolution
 """
 
+from .commands import EnvironmentMergeCommand, MergeCommand
 from .merger import HierarchyMerger, MergeStrategy
 from .processor import HierarchyProcessor
-from .commands import MergeCommand, EnvironmentMergeCommand
 
 __all__ = [
-    'HierarchyMerger',
-    'MergeStrategy',
-    'HierarchyProcessor',
-    'MergeCommand',
-    'EnvironmentMergeCommand',
+    "EnvironmentMergeCommand",
+    "HierarchyMerger",
+    "HierarchyProcessor",
+    "MergeCommand",
+    "MergeStrategy",
 ]

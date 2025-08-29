@@ -101,7 +101,7 @@ uml_diagrams/
 # Root-level documentation duplicates (moved to docs/)
 API_REFERENCE.md
 CLI_REFERENCE.md
-MIGRATION_GUIDE.md
+# MIGRATION_GUIDE.md  # Important documentation
 PLUGIN_QUICKSTART.md
 RELEASE_SCOPE.md
 

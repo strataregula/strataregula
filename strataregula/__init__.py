@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 """
 Strataregula - Layered Configuration Management with Strata Rules Architecture.
 
@@ -10,30 +12,33 @@ Features:
 - Multiple output formats (Python, JSON, YAML)
 - Memory-efficient streaming processing
 - Simple CLI interface
+- Pass/View kernel architecture (v0.3.0)
+- Config interning and hash-consing (v0.3.0)
+- Content-addressed caching (v0.3.0)
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __author__ = "Strataregula Team"
 __email__ = "team@strataregula.com"
 
 # Only import what actually works and is tested
-try:
-    from .core.pattern_expander import (
-        PatternExpander,
-        EnhancedPatternExpander
-    )
-except ImportError:
-    pass
+with suppress(ImportError):
+    from .core.pattern_expander import EnhancedPatternExpander, PatternExpander
 
-try:
-    from .core.config_compiler import (
-        ConfigCompiler,
-        CompilationConfig
-    )
-except ImportError:
-    pass
+with suppress(ImportError):
+    from .core.config_compiler import CompilationConfig, ConfigCompiler
+
+# v0.3.0 New Architecture
+with suppress(ImportError):
+    from .kernel import CacheStats, Kernel, LRUCacheBackend
+
+with suppress(ImportError):
+    from .passes import InternPass
 
 __all__ = [
     # Version info
-    '__version__',
+    "__version__",
+    # v0.3.0 New Architecture
+    "Kernel",
+    "InternPass",
 ]

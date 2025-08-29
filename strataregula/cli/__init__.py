@@ -12,5 +12,5 @@ Provides a rich command-line interface with:
 from .main import main
 
 __all__ = [
-    'main',
+    "main",
 ]
