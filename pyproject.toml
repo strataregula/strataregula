@@ -43,7 +43,8 @@ dependencies = [
     "click>=7.0.0",          # より広い互換性
     "rich>=10.0.0",          # 2021年初期版から対応
     "pyyaml>=5.4.0",         # Python 3.8 確実対応
-    "typing-extensions>=3.10.0"  # Python 3.8 対応
+    "typing-extensions>=3.10.0",  # Python 3.8 対応
+    "tomli>=1.2.0; python_version<'3.11'"  # TOML parsing for legacy support
 ]
 
 [project.optional-dependencies]
