@@ -37,11 +37,25 @@ def _load_thresholds():
         with open(config_file, "rb") as f:
             config = tomllib.load(f)
             golden_config = config.get("tool", {}).get("strataregula", {}).get("golden-metrics", {})
-            thresholds = golden_config.get("thresholds", default_thresholds)
+            
+            # Check if adaptive mode is enabled
+            mode = golden_config.get("mode", "fixed")
+            
+            if mode == "adaptive":
+                # Try to use adaptive thresholds
+                adaptive_thresholds = _calculate_adaptive_thresholds(golden_config)
+                if adaptive_thresholds:
+                    thresholds = adaptive_thresholds
+                else:
+                    print("WARNING: Adaptive mode enabled but insufficient data, falling back to fixed thresholds")
+                    thresholds = golden_config.get("thresholds", default_thresholds)
+            else:
+                # Fixed mode
+                thresholds = golden_config.get("thresholds", default_thresholds)
     else:
         thresholds = default_thresholds
     
-    # Environment variable override
+    # Environment variable override (always takes precedence)
     LAT_PCT = float(os.getenv("GOLDEN_LATENCY_ALLOW_PCT", str((thresholds.get("latency", 1.05) - 1) * 100)))
     P95_PCT = float(os.getenv("GOLDEN_P95_ALLOW_PCT", str((thresholds.get("latency", 1.05) - 1) * 100 * 1.2)))  # P95 slightly more lenient
     TPUT_PCT = float(os.getenv("GOLDEN_THROUGHPUT_ALLOW_PCT", str((1 - thresholds.get("throughput", 0.97)) * 100)))
@@ -49,6 +63,50 @@ def _load_thresholds():
     CACHE_PCT = float(os.getenv("GOLDEN_CACHE_ALLOW_PCT", str((1 - thresholds.get("cache_hit_rate", 0.98)) * 100)))
     
     return LAT_PCT, P95_PCT, TPUT_PCT, MEM_PCT, CACHE_PCT
+
+
+def _calculate_adaptive_thresholds(golden_config):
+    """Calculate adaptive thresholds if sufficient historical data exists."""
+    try:
+        # Import adaptive modules (may not be available)
+        import sys
+        sys.path.append(str(ROOT))
+        from strataregula.golden.adaptive import calculate_adaptive_thresholds_for_config
+        from strataregula.golden.history import initialize_history
+        
+        # Check if we have sufficient history
+        history = initialize_history(REPORT_ROOT)
+        stats = history.get_summary_stats()
+        
+        min_samples = golden_config.get("min_samples_for_adaptive", 5)
+        if stats["total_entries"] < min_samples:
+            return None
+        
+        # Calculate adaptive thresholds
+        adaptive_thresholds_data = calculate_adaptive_thresholds_for_config(
+            REPORT_ROOT, golden_config
+        )
+        
+        # Convert to format expected by regression guard
+        thresholds = {}
+        for metric_name, threshold_obj in adaptive_thresholds_data.items():
+            if metric_name == "latency_ms":
+                thresholds["latency"] = threshold_obj.threshold_value / 100  # Convert to ratio
+            elif metric_name == "throughput_rps":
+                thresholds["throughput"] = threshold_obj.threshold_value / 100
+            elif metric_name == "memory_bytes":
+                thresholds["memory"] = threshold_obj.threshold_value / 100
+            elif metric_name == "hit_ratio":
+                thresholds["cache_hit_rate"] = threshold_obj.threshold_value
+        
+        return thresholds
+        
+    except ImportError:
+        # Adaptive modules not available
+        return None
+    except Exception as e:
+        print(f"WARNING: Failed to calculate adaptive thresholds: {e}")
+        return None
 
 # Load thresholds
 LAT_PCT, P95_PCT, TPUT_PCT, MEM_PCT, CACHE_PCT = _load_thresholds()

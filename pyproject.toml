@@ -273,9 +273,14 @@ extend-exclude = '''
 
 # Golden Metrics Guard configuration
 [tool.strataregula.golden-metrics]
-mode = "fixed"  # Will change to "adaptive" in v0.4.0
+mode = "fixed"  # Options: "fixed", "adaptive"
 enabled = true
 report_dir = "reports"
+
+# History and adaptive mode settings (v0.4.0+)
+history_retention_days = 90
+min_samples_for_adaptive = 5
+default_window_size = 20
 
 [tool.strataregula.golden-metrics.thresholds]
 # Performance regression thresholds (fixed mode)
@@ -286,6 +291,23 @@ memory = 1.10       # +10% tolerance for memory usage increase
 cache_hit_rate = 0.98  # -2% tolerance for cache hit rate decrease
 
 [tool.strataregula.golden-metrics.critical]
-# Critical metrics with stricter thresholds
+# Critical metrics with stricter thresholds (fixed mode)
 kernel_latency = 1.01     # Kernel operations must be fast
 config_intern_ratio = 0.95  # Config interning efficiency
+
+[tool.strataregula.golden-metrics.adaptive]
+# Adaptive threshold settings (v0.4.0+)
+sensitivity = "normal"  # Options: "strict", "normal", "relaxed"
+strategy = "confidence_interval"  # Options: "confidence_interval", "percentile", "moving_average", "trend_adjusted"
+
+# Per-metric adaptive configuration
+[tool.strataregula.golden-metrics.adaptive.metrics]
+latency_ms = { strategy = "trend_adjusted", sensitivity = "normal" }
+throughput_rps = { strategy = "confidence_interval", sensitivity = "normal" }  
+error_rate = { strategy = "percentile", sensitivity = "strict" }
+memory_bytes = { strategy = "moving_average", sensitivity = "normal" }
+hit_ratio = { strategy = "confidence_interval", sensitivity = "normal" }
+
+# Legacy support - override specific metrics with fixed thresholds even in adaptive mode
+[tool.strataregula.golden-metrics.adaptive.overrides]
+# kernel_latency = 1.01  # Force fixed threshold for critical metrics

@@ -1,0 +1,4 @@
+{
+  "error": "<frozen runpy>:128: RuntimeWarning: 'strataregula.cli.main' found in sys.modules after import of package 'strataregula.cli', but prior to execution of 'strataregula.cli.main'; this may result in unpredictable behaviour\nCompilation failed: No module named 'strataregula.plugins.base'\n",
+  "returncode": 1
+}
