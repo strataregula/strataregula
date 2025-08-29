@@ -10,6 +10,12 @@ on:
     #   - "src/**/*.js"
     #   - "src/**/*.jsx"
 
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+  id-token: write
+
 jobs:
   claude-review:
     # Optional: Filter by PR author
@@ -75,4 +81,3 @@ jobs:
           # if: |
           #   !contains(github.event.pull_request.title, '[skip-review]') &&
           #   !contains(github.event.pull_request.title, '[WIP]')
-
