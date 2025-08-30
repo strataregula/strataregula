@@ -1,3 +1,5 @@
+> **開発者へ**: 作業開始前に必ず [docs/README_FOR_DEVELOPERS.md](docs/README_FOR_DEVELOPERS.md) を確認してください。
+
 # StrataRegula
 
 [![PyPI version](https://badge.fury.io/py/strataregula.svg)](https://badge.fury.io/py/strataregula)

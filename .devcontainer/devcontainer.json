@@ -1,0 +1,37 @@
+{
+  "name": "StrataRegula DoE Runner Dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "VARIANT": "3.11",
+      "NODE_VERSION": "20"
+    }
+  },
+
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "charliermarsh.ruff",
+        "ms-toolsai.jupyter",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.testing.pytestEnabled": true,
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "updateContentCommand": "bash .devcontainer/post_create_or_update.sh",
+  "postCreateCommand": "bash .devcontainer/post_create_or_update.sh",
+  "postStartCommand": "bash .devcontainer/post_start.sh",
+  "runArgs": ["--env-file", ".devcontainer/dev.env"],
+  "containerEnv": {
+    "PIP_DISABLE_PIP_VERSION_CHECK": "1",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  }
+}
