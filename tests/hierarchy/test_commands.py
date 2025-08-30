@@ -100,7 +100,7 @@ class TestMergeCommand:
             
             result = await self.command.execute(
                 base_data, 
-                with=str(config_file)
+                **{"with": str(config_file)}
             )
             
             assert result["app"] == "merged"
@@ -116,7 +116,7 @@ class TestMergeCommand:
         
         result = await self.command.execute(
             base_data, 
-            with=yaml_string
+            **{"with": yaml_string}
         )
         
         assert result["app"] == "merged"
@@ -129,7 +129,7 @@ class TestMergeCommand:
         invalid_yaml = "invalid: yaml: [unclosed"
         
         with pytest.raises(ValueError, match="Invalid YAML string"):
-            await self.command.execute(base_data, with=invalid_yaml)
+            await self.command.execute(base_data, **{"with": invalid_yaml})
     
     @pytest.mark.asyncio
     async def test_execute_with_nonexistent_file(self):
@@ -138,7 +138,7 @@ class TestMergeCommand:
         nonexistent_file = "/path/to/nonexistent/file.yaml"
         
         with pytest.raises(ValueError, match="Invalid YAML string"):
-            await self.command.execute(base_data, with=nonexistent_file)
+            await self.command.execute(base_data, **{"with": nonexistent_file})
 
 
 class TestEnvironmentMergeCommand:
@@ -599,7 +599,7 @@ class TestCommandIntegration:
         with pytest.raises(ValueError):
             await merge_cmd.execute(
                 {"base": "data"},
-                with=str(corrupt_file)
+                **{"with": str(corrupt_file)}
             )
 
 

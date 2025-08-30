@@ -1,0 +1,343 @@
+name: Bench Guard
+# StrataRegula パフォーマンス回帰検知システム
+# 主要機能（PatternExpander, ConfigCompiler, Kernel）の最適化実装と
+# フォールバック実装を比較し、しきい値を下回った場合にPRを落とす
+
+on:
+  pull_request:
+    paths:
+      - 'strataregula/**'
+      - 'scripts/**'
+      - 'pyproject.toml'
+      - 'requirements.txt'
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'strataregula/**'
+      - 'scripts/**'
+      - 'pyproject.toml'
+      - 'requirements.txt'
+
+jobs:
+  bench-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Tokyo
+      PYTHONUTF8: "1"
+      # StrataRegula ベンチマーク設定（環境変数で調整可能）
+      SR_BENCH_MIN_RATIO: "50"      # 50x の速度比を要求（高性能要求）
+      SR_BENCH_MAX_P95_US: "50"     # p95 50us以下を要求（低レイテンシ要求）
+      SR_BENCH_N: "50000"           # 5万回実行でベンチマーク
+      SR_BENCH_WARMUP: "1000"       # 1000回のウォームアップ
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'  # StrataRegula の推奨バージョン
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # エディタブルモードでインストール
+          pip install -e .
+          
+          # 必要に応じて追加の依存関係をインストール
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Verify StrataRegula components
+        run: |
+          python -c "
+          try:
+              import strataregula
+              print(f'✅ StrataRegula v{strataregula.__version__} loaded successfully')
+              
+              # 主要コンポーネントの確認
+              from strataregula.core.pattern_expander import PatternExpander, EnhancedPatternExpander
+              print('✅ PatternExpander components available')
+              
+              from strataregula.core.config_compiler import ConfigCompiler
+              print('✅ ConfigCompiler available')
+              
+              from strataregula.kernel import Kernel, LRUCacheBackend
+              print('✅ Kernel and cache backend available')
+              
+              # 動作確認
+              expander = EnhancedPatternExpander()
+              print('✅ Enhanced pattern expander instantiated successfully')
+              
+          except Exception as e:
+              print(f'❌ StrataRegula component verification failed: {e}')
+              import traceback
+              traceback.print_exc()
+              exit(1)
+          "
+
+      - name: Run performance benchmark (3-run median evaluation)
+        id: bench
+        run: |
+          echo "Starting StrataRegula bench guard performance test with 3-run median evaluation..."
+          
+          # 3回実行して結果を収集
+          for run in 1 2 3; do
+            echo "🔄 Running benchmark iteration $run/3..."
+            
+            # 前回の結果ファイルをバックアップ
+            if [ -f bench_guard.json ]; then
+              mv bench_guard.json "bench_guard_run${run}.json"
+            fi
+            
+            # ベンチマーク実行
+            python scripts/bench_guard.py || {
+              echo "⚠️ Benchmark run $run failed, continuing with remaining runs..."
+              echo "{\"overall\":{\"min_ratio\":0,\"max_p95_us\":9999},\"passed\":false,\"error\":\"execution_failed\"}" > "bench_guard_run${run}.json"
+            }
+            
+            # 結果ファイルを正しい名前にリネーム
+            if [ -f bench_guard.json ]; then
+              mv bench_guard.json "bench_guard_run${run}.json"
+            fi
+            
+            echo "📊 Run $run completed"
+          done
+          
+          # 3つの結果から中央値を計算して最終判定
+          echo "🧮 Calculating median results from 3 runs..."
+          python - <<'PY'
+          import json
+          import glob
+          import statistics
+          import sys
+          import os
+          
+          try:
+              # 3つの結果ファイルを読み込み
+              run_files = sorted(glob.glob("bench_guard_run*.json"))
+              if len(run_files) != 3:
+                  print(f"❌ Expected 3 result files, found {len(run_files)}")
+                  sys.exit(1)
+              
+              runs = []
+              for file in run_files:
+                  try:
+                      with open(file) as f:
+                          data = json.load(f)
+                          runs.append(data)
+                      print(f"✅ Loaded {file}: ratio={data.get('overall', {}).get('min_ratio', 0):.2f}x, p95={data.get('overall', {}).get('max_p95_us', 9999):.1f}μs")
+                  except Exception as e:
+                      print(f"⚠️ Failed to load {file}: {e}")
+                      # フォールバック値を使用
+                      runs.append({"overall":{"min_ratio":0,"max_p95_us":9999},"passed":False,"error":"parse_failed"})
+              
+              # 中央値計算
+              ratios = [r.get("overall", {}).get("min_ratio", 0) for r in runs]
+              p95s = [r.get("overall", {}).get("max_p95_us", 9999) for r in runs]
+              
+              median_ratio = statistics.median(ratios)
+              median_p95 = statistics.median(p95s)
+              
+              # 閾値取得
+              min_ratio_threshold = float(os.getenv("SR_BENCH_MIN_RATIO", "50"))
+              max_p95_threshold = float(os.getenv("SR_BENCH_MAX_P95_US", "50"))
+              
+              # 最終判定
+              ratio_ok = median_ratio >= min_ratio_threshold
+              p95_ok = median_p95 <= max_p95_threshold
+              final_passed = ratio_ok and p95_ok
+              
+              print(f"\n📋 Median Results:")
+              print(f"  - Median ratio: {median_ratio:.2f}x (threshold: ≥{min_ratio_threshold}x) {'✅' if ratio_ok else '❌'}")
+              print(f"  - Median p95: {median_p95:.1f}μs (threshold: ≤{max_p95_threshold}μs) {'✅' if p95_ok else '❌'}")
+              print(f"  - Final result: {'✅ PASSED' if final_passed else '❌ FAILED'}")
+              
+              # 最終結果をGitHub Actions出力に設定
+              print(f"OVERALL_RATIO={median_ratio:.2f}")
+              print(f"OVERALL_P95={median_p95:.1f}")
+              print(f"PASSED={str(final_passed).lower()}")
+              print(f"RATIO_OK={str(ratio_ok).lower()}")
+              print(f"P95_OK={str(p95_ok).lower()}")
+              
+              # 統合結果ファイルを作成
+              # 最も代表的な結果（中央値に最も近い）を選択
+              closest_run = min(runs, key=lambda r: abs(r.get("overall", {}).get("min_ratio", 0) - median_ratio))
+              
+              # 中央値結果で更新
+              final_result = closest_run.copy()
+              final_result["median_evaluation"] = {
+                  "runs_count": len(runs),
+                  "individual_ratios": ratios,
+                  "individual_p95s": p95s,
+                  "median_ratio": median_ratio,
+                  "median_p95": median_p95,
+                  "evaluation_method": "3-run median"
+              }
+              final_result["overall"] = {
+                  "min_ratio": median_ratio,
+                  "max_p95_us": median_p95,
+                  "ratio_ok": ratio_ok,
+                  "fast_p95_ok": p95_ok
+              }
+              final_result["passed"] = final_passed
+              
+              # 統合結果を保存
+              with open("bench_guard.json", "w") as f:
+                  json.dump(final_result, f, indent=2, ensure_ascii=False)
+              
+              print(f"\n💾 Final results saved to bench_guard.json")
+              
+              # 失敗時はexit 1
+              if not final_passed:
+                  print(f"\n🚨 Performance regression detected in median evaluation")
+                  if not ratio_ok:
+                      print(f"   - Speed ratio {median_ratio:.2f}x < {min_ratio_threshold}x")
+                  if not p95_ok:
+                      print(f"   - P95 latency {median_p95:.1f}μs > {max_p95_threshold}μs")
+                  sys.exit(1)
+              else:
+                  print(f"\n✅ All median performance thresholds met")
+                  
+          except Exception as e:
+              print(f"❌ Error in median evaluation: {e}")
+              import traceback
+              traceback.print_exc()
+              sys.exit(1)
+          PY
+
+      - name: Upload benchmark artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: strataregula-bench-guard-results
+          path: bench_guard.json
+          retention-days: 30
+
+      - name: Create job summary
+        if: always()
+        run: |
+          echo "## 🚀 StrataRegula Bench Guard Result (JST)" >> $GITHUB_STEP_SUMMARY
+          echo "_Performance regression test completed at $(date '+%Y-%m-%d %H:%M:%S JST')_" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f bench_guard.json ]; then
+            python - <<'PY' >> $GITHUB_STEP_SUMMARY
+import json
+import pathlib
+
+try:
+    data = json.loads(pathlib.Path("bench_guard.json").read_text())
+    
+    # 結果サマリー
+    passed = data['passed']
+    status_emoji = "✅" if passed else "❌"
+    status_text = "PASSED" if passed else "FAILED"
+    
+    print(f"### {status_emoji} Result: **{status_text}**")
+    print()
+    
+    # 個別ベンチマーク結果
+    benchmarks = data['benchmarks']
+    overall = data['overall']
+    config = data['config']
+    
+    print("### 📊 Component Performance")
+    print("| Component | Fast (ops/s) | Slow (ops/s) | Ratio | p95 (μs) |")
+    print("|-----------|--------------|--------------|-------|----------|")
+    
+    for name, bench in benchmarks.items():
+        fast_ops = bench['fast']['ops']
+        slow_ops = bench['slow']['ops']
+        ratio = bench['ratio']
+        p95 = bench['fast']['p95_us']
+        display_name = name.replace('_', ' ').title()
+        print(f"| **{display_name}** | {fast_ops:,.0f} | {slow_ops:,.0f} | **{ratio:.1f}x** | {p95:.1f}μs |")
+    
+    print()
+    
+    # 総合評価
+    print("### 🎯 Overall Assessment")
+    ratio_ok = overall['ratio_ok']
+    p95_ok = overall['fast_p95_ok']
+    
+    ratio_emoji = "✅" if ratio_ok else "❌"
+    p95_emoji = "✅" if p95_ok else "❌"
+    
+    print(f"- {ratio_emoji} **Minimum Speed Ratio**: {overall['min_ratio']:.1f}x (required: ≥{config['min_ratio']}x)")
+    print(f"- {p95_emoji} **Maximum p95 Latency**: {overall['max_p95_us']:.1f}μs (required: ≤{config['max_p95_us']}μs)")
+    print()
+    
+    # 設定情報
+    print("### ⚙️ Test Configuration")
+    print(f"- **Test iterations**: {config['n']:,}")
+    print(f"- **Warmup iterations**: {config['warmup']:,}")
+    print(f"- **Components tested**: PatternExpander, ConfigCompiler, KernelCache")
+    print(f"- **Timestamp**: {data['timestamp']}")
+    
+    if not passed:
+        print()
+        print("### ❌ Performance Regression Detected")
+        print("**This PR introduces performance regressions and will be blocked.**")
+        print()
+        
+        reasons = []
+        if not ratio_ok:
+            print(f"- **Speed Degradation**: Minimum ratio {overall['min_ratio']:.1f}x is below the required threshold of {config['min_ratio']}x")
+        if not p95_ok:
+            print(f"- **Latency Regression**: Maximum p95 latency {overall['max_p95_us']:.1f}μs exceeds the threshold of {config['max_p95_us']}μs")
+        
+        print()
+        print("**💡 Next Steps:**")
+        print("1. Profile the affected components to identify performance bottlenecks")
+        print("2. Optimize the slow paths or review algorithmic changes")
+        print("3. Consider if the performance regression is acceptable and adjust thresholds")
+        print()
+        print("**🔧 Emergency Threshold Adjustment (use sparingly):**")
+        print("```yaml")
+        print("env:")
+        print(f"  SR_BENCH_MIN_RATIO: \"30\"  # Temporarily lower from {config['min_ratio']}")
+        print(f"  SR_BENCH_MAX_P95_US: \"100\" # Temporarily higher from {config['max_p95_us']}")
+        print("```")
+    else:
+        print()
+        print("### ✅ Performance Maintained")
+        print("All components meet the required performance thresholds. Great work! 🎉")
+
+except Exception as e:
+    print(f"❌ Error processing benchmark results: {e}")
+    print()
+    print("Please check the benchmark artifact for detailed information.")
+PY
+          else
+            echo "❌ **Benchmark results file not found**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The performance test may have failed to run properly. Check the job logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Performance regression detected
+        if: failure()
+        run: |
+          echo "🚨 StrataRegula performance regression detected!"
+          echo ""
+          echo "One or more core components failed to meet performance requirements:"
+          echo "- PatternExpander optimization degraded"
+          echo "- ConfigCompiler performance regressed"  
+          echo "- Kernel cache efficiency decreased"
+          echo ""
+          echo "This PR will be blocked until performance is restored."
+          echo ""
+          echo "To temporarily adjust thresholds (use only in emergencies):"
+          echo "  - SR_BENCH_MIN_RATIO: Minimum speed ratio (default: 50)"
+          echo "  - SR_BENCH_MAX_P95_US: Maximum p95 latency in μs (default: 50)"
+          echo ""
+          echo "Consider:"
+          echo "1. Profiling affected components"
+          echo "2. Reviewing algorithmic changes"
+          echo "3. Optimizing critical paths"
+          exit 1

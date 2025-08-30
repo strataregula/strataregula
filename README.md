@@ -1,3 +1,5 @@
+> 👋 新しく参加した方はまず [docs/ONBOARDING.md](docs/ONBOARDING.md) をご覧ください。
+
 > **開発者へ**: 作業開始前に必ず [docs/README_FOR_DEVELOPERS.md](docs/README_FOR_DEVELOPERS.md) を確認してください。
 
 # StrataRegula
@@ -5,6 +7,10 @@
 [![PyPI version](https://badge.fury.io/py/strataregula.svg)](https://badge.fury.io/py/strataregula)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![CI](https://img.shields.io/badge/CI-github--actions-blue)](#)
+[![RunLog Guard](https://img.shields.io/badge/RunLog-guard-green)](#)
+[![Docs LinkCheck](https://img.shields.io/badge/Docs-linkcheck-green)](#)
+[![PR Size Guard](https://img.shields.io/badge/PR--Size-guard-orange)](#)
 
 **StrataRegula** (strata + regula) is a YAML Configuration Pattern Compiler for hierarchical configuration management with wildcard pattern expansion, designed for enterprise-scale configuration processing.
 

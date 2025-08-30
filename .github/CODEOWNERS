@@ -1,0 +1,8 @@
+# Code ownership for clear accountability
+/strataregula/             @strataregula/core-team
+/tests/                    @strataregula/qa-team
+/.devcontainer/            @strataregula/devex-team
+/docs/                     @strataregula/devex-team
+/.github/                  @strataregula/devex-team
+/AGENTS.md                 @strataregula/devex-team
+/CONTRIBUTING.md           @strataregula/devex-team

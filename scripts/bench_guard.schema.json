@@ -1,0 +1,191 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/strataregula/strataregula/blob/main/scripts/bench_guard.schema.json",
+  "title": "StrataRegula Benchmark Guard Results Schema",
+  "description": "Schema for bench_guard.json output format to ensure consistent structure for analysis and visualization tools",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "config", 
+    "benchmarks",
+    "overall",
+    "passed"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "description": "ISO timestamp of when the benchmark was executed",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} JST$",
+      "examples": ["2024-01-15 14:30:45 JST"]
+    },
+    "config": {
+      "type": "object",
+      "description": "Configuration parameters used for the benchmark",
+      "required": ["min_ratio", "max_p95_us", "warmup", "n"],
+      "properties": {
+        "min_ratio": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Minimum required speed ratio (fast/slow)"
+        },
+        "max_p95_us": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum allowed p95 latency in microseconds"
+        },
+        "warmup": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of warmup iterations"
+        },
+        "n": {
+          "type": "integer", 
+          "minimum": 1,
+          "description": "Number of test iterations per component"
+        }
+      },
+      "additionalProperties": false
+    },
+    "benchmarks": {
+      "type": "object",
+      "description": "Individual benchmark results for each component",
+      "required": ["pattern_expansion", "config_compilation", "kernel_cache"],
+      "properties": {
+        "pattern_expansion": { "$ref": "#/definitions/componentBenchmark" },
+        "config_compilation": { "$ref": "#/definitions/componentBenchmark" },
+        "kernel_cache": { "$ref": "#/definitions/componentBenchmark" }
+      },
+      "additionalProperties": false
+    },
+    "overall": {
+      "type": "object",
+      "description": "Overall assessment combining all component results",
+      "required": ["min_ratio", "max_p95_us", "ratio_ok", "fast_p95_ok"],
+      "properties": {
+        "min_ratio": {
+          "type": "number",
+          "description": "Minimum speed ratio across all components"
+        },
+        "max_p95_us": {
+          "type": "number",
+          "description": "Maximum p95 latency across all components"
+        },
+        "ratio_ok": {
+          "type": "boolean",
+          "description": "Whether minimum ratio threshold was met"
+        },
+        "fast_p95_ok": {
+          "type": "boolean",
+          "description": "Whether maximum p95 latency threshold was met"
+        }
+      },
+      "additionalProperties": false
+    },
+    "passed": {
+      "type": "boolean",
+      "description": "Overall pass/fail result (true if all thresholds met)"
+    },
+    "median_evaluation": {
+      "type": "object",
+      "description": "Median evaluation metadata (present when using 3-run evaluation)",
+      "required": ["runs_count", "median_ratio", "median_p95", "evaluation_method"],
+      "properties": {
+        "runs_count": {
+          "type": "integer",
+          "minimum": 2,
+          "description": "Number of runs used for median calculation"
+        },
+        "individual_ratios": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Individual ratio results from each run"
+        },
+        "individual_p95s": {
+          "type": "array", 
+          "items": { "type": "number" },
+          "description": "Individual p95 results from each run"
+        },
+        "median_ratio": {
+          "type": "number",
+          "description": "Median ratio across all runs"
+        },
+        "median_p95": {
+          "type": "number",
+          "description": "Median p95 latency across all runs"
+        },
+        "evaluation_method": {
+          "type": "string",
+          "enum": ["3-run median", "5-run median", "single-run"],
+          "description": "Method used for evaluation"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "componentBenchmark": {
+      "type": "object",
+      "description": "Benchmark results for a single component",
+      "required": ["fast", "slow", "ratio"],
+      "properties": {
+        "fast": { "$ref": "#/definitions/performanceMetrics" },
+        "slow": { "$ref": "#/definitions/performanceMetrics" },
+        "ratio": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Speed ratio (fast ops/sec ÷ slow ops/sec)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "performanceMetrics": {
+      "type": "object", 
+      "description": "Performance metrics for a single implementation",
+      "required": ["ops", "p50_us", "p95_us", "p99_us", "min_us", "max_us", "mean_us", "std_us"],
+      "properties": {
+        "ops": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Operations per second (throughput)"
+        },
+        "p50_us": {
+          "type": "number",
+          "minimum": 0,
+          "description": "50th percentile latency in microseconds"
+        },
+        "p95_us": {
+          "type": "number",
+          "minimum": 0,
+          "description": "95th percentile latency in microseconds" 
+        },
+        "p99_us": {
+          "type": "number",
+          "minimum": 0,
+          "description": "99th percentile latency in microseconds"
+        },
+        "min_us": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Minimum latency in microseconds"
+        },
+        "max_us": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum latency in microseconds"
+        },
+        "mean_us": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Mean latency in microseconds"
+        },
+        "std_us": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Standard deviation of latency in microseconds"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

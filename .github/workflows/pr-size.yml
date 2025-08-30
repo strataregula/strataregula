@@ -1,0 +1,15 @@
+name: pr-size
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: floydspace/pr-size-labeler@v1.10.0
+        with:
+          xs_max_size: '50'
+          s_max_size: '200'
+          m_max_size: '500'
+          l_max_size: '1000'
+          fail_if_xl: 'true'

@@ -1,0 +1,44 @@
+name: cov-bump
+on:
+  schedule: 
+    - cron: "0 0 10 * *"  # Monthly on 10th at 09:00 JST (UTC 0:00)
+  workflow_dispatch:
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: 
+          python-version: "3.11"
+      - name: Install pytest (best effort)
+        run: |
+          pip install -U pip pytest pytest-cov || true
+          if [ -f requirements.txt ]; then pip install -r requirements.txt || true; fi
+          if [ -f pyproject.toml ]; then pip install -e ".[test]" || true; fi
+      - name: Try bump +5pt if head passes
+        run: |
+          python tools/bump_coverage_fail_under.py || true
+      - name: Create PR if changes made
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "ci(coverage): bump fail-under +5pt if head coverage supports it"
+          title: "ci(coverage): monthly threshold bump +5pt"
+          body: |
+            Auto-generated monthly coverage threshold increase.
+            
+            This PR increases the coverage fail-under threshold by 5 percentage points,
+            but only if current coverage already meets the new target.
+            
+            **Safety guarantee**: Existing tests will continue to pass.
+            
+            Changes:
+            - Updated coverage threshold in pytest.ini or pyproject.toml
+            - Current coverage verified to support new threshold
+            
+            Monthly coverage improvement as part of quality enhancement initiative.
+          branch: "ci/cov-bump"
+          delete-branch: true

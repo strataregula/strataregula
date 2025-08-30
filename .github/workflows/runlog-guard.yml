@@ -1,0 +1,40 @@
+name: runlog-guard
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Detect changes
+        id: diff
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.sha }}"
+          git diff --name-only "$BASE_SHA" "$HEAD_SHA" > .changed_files.txt
+          echo "changed=$(wc -l < .changed_files.txt)" >> $GITHUB_OUTPUT
+          grep -E '^(src|scripts|packages|extension|server|lib)/' .changed_files.txt || true
+          echo "code_changed=$([ $? -eq 0 ] && echo yes || echo no)" >> $GITHUB_OUTPUT
+          grep -E '^docs/run/.+\.md' .changed_files.txt || true
+          echo "runlog_changed=$([ $? -eq 0 ] && echo yes || echo no)" >> $GITHUB_OUTPUT
+      - name: Enforce
+        if: steps.diff.outputs.code_changed == 'yes' && steps.diff.outputs.runlog_changed != 'yes'
+        run: |
+          echo "::error title=Run Log required::コード変更があります。docs/run/*.md のRunログ（Summary非空, JST）を追加してください。"
+          exit 1
+      - name: Validate Run Log content
+        if: steps.diff.outputs.code_changed == 'yes' && steps.diff.outputs.runlog_changed == 'yes'
+        run: |
+          bad=0
+          while IFS= read -r f; do
+            if [ -f "$f" ]; then
+              # Summary 行が存在し、かつ「空でない/placeholderでない」ことを検査
+              if ! grep -qE '^- +Summary: +[^[:space:]].+' "$f"; then
+                echo "::error file=$f,title=Summary is empty::Run Log の Summary が空です。要点を1–3行で記載してください。"
+                bad=1
+              fi
+            fi
+          done < <(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^docs/run/.*\.md' || true)
+          exit $bad

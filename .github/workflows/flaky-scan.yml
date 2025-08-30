@@ -1,0 +1,25 @@
+name: flaky-scan
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # JST Monday 11:00 AM
+  workflow_dispatch:
+jobs:
+  flaky:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install deps (best-effort)
+        run: |
+          pip install -U pip pytest || true
+          if [ -f requirements.txt ]; then pip install -r requirements.txt || true; fi
+          if [ -f pyproject.toml ]; then pip install uv && uv sync || true; fi
+      - name: Run flaky scan
+        env:
+          FLAKY_RUNS: "5"
+        run: python tools/flaky_scan.py || true
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: flaky-report, path: docs/reports/flaky.md, if-no-files-found: ignore }

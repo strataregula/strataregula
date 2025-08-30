@@ -1,0 +1,15 @@
+{
+  "base": "e0dc5d4ec87f923e51816038c8d05864ef485b23",
+  "head": "224919ef33880b5ff9e521f8cb9ffa8be8da5cb1",
+  "roots": [
+    "src",
+    "tests"
+  ],
+  "files": [
+    "C:\\Users\\uraka\\project\\strataregula\\tests\\compat\\test_v02x_compatibility.py",
+    "C:\\Users\\uraka\\project\\strataregula\\tests\\golden\\test_adaptive_thresholds.py",
+    "C:\\Users\\uraka\\project\\strataregula\\tests\\golden\\test_regression_guard.py",
+    "C:\\Users\\uraka\\project\\strataregula\\tests\\patterns\\micro_tests.py"
+  ],
+  "timestamp": 1756558753.8222606
+}

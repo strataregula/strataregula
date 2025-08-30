@@ -1,0 +1,404 @@
+name: Bench Guard Nightly
+# StrataRegula 長時間パフォーマンス監視システム
+# 毎日深夜に実行し、詳細なパフォーマンス分析とトレンド監視を行う
+
+on:
+  schedule:
+    # 毎日深夜2時（JST）に実行（UTC 17:00）
+    - cron: '0 17 * * *'
+  workflow_dispatch:
+    # 手動実行も可能
+    inputs:
+      test_scale:
+        description: 'Test scale (light/standard/heavy)'
+        required: false
+        default: 'standard'
+        type: choice
+        options:
+        - light
+        - standard  
+        - heavy
+
+jobs:
+  nightly-performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TZ: Asia/Tokyo
+      PYTHONUTF8: "1"
+      # Nightly用の厳格な設定（より多くの実行、厳しい閾値）
+      SR_BENCH_MIN_RATIO: "60"      # 通常より高い要求（60x）
+      SR_BENCH_MAX_P95_US: "40"     # 通常より厳しいレイテンシ要求（40μs）
+      SR_BENCH_MAX_P99_US: "100"    # p99も監視（100μs）
+      SR_BENCH_N: "100000"          # 10万回実行で詳細分析
+      SR_BENCH_WARMUP: "5000"       # 充分なウォームアップ
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set test parameters
+        id: params
+        run: |
+          # 手動実行時の設定調整
+          case "${{ github.event.inputs.test_scale }}" in
+            light)
+              echo "SR_BENCH_N=10000" >> $GITHUB_ENV
+              echo "SR_BENCH_WARMUP=1000" >> $GITHUB_ENV
+              echo "TIMEOUT_MINUTES=30" >> $GITHUB_ENV
+              echo "🟡 Light test scale selected"
+              ;;
+            heavy)
+              echo "SR_BENCH_N=500000" >> $GITHUB_ENV
+              echo "SR_BENCH_WARMUP=10000" >> $GITHUB_ENV
+              echo "TIMEOUT_MINUTES=120" >> $GITHUB_ENV
+              echo "🔴 Heavy test scale selected"
+              ;;
+            *)
+              echo "🟢 Standard test scale (default)"
+              ;;
+          esac
+          
+          # 実行時刻を記録
+          echo "NIGHTLY_START=$(date '+%Y-%m-%d %H:%M:%S JST')" >> $GITHUB_ENV
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          
+          # パフォーマンス監視用追加パッケージ
+          pip install psutil matplotlib seaborn pandas
+
+      - name: System performance baseline
+        run: |
+          echo "📊 System Performance Baseline"
+          echo "=============================="
+          echo "🖥️  CPU Info:"
+          lscpu | head -20
+          echo ""
+          echo "💾 Memory Info:"
+          free -h
+          echo ""
+          echo "💽 Disk Info:"
+          df -h
+          echo ""
+          echo "🐍 Python Info:"
+          python --version
+          python -c "import sys; print(f'Python executable: {sys.executable}')"
+          python -c "import platform; print(f'Platform: {platform.platform()}')"
+
+      - name: Run comprehensive performance test
+        id: nightly-bench
+        run: |
+          echo "🌙 Starting Nightly Performance Analysis"
+          echo "========================================"
+          echo "⏰ Start time: $NIGHTLY_START"
+          echo "🎯 Target ratio: ≥${SR_BENCH_MIN_RATIO}x"
+          echo "🎯 Target p95: ≤${SR_BENCH_MAX_P95_US}μs"
+          echo "🎯 Target p99: ≤${SR_BENCH_MAX_P99_US}μs"
+          echo "🔢 Test iterations: ${SR_BENCH_N}"
+          echo "🔥 Warmup iterations: ${SR_BENCH_WARMUP}"
+          echo ""
+          
+          # 5回実行して詳細分析（Nightlyは時間に余裕があるため）
+          results=()
+          for run in 1 2 3 4 5; do
+            echo "🔄 Running comprehensive test $run/5..."
+            
+            if python scripts/bench_guard.py; then
+              mv bench_guard.json "nightly_run${run}.json"
+              echo "✅ Run $run completed successfully"
+            else
+              echo "⚠️ Run $run encountered issues, saving partial results..."
+              if [ -f bench_guard.json ]; then
+                mv bench_guard.json "nightly_run${run}.json"
+              else
+                echo "{\"overall\":{\"min_ratio\":0,\"max_p95_us\":9999},\"passed\":false,\"error\":\"execution_failed\",\"run\":$run}" > "nightly_run${run}.json"
+              fi
+            fi
+            
+            # 短い間隔でGCを実行
+            python -c "import gc; gc.collect()"
+            sleep 5
+          done
+          
+          echo ""
+          echo "🧮 Analyzing results from 5 comprehensive runs..."
+
+      - name: Advanced statistical analysis
+        run: |
+          python - <<'PY'
+          import json
+          import glob
+          import statistics
+          import sys
+          import os
+          from datetime import datetime
+          import math
+          
+          def analyze_performance():
+              # 5つの結果を収集
+              run_files = sorted(glob.glob("nightly_run*.json"))
+              print(f"📊 Found {len(run_files)} result files")
+              
+              runs = []
+              valid_runs = 0
+              
+              for file in run_files:
+                  try:
+                      with open(file) as f:
+                          data = json.load(f)
+                          runs.append(data)
+                          if data.get('passed', False):
+                              valid_runs += 1
+                      print(f"✅ {file}: loaded successfully")
+                  except Exception as e:
+                      print(f"❌ {file}: failed to load - {e}")
+                      continue
+              
+              if len(runs) < 3:
+                  print(f"❌ Insufficient data: only {len(runs)} runs available")
+                  sys.exit(1)
+              
+              # 統計分析
+              ratios = [r.get("overall", {}).get("min_ratio", 0) for r in runs]
+              p95s = [r.get("overall", {}).get("max_p95_us", 9999) for r in runs]
+              
+              # 詳細統計
+              stats = {
+                  "ratio": {
+                      "mean": statistics.mean(ratios),
+                      "median": statistics.median(ratios),
+                      "stdev": statistics.stdev(ratios) if len(ratios) > 1 else 0,
+                      "min": min(ratios),
+                      "max": max(ratios),
+                      "values": ratios
+                  },
+                  "p95": {
+                      "mean": statistics.mean(p95s),
+                      "median": statistics.median(p95s), 
+                      "stdev": statistics.stdev(p95s) if len(p95s) > 1 else 0,
+                      "min": min(p95s),
+                      "max": max(p95s),
+                      "values": p95s
+                  }
+              }
+              
+              # 閾値
+              ratio_threshold = float(os.getenv("SR_BENCH_MIN_RATIO", "60"))
+              p95_threshold = float(os.getenv("SR_BENCH_MAX_P95_US", "40"))
+              p99_threshold = float(os.getenv("SR_BENCH_MAX_P99_US", "100"))
+              
+              # 判定（Nightlyは中央値ベース）
+              median_ratio = stats["ratio"]["median"]
+              median_p95 = stats["p95"]["median"]
+              
+              ratio_ok = median_ratio >= ratio_threshold
+              p95_ok = median_p95 <= p95_threshold
+              final_passed = ratio_ok and p95_ok
+              
+              # 安定性評価（変動係数）
+              ratio_cv = (stats["ratio"]["stdev"] / stats["ratio"]["mean"]) * 100 if stats["ratio"]["mean"] > 0 else 100
+              p95_cv = (stats["p95"]["stdev"] / stats["p95"]["mean"]) * 100 if stats["p95"]["mean"] > 0 else 100
+              
+              print(f"\n📊 Nightly Performance Analysis Results")
+              print(f"==========================================")
+              print(f"🔍 Test runs: {len(runs)} ({valid_runs} passed)")
+              print(f"📈 Speed ratio:")
+              print(f"   - Median: {median_ratio:.2f}x (threshold: ≥{ratio_threshold}x) {'✅' if ratio_ok else '❌'}")
+              print(f"   - Mean: {stats['ratio']['mean']:.2f}x ± {stats['ratio']['stdev']:.2f}")
+              print(f"   - Range: {stats['ratio']['min']:.2f}x ~ {stats['ratio']['max']:.2f}x")
+              print(f"   - Stability: CV={ratio_cv:.1f}% ({'Good' if ratio_cv < 10 else 'Variable' if ratio_cv < 20 else 'Unstable'})")
+              print(f"📉 P95 latency:")
+              print(f"   - Median: {median_p95:.1f}μs (threshold: ≤{p95_threshold}μs) {'✅' if p95_ok else '❌'}")
+              print(f"   - Mean: {stats['p95']['mean']:.1f}μs ± {stats['p95']['stdev']:.1f}")
+              print(f"   - Range: {stats['p95']['min']:.1f}μs ~ {stats['p95']['max']:.1f}μs")
+              print(f"   - Stability: CV={p95_cv:.1f}% ({'Good' if p95_cv < 15 else 'Variable' if p95_cv < 30 else 'Unstable'})")
+              print(f"\n🎯 Overall: {'✅ PASSED' if final_passed else '❌ FAILED'}")
+              
+              # 総合結果ファイル作成
+              nightly_result = {
+                  "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S JST"),
+                  "test_type": "nightly_comprehensive",
+                  "runs_analyzed": len(runs),
+                  "valid_runs": valid_runs,
+                  "statistics": stats,
+                  "thresholds": {
+                      "min_ratio": ratio_threshold,
+                      "max_p95_us": p95_threshold,
+                      "max_p99_us": p99_threshold
+                  },
+                  "evaluation": {
+                      "median_ratio": median_ratio,
+                      "median_p95": median_p95,
+                      "ratio_ok": ratio_ok,
+                      "p95_ok": p95_ok,
+                      "stability": {
+                          "ratio_cv": ratio_cv,
+                          "p95_cv": p95_cv,
+                          "overall_stable": ratio_cv < 15 and p95_cv < 20
+                      }
+                  },
+                  "passed": final_passed,
+                  "individual_runs": runs
+              }
+              
+              with open("bench_guard_nightly.json", "w") as f:
+                  json.dump(nightly_result, f, indent=2, ensure_ascii=False)
+              
+              print(f"\n💾 Comprehensive results saved to bench_guard_nightly.json")
+              
+              # GitHub Actions出力
+              print(f"NIGHTLY_RATIO={median_ratio:.2f}")
+              print(f"NIGHTLY_P95={median_p95:.1f}")
+              print(f"NIGHTLY_PASSED={str(final_passed).lower()}")
+              print(f"STABILITY_RATIO_CV={ratio_cv:.1f}")
+              print(f"STABILITY_P95_CV={p95_cv:.1f}")
+              
+              return final_passed
+          
+          success = analyze_performance()
+          sys.exit(0 if success else 1)
+          PY
+
+      - name: Upload comprehensive results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: strataregula-nightly-bench-results-${{ env.NIGHTLY_START }}
+          path: |
+            bench_guard_nightly.json
+            nightly_run*.json
+          retention-days: 90
+
+      - name: Performance trend analysis
+        if: always()
+        run: |
+          echo "📈 Performance Trend Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "============================" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "_Nightly comprehensive test completed at $(date '+%Y-%m-%d %H:%M:%S JST')_" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f bench_guard_nightly.json ]; then
+            python - <<'PY' >> $GITHUB_STEP_SUMMARY
+import json
+from datetime import datetime
+
+try:
+    with open("bench_guard_nightly.json") as f:
+        data = json.load(f)
+    
+    eval_data = data["evaluation"]
+    stats = data["statistics"]
+    stability = eval_data["stability"]
+    
+    # 結果サマリー
+    passed = data["passed"]
+    status_emoji = "✅" if passed else "❌"
+    status_text = "PASSED" if passed else "FAILED"
+    
+    print(f"## {status_emoji} Nightly Result: **{status_text}**")
+    print()
+    
+    # 統計サマリー
+    print("### 📊 Performance Statistics (5-run analysis)")
+    print("| Metric | Median | Mean ± StdDev | Range | Stability |")
+    print("|--------|--------|---------------|-------|-----------|")
+    
+    ratio_stats = stats["ratio"]
+    p95_stats = stats["p95"]
+    
+    ratio_stability = "🟢 Good" if stability["ratio_cv"] < 10 else "🟡 Variable" if stability["ratio_cv"] < 20 else "🔴 Unstable"
+    p95_stability = "🟢 Good" if stability["p95_cv"] < 15 else "🟡 Variable" if stability["p95_cv"] < 30 else "🔴 Unstable"
+    
+    print(f"| **Speed Ratio** | {ratio_stats['median']:.2f}x | {ratio_stats['mean']:.2f} ± {ratio_stats['stdev']:.2f} | {ratio_stats['min']:.1f}x ~ {ratio_stats['max']:.1f}x | {ratio_stability} (CV: {stability['ratio_cv']:.1f}%) |")
+    print(f"| **P95 Latency** | {p95_stats['median']:.1f}μs | {p95_stats['mean']:.1f} ± {p95_stats['stdev']:.1f} | {p95_stats['min']:.1f}μs ~ {p95_stats['max']:.1f}μs | {p95_stability} (CV: {stability['p95_cv']:.1f}%) |")
+    
+    print()
+    
+    # 詳細評価
+    print("### 🎯 Threshold Evaluation")
+    thresholds = data["thresholds"]
+    ratio_ok = eval_data["ratio_ok"]
+    p95_ok = eval_data["p95_ok"]
+    
+    ratio_emoji = "✅" if ratio_ok else "❌"
+    p95_emoji = "✅" if p95_ok else "❌"
+    
+    print(f"- {ratio_emoji} **Speed Performance**: {eval_data['median_ratio']:.2f}x (required: ≥{thresholds['min_ratio']}x)")
+    print(f"- {p95_emoji} **Latency Performance**: {eval_data['median_p95']:.1f}μs (required: ≤{thresholds['max_p95_us']}μs)")
+    
+    overall_stable = stability["overall_stable"]
+    stability_emoji = "✅" if overall_stable else "⚠️"
+    print(f"- {stability_emoji} **Performance Stability**: {'Stable' if overall_stable else 'Variable'}")
+    
+    print()
+    
+    # 設定情報
+    print("### ⚙️ Test Configuration")
+    print(f"- **Test runs**: {data['runs_analyzed']} comprehensive tests")
+    print(f"- **Valid runs**: {data['valid_runs']}")
+    print(f"- **Test iterations**: {thresholds.get('test_iterations', 'N/A'):,} per run")
+    print(f"- **Analysis method**: 5-run statistical analysis with median evaluation")
+    print()
+    
+    if not passed:
+        print("### ❌ Performance Issues Detected")
+        print("**Nightly monitoring has detected performance degradation.**")
+        print()
+        if not ratio_ok:
+            print(f"- **Speed Regression**: Median ratio {eval_data['median_ratio']:.2f}x below threshold")
+        if not p95_ok:
+            print(f"- **Latency Regression**: Median p95 {eval_data['median_p95']:.1f}μs exceeds threshold")
+        if not overall_stable:
+            print(f"- **Performance Instability**: High variability detected (Ratio CV: {stability['ratio_cv']:.1f}%, P95 CV: {stability['p95_cv']:.1f}%)")
+        print()
+        print("**🔍 Investigation Required:**")
+        print("1. Review recent changes for performance impact")
+        print("2. Check for system resource constraints")
+        print("3. Consider algorithm optimization opportunities")
+    else:
+        print("### ✅ Excellent Performance")
+        print("All nightly performance targets achieved with good stability! 🎉")
+        if overall_stable:
+            print("Performance is consistently stable across test runs. 📊")
+
+except Exception as e:
+    print(f"❌ Error generating nightly summary: {e}")
+    print("Please check the nightly artifact for detailed results.")
+PY
+          else
+            echo "❌ **Nightly results not available**" >> $GITHUB_STEP_SUMMARY
+            echo "The comprehensive performance test encountered issues." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Notify on significant regression  
+        if: failure()
+        run: |
+          echo "🚨 NIGHTLY PERFORMANCE REGRESSION DETECTED"
+          echo "=========================================="
+          echo ""
+          echo "The nightly comprehensive performance analysis has detected"
+          echo "significant performance regression in StrataRegula core components."
+          echo ""
+          echo "This indicates a systemic performance issue that requires immediate attention."
+          echo ""
+          echo "📋 Next Steps:"
+          echo "1. Review the comprehensive analysis in the job summary"
+          echo "2. Check recent commits for performance-impacting changes" 
+          echo "3. Run local benchmarks to reproduce the issue"
+          echo "4. Consider reverting recent changes if regression is severe"
+          echo ""
+          echo "📊 Full results are available in the nightly artifacts."
