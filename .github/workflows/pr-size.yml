@@ -2,14 +2,25 @@ name: pr-size
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+  pull-requests: write
 jobs:
   size:
     runs-on: ubuntu-latest
     steps:
-      - uses: floydspace/pr-size-labeler@v1.10.0
+      - uses: actions/checkout@v4
+      - name: Add size label
+        uses: pascalgn/size-label-action@v0.5.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          xs_max_size: '50'
-          s_max_size: '200'
-          m_max_size: '500'
-          l_max_size: '1000'
-          fail_if_xl: 'true'
+          sizes: >
+            {
+              "XS": 0,
+              "S": 50,
+              "M": 200,
+              "L": 500,
+              "XL": 1000,
+              "XXL": 2000
+            }
