@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+expected_host=$(git config --get repo.host || true)
+expected_email=$(git config --get user.email || true)
+remote=$(git remote get-url --push origin 2>/dev/null || git remote get-url origin)
+
+# host抽出（ssh形式/https形式の両方対応）
+host=$(printf '%s\n' "$remote" | sed -E 's#^[^@]+@([^:/]+).*#\1#; t; s#^https?://([^/]+)/.*#\1#')
+
+err=0
+if [ -n "${expected_host:-}" ] && [ "$host" != "$expected_host" ]; then
+  echo "ERROR: wrong remote host. expected=$expected_host actual=$host"
+  err=1
+fi
+
+email=$(git config --get user.email || true)
+if [ -n "${expected_email:-}" ] && [ "$email" != "$expected_email" ]; then
+  echo "ERROR: wrong git user.email. expected=$expected_email actual=$email"
+  err=1
+fi
+
+exit $err
