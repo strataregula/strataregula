@@ -1,8 +1,8 @@
 # DevContainer Rollout Run
 
-**When**: 2025-08-30T10-03JST  
-**Repo**: strataregula  
-**Summary**: DevContainer 一式と開発前ドキュ導線を追加
+- When: 2025-08-30T10-03JST  
+- Repo: strataregula  
+- Summary: DevContainer 一式と開発前ドキュ導線を追加
 
 ## Environment
 

@@ -1,10 +1,8 @@
 # Task 3-1 Developer Documentation Template Application
 
-**実行日時 (JST)**: 2025-08-30 19:32  
-**タスク**: Apply Task 3-1 developer documentation template to strataregula repository
-
-## Summary
-Applied the successful Task 3-1 developer documentation template from strataregula-doe-runner to the core StrataRegula framework repository. Created unified template structure with adaptations specific to the core framework's plugin architecture and development workflow.
+- When: 2025-08-30T19-32JST  
+- Repo: strataregula
+- Summary: Applied the successful Task 3-1 developer documentation template from strataregula-doe-runner to the core StrataRegula framework repository. Created unified template structure with adaptations specific to the core framework's plugin architecture and development workflow.
 
 ## Intent
 Standardize developer documentation across all StrataRegula-related repositories to improve developer onboarding experience and maintain consistent development practices. The core framework needed specialized adaptations to reflect its role as the foundation for plugins like DOE Runner.

@@ -2,7 +2,7 @@
 
 - **Time**: 2025-08-30T21:21 JST
 - **Intent**: Deploy comprehensive documentation quality automation across repository ecosystem
-- **Summary**: Successfully deployed ONBOARDING.md standardization, docs-linkcheck CI workflow, and enhanced runlog-guard with Summary content validation across all 6 repositories
+- Summary: Successfully deployed ONBOARDING.md standardization, docs-linkcheck CI workflow, and enhanced runlog-guard with Summary content validation across all 6 repositories
 
 ## Context
 
