@@ -238,8 +238,8 @@ class FormatConverter:
 
     def _parse_csv(
         self, csv_string: str, format: str, **options
-    ) -> list[dict[str, Any]]:
-        """CSVを辞書のリストに変換"""
+    ) -> list[dict[str, Any]] | list[list[str]]:
+        """CSVを辞書のリストまたはリストのリストに変換"""
         delimiter = "\t" if format == "tsv" else options.get("delimiter", ",")
         has_header = options.get("has_header", True)
 
@@ -254,8 +254,8 @@ class FormatConverter:
             data_rows = rows[1:]
             return [dict(zip(headers, row, strict=False)) for row in data_rows]
         else:
-            # ヘッダーがない場合は列番号をキーにする
-            return [dict(enumerate(row)) for row in rows]
+            # ヘッダーがない場合はリスト形式で返す（数値インデックス保持）
+            return [list(row) for row in rows]
 
     def _format_csv(self, data: Any, format: str, **options) -> str:
         """辞書のリストをCSVに変換"""
