@@ -11,16 +11,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Add size label
-        uses: pascalgn/size-label-action@v0.5.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: codelytv/pr-size-labeler@v1
         with:
-          sizes: >
-            {
-              "XS": 0,
-              "S": 50,
-              "M": 200,
-              "L": 500,
-              "XL": 1000,
-              "XXL": 2000
-            }
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          xs_label: 'size/XS'
+          xs_max_size: 50
+          s_label: 'size/S'
+          s_max_size: 200
+          m_label: 'size/M'
+          m_max_size: 500
+          l_label: 'size/L'
+          l_max_size: 1000
+          xl_label: 'size/XL'
+          xl_max_size: 2000
+          xxl_label: 'size/XXL'
