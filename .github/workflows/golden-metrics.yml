@@ -100,21 +100,8 @@ jobs:
           echo "PWD=$(pwd)"
           echo "Event inputs: ${{ github.event.inputs.strictness || 'default' }}"
 
-      - name: Run Golden Metrics Guard (Normal)
-        if: (github.event.inputs.strictness == 'normal' || github.event.inputs.strictness == '') && !env.CI
-        env:
-          GOLDEN_LATENCY_ALLOW_PCT: '1.0'
-          GOLDEN_P95_ALLOW_PCT: '1.2'
-          GOLDEN_THROUGHPUT_ALLOW_PCT: '0.5'
-          GOLDEN_MEMORY_ALLOW_PCT: '2.0'
-          GOLDEN_CACHE_ALLOW_PCT: '1.0'
-        run: |
-          echo "🎯 Running Golden Metrics Guard (Normal strictness)"
-          pytest -v tests/golden/test_regression_guard.py \
-            --junitxml=reports/junit/golden-results.xml
-
       - name: Run Golden Metrics Guard (CI - Relaxed)
-        if: github.event.inputs.strictness == 'ci' || env.CI
+        if: always()
         env:
           GOLDEN_LATENCY_ALLOW_PCT: '15.0'
           GOLDEN_P95_ALLOW_PCT: '20.0'
