@@ -130,9 +130,13 @@ class EnhancedPluginManager:
             if context.state == PluginState.LOADED and not force:
                 return True
 
-            if context.state == PluginState.FAILED and not force and (
-                context.last_error
-                and time.time() - context.load_time < self.config.error_cooldown
+            if (
+                context.state == PluginState.FAILED
+                and not force
+                and (
+                    context.last_error
+                    and time.time() - context.load_time < self.config.error_cooldown
+                )
             ):
                 logger.debug(f"Plugin '{name}' in cooldown period")
                 return False

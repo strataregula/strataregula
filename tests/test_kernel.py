@@ -222,6 +222,7 @@ if __name__ == "__main__":
 def test_kernel_compile_exists_and_runs():
     """compile() 互換ラッパーの存在と正常動作を確認"""
     from types import MappingProxyType
+
     kernel = Kernel()
 
     class NoopPass:

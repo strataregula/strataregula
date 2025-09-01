@@ -1,0 +1,4 @@
+{
+  "error": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 189, in _run_module_as_main\n  File \"<frozen runpy>\", line 112, in _get_module_details\n  File \"C:\\Users\\uraka\\project\\strataregula\\strataregula\\cli\\__init__.py\", line 12, in <module>\n    from .main import main\n  File \"C:\\Users\\uraka\\project\\strataregula\\strataregula\\cli\\main.py\", line 41, in <module>\n    from .compile_command import compile_cmd\n  File \"C:\\Users\\uraka\\project\\strataregula\\strataregula\\cli\\compile_command.py\", line 89, in <module>\n    prefectures: Optional[Path],\n                 ^^^^^^^^\nNameError: name 'Optional' is not defined\n",
+  "returncode": 1
+}

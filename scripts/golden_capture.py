@@ -39,17 +39,20 @@ def measure_kernel_performance() -> dict[str, Any]:
         # Check if typing modules are available
         try:
             from typing import Optional, Union, Callable
-            print("✅ Typing imports successful")
+
+            print("[OK] Typing imports successful")
         except ImportError as typing_error:
             print(f"Warning: Typing imports failed: {typing_error}")
             print("Using synthetic metrics for testing")
             return _synthetic_metrics()
 
-        print("🔄 Attempting to import strataregula...")
+        print("[INFO] Attempting to import strataregula...")
         from strataregula import Kernel
-        print("✅ Kernel import successful")
+
+        print("[OK] Kernel import successful")
         from strataregula.passes import InternPass
-        print("✅ InternPass import successful")
+
+        print("[OK] InternPass import successful")
     except ImportError as e:
         print(f"Warning: StrataRegula imports failed: {e}")
         print("Using synthetic metrics for testing")
@@ -59,6 +62,7 @@ def measure_kernel_performance() -> dict[str, Any]:
         print(f"Error type: {type(e).__name__}")
         print(f"Error details: {str(e)}")
         import traceback
+
         traceback.print_exc()
         print("Falling back to synthetic metrics for CI compatibility")
         return _synthetic_metrics()
@@ -89,10 +93,10 @@ def measure_kernel_performance() -> dict[str, Any]:
     kernel.register_pass(intern_pass)
 
     # 事前にconfig interningを実行して統計を確認
-    print("🔄 Pre-compiling config with InternPass...")
+    print("[INFO] Pre-compiling config with InternPass...")
     compiled_config = kernel.precompile(test_config)
-    print(f"✅ Config compiled, size: {len(str(compiled_config.data))}")
-    
+    print(f"[OK] Config compiled, size: {len(str(compiled_config.data))}")
+
     # InternPassの統計を確認
     intern_stats = intern_pass.get_stats()
     print(f"DEBUG: After compile - InternPass stats: {intern_stats}")
@@ -100,7 +104,9 @@ def measure_kernel_performance() -> dict[str, Any]:
     # Warm-up runs (キャッシュを温める)
     for _ in range(5000):  # 10 → 5000
         try:
-            kernel.query("basic_view", {"region": "test", "service": "web"}, compiled_config)
+            kernel.query(
+                "basic_view", {"region": "test", "service": "web"}, compiled_config
+            )
         except Exception:
             pass  # View might not exist yet, that's OK for metrics
 
@@ -116,10 +122,10 @@ def measure_kernel_performance() -> dict[str, Any]:
     latencies = []
     start_time = time.perf_counter()
     iterations = 1000
-    
+
     # 同一キーで計測（キャッシュヒット率を上げる）
     test_params = {"region": "test", "service": "web"}
-    
+
     for _ in range(iterations):
         query_start = time.perf_counter()
         try:
@@ -151,11 +157,11 @@ def measure_kernel_performance() -> dict[str, Any]:
         # Kernelの統計から取得（InternPassの統計も含む）
         kernel_stats = kernel.get_stats()
         print(f"DEBUG: Kernel stats: {kernel_stats}")
-        
+
         # InternPassの統計も確認
         intern_stats = intern_pass.get_stats()
         print(f"DEBUG: InternPass stats: {intern_stats}")
-        
+
         # 優先順位: InternPass > Kernel > デフォルト
         if intern_stats and intern_stats.get("hit_rate", 0) > 0:
             hit_ratio = intern_stats.get("hit_rate", 0.85) / 100.0
@@ -163,7 +169,7 @@ def measure_kernel_performance() -> dict[str, Any]:
             hit_ratio = kernel_stats.get("hit_rate", 0.85)
         else:
             hit_ratio = 0.85  # デフォルト値
-            
+
         print(f"DEBUG: Final hit ratio: {hit_ratio:.3f}")
     except Exception as e:
         print(f"Warning: Could not get stats: {e}")
@@ -209,11 +215,23 @@ def _synthetic_metrics() -> dict[str, Any]:
         base_hit_ratio = 0.923  # Matches baseline exactly
     else:
         # Local developmentでは少し変動を許容
-        base_latency = 8.43 + (hashlib.md5(seed_source.encode()).hexdigest()[0:2] == "00") * 0.1
-        base_p95 = 15.27 + (hashlib.md5(seed_source.encode()).hexdigest()[2:4] == "00") * 0.2
-        base_throughput = 11847.2 + (hashlib.md5(seed_source.encode()).hexdigest()[4:6] == "00") * 10
-        base_memory = 28_567_392 + (hashlib.md5(seed_source.encode()).hexdigest()[6:8] == "00") * 1000
-        base_hit_ratio = 0.923 + (hashlib.md5(seed_source.encode()).hexdigest()[8:10] == "00") * 0.001
+        base_latency = (
+            8.43 + (hashlib.md5(seed_source.encode()).hexdigest()[0:2] == "00") * 0.1
+        )
+        base_p95 = (
+            15.27 + (hashlib.md5(seed_source.encode()).hexdigest()[2:4] == "00") * 0.2
+        )
+        base_throughput = (
+            11847.2 + (hashlib.md5(seed_source.encode()).hexdigest()[4:6] == "00") * 10
+        )
+        base_memory = (
+            28_567_392
+            + (hashlib.md5(seed_source.encode()).hexdigest()[6:8] == "00") * 1000
+        )
+        base_hit_ratio = (
+            0.923
+            + (hashlib.md5(seed_source.encode()).hexdigest()[8:10] == "00") * 0.001
+        )
 
     return {
         "latency_ms": round(base_latency, 2),
@@ -262,7 +280,9 @@ routes:
                 "--format",
                 "json",
             ]
-            result = subprocess.run(cmd, check=False, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                cmd, check=False, capture_output=True, text=True, timeout=30
+            )
 
             if result.returncode == 0:
                 try:
@@ -332,7 +352,7 @@ def main():
         # Ensure output directory exists
         out_path = pathlib.Path(args.out)
         out_path.mkdir(parents=True, exist_ok=True)
-        
+
         # Check if we're in CI environment
         if os.getenv("CI") or os.getenv("GITHUB_ACTIONS"):
             print("CI: Running in CI environment, attempting real metrics capture")
@@ -340,38 +360,38 @@ def main():
                 # CI環境でも実際のメトリクス測定を試行
                 metrics = measure_kernel_performance()
                 cli_output = capture_cli_output()
-                
+
                 # Write metrics file
                 metrics_file = out_path / "metrics.json"
                 with metrics_file.open("w", encoding="utf-8") as f:
                     json.dump(metrics, f, indent=2)
-                
+
                 # Write CLI output file
                 cli_file = out_path / "cli_output.json"
                 with cli_file.open("w", encoding="utf-8") as f:
                     json.dump(cli_output, f, indent=2)
-                
+
                 print(f"SUCCESS: Real metrics captured in CI: {out_path}")
                 return 0
-                
+
             except Exception as ci_error:
                 print(f"CI: Real metrics failed, falling back to synthetic: {ci_error}")
                 # フォールバックとして合成メトリクスを使用
                 metrics = _synthetic_metrics()
                 cli_output = {"mode": "ci_synthetic", "timestamp": time.time()}
-                
+
                 # Write fallback files
                 metrics_file = out_path / "metrics.json"
                 with metrics_file.open("w", encoding="utf-8") as f:
                     json.dump(metrics, f, indent=2)
-                
+
                 cli_file = out_path / "cli_output.json"
                 with cli_file.open("w", encoding="utf-8") as f:
                     json.dump(cli_output, f, indent=2)
-                
+
                 print(f"CI: Fallback synthetic metrics written to {out_path}")
                 return 0
-        
+
         # Normal execution
         run_cli_and_collect(out_path)
         print("\nSUCCESS: Golden metrics captured successfully!")
@@ -381,28 +401,29 @@ def main():
         print(f"\nERROR: Error capturing golden metrics: {e}")
         if args.verbose:
             import traceback
+
             traceback.print_exc()
-        
+
         # In CI, don't fail completely - write fallback data
         if os.getenv("CI") or os.getenv("GITHUB_ACTIONS"):
             try:
                 out_path = pathlib.Path(args.out)
                 out_path.mkdir(parents=True, exist_ok=True)
-                
+
                 fallback_metrics = _synthetic_metrics()
                 fallback_metrics["error_fallback"] = True
                 fallback_metrics["error_message"] = str(e)
-                
+
                 metrics_file = out_path / "metrics.json"
                 with metrics_file.open("w", encoding="utf-8") as f:
                     json.dump(fallback_metrics, f, indent=2)
-                
+
                 print("CI: Wrote fallback metrics despite error")
                 return 0
             except Exception as fallback_error:
                 print(f"CI: Even fallback failed: {fallback_error}")
                 return 1
-        
+
         return 1
 
 

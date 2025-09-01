@@ -47,7 +47,7 @@ class InternPass:
             Interned configuration with structural sharing
         """
         print(f"🔍 InternPass.run() called with model size: {len(str(model))}")
-        
+
         if self._stats:
             self._stats.__init__()  # Reset stats for this run
             print("📊 Stats collection enabled and reset")

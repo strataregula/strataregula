@@ -203,7 +203,9 @@ metadata:
 class ConfigCompiler:
     """Main configuration compiler."""
 
-    def __init__(self, config: Optional[CompilationConfig] = None, use_plugins: bool = True):
+    def __init__(
+        self, config: Optional[CompilationConfig] = None, use_plugins: bool = True
+    ):
         self.config = config or CompilationConfig()
 
         # Initialize plugin system if enabled
@@ -574,7 +576,9 @@ def get_services_by_prefecture(prefecture: str) -> Dict[str, float]:
 
 # CLI compatibility functions
 def compile_config(
-    traffic_file: str, prefectures_file: Optional[str] = None, output_file: Optional[str] = None
+    traffic_file: str,
+    prefectures_file: Optional[str] = None,
+    output_file: Optional[str] = None,
 ) -> str:
     """CLI-compatible config compilation function."""
     compiler = ConfigCompiler()
