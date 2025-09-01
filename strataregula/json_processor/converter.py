@@ -203,7 +203,7 @@ class FormatConverter:
 
         if isinstance(data, dict) and len(data) == 1:
             # 単一のルート要素がある場合
-            root_name = list(data.keys())[0]
+            root_name = next(iter(data.keys()))
             data = data[root_name]
 
         root = ET.Element(root_name)
@@ -282,7 +282,7 @@ class FormatConverter:
         else:
             writer = csv.writer(output, delimiter=delimiter)
             for row in data:
-                if isinstance(row, (list, tuple)):
+                if isinstance(row, list | tuple):
                     writer.writerow(row)
                 else:
                     writer.writerow([row])

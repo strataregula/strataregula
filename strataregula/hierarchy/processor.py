@@ -42,9 +42,7 @@ class HierarchyProcessor:
             logger.error(f"Error loading base config: {e}")
             return False
 
-    def load_environment_config(
-        self, env_name: str, config_path: str | Path
-    ) -> bool:
+    def load_environment_config(self, env_name: str, config_path: str | Path) -> bool:
         """環境別設定を読み込み"""
         try:
             config_path = Path(config_path)
@@ -106,7 +104,7 @@ class HierarchyProcessor:
         return False
 
     def get_merged_config(
-        self, target_env: str = None, strategy: MergeStrategy = None
+        self, target_env: str | None = None, strategy: MergeStrategy = None
     ) -> dict | None:
         """マージされた設定を取得"""
         if not self.base_config:
@@ -151,7 +149,7 @@ class HierarchyProcessor:
         return self.merger.merge_multiple(configs)
 
     def resolve_config_conflicts(
-        self, base: dict, conflicts: list[dict], priority_order: list[str] = None
+        self, base: dict, conflicts: list[dict], priority_order: list[str] | None = None
     ) -> dict:
         """設定の競合を解決"""
         logger.info(f"Resolving conflicts for {len(conflicts)} configurations")

@@ -1,0 +1,33 @@
+================================================================================
+StrataRegula Benchmark Results - [FAIL] FAILED
+Timestamp: 2025-09-01 08:36:04 JST
+================================================================================
+
+Configuration:
+   * Operations: 1,000
+   * Warmup: 100
+   * Min Ratio: >=50.0x
+   * Max p95: <=50.0us
+
+Component Performance:
+Component                 Ops/sec      p50 (us)   p95 (us)   Status  
+---------------------------------------------------------------------------
+Pattern Expansion (Fast)       16,137      56.6      65.1 [OK]
+Pattern Expansion (Slow)       15,429      57.4      95.5 [OK]
+Config Compilation (Fast           45   20821.4   33829.1 [SLOW]
+Config Compilation (Slow      119,962       8.2       8.6 [FAST]
+Kernel Cache (Fast)            19,812      47.7      51.3 [OK]
+Kernel Cache (Slow)           453,206       2.1       2.3 [FAST]
+
+Performance Analysis:
+   * Fastest: kernel_cache_slow (453,206 ops/s)
+   * Slowest: config_compilation_fast (45 ops/s)
+   * Speed Ratio: 10042.1x
+
+Performance Issues Detected:
+
+Recommended Actions:
+   * Profile critical paths for bottlenecks
+   * Review recent algorithmic changes
+   * Consider caching or optimization strategies
+================================================================================

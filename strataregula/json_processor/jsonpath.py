@@ -202,9 +202,9 @@ class JSONPathProcessor:
 
         try:
             if operation == "sum":
-                return sum(v for v in values if isinstance(v, (int, float)))
-            elif operation == "avg" or operation == "average":
-                numeric_values = [v for v in values if isinstance(v, (int, float))]
+                return sum(v for v in values if isinstance(v, int | float))
+            elif operation in {"avg", "average"}:
+                numeric_values = [v for v in values if isinstance(v, int | float)]
                 return (
                     sum(numeric_values) / len(numeric_values)
                     if numeric_values

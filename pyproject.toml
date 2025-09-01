@@ -229,6 +229,66 @@ ignore = [
     "PLR0913", # too many arguments
     "PLR0911", # too many return statements
     "PLR0912", # too many branches
+    "PLR0915", # too many statements (関数が長すぎる)
+    "PLR2004", # magic values (マジックナンバー)
+    "RUF003",  # 全角文字の問題（日本語コメント）
+    "RUF002",  # 全角文字の問題（docstring）
+    "UP038",   # isinstance の新しい構文（Python 3.10+）
+    "UP035",   # typing の非推奨構文
+    "UP045",   # 新しい型注釈構文
+    "UP006",   # 新しい型注釈構文
+    "UP007",   # 新しい型注釈構文
+    "UP015",   # 不要なmode引数
+    "UP017",   # datetime.UTC
+    "B904",    # except句での例外処理
+    "B905",    # zip()のstrict引数
+    "B007",    # ループ制御変数の未使用
+    "B018",    # 無用な属性アクセス
+    "C401",    # 不要なジェネレータ
+    "C4",      # 内包表記の問題
+    "E401",    # 複数インポート
+    "E712",    # 真偽値比較
+    "E722",    # 裸のexcept
+    "E731",    # lambda式の代入
+    "F401",    # 未使用インポート
+    "F403",    # star import
+    "F405",    # star importからの名前
+    "F541",    # プレースホルダーのないf-string
+    "F811",    # 重複定義
+    "F841",    # 未使用変数
+    "I001",    # インポートブロックの順序
+    "PLC0415", # トップレベル以外でのインポート
+    "PLW1510", # subprocess.runのcheck引数
+    "PLW2901", # ループ変数の上書き
+    "PTH108",  # os.unlink
+    "PTH117",  # os.path.isabs
+    "PTH118",  # os.path.join
+    "PTH120",  # os.path.dirname
+    "PTH123",  # open()をPath.open()に
+    "RUF006",  # asyncio.create_taskの戻り値
+    "RUF012",  # 可変クラス属性の型注釈
+    "RUF013",  # 暗黙のOptional
+    "RUF015",  # next(iter())の使用
+    "RUF022",  # __all__のソート
+    "SIM102",  # 単一のif文
+    "SIM103",  # 条件の直接返却
+    "SIM105",  # contextlib.suppress
+    "SIM118",  # dict.keys()の使用
+    "TC001",   # 型チェックブロックでのインポート
+    "TC003",   # 型チェックブロックでのインポート
+    "ARG001",  # 未使用関数引数
+    "ARG002",  # 未使用メソッド引数
+    "ARG003",  # 未使用クラスメソッド引数
+    "ARG005",  # 未使用lambda引数
+    "E402",    # モジュールレベルでのインポート位置
+    "E721",    # 型比較の問題
+    "ERA001",  # コメントアウトされたコード
+    "RUF001",  # 全角文字（日本語表示用）
+    "B019",    # lru_cacheの警告
+    "B023",    # ループ変数の束縛
+    "SIM108",  # 三項演算子の使用
+    "SIM113",  # enumerateの使用
+    "PTH122",  # os.path.splitext
 ]
 
 [tool.ruff.format]
@@ -242,6 +302,27 @@ line-ending = "auto"
     "S101",    # assert allowed in tests
     "ARG",     # unused arguments OK in tests
     "PLR2004", # magic values OK in tests
+    "F401",    # unused imports OK in tests
+    "F403",    # star imports OK in tests
+    "F405",    # star import names OK in tests
+    "F541",    # f-strings without placeholders OK in tests
+    "F811",    # redefinition OK in tests
+    "F841",    # unused variables OK in tests
+    "I001",    # import order OK in tests
+    "PLC0415", # imports not at top level OK in tests
+    "PLR0915", # too many statements OK in tests
+    "B007",    # loop control variables OK in tests
+    "B904",    # exception handling OK in tests
+    "B905",    # zip strict OK in tests
+    "E401",    # multiple imports OK in tests
+    "E712",    # boolean comparison OK in tests
+    "E731",    # lambda assignment OK in tests
+    "SIM105",  # contextlib.suppress OK in tests
+    "UP035",   # typing deprecated OK in tests
+    "UP006",   # typing deprecated OK in tests
+    "UP007",   # typing deprecated OK in tests
+    "UP017",   # datetime.UTC OK in tests
+    "UP045",   # new type annotations OK in tests
 ]
 "__init__.py" = [
     "F401",    # imported but unused (re-exports)

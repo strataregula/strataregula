@@ -327,12 +327,12 @@ class JSONFilterCommand(BaseCommand):
                 results.append(item_value <= value if item_value is not None else False)
             elif operator == "in":
                 results.append(
-                    item_value in value if isinstance(value, (list, tuple)) else False
+                    item_value in value if isinstance(value, list | tuple) else False
                 )
             elif operator == "contains":
                 results.append(
                     value in item_value
-                    if isinstance(item_value, (str, list))
+                    if isinstance(item_value, str | list)
                     else False
                 )
             elif operator == "exists":
@@ -379,7 +379,7 @@ class JSONStatsCommand(BaseCommand):
         elif isinstance(data, list):
             stats["item_count"] = len(data)
             if data:
-                stats["item_types"] = list(set(type(item).__name__ for item in data))
+                stats["item_types"] = list({type(item).__name__ for item in data})
 
         # 構造分析
         if include_structure:
@@ -416,7 +416,7 @@ class JSONStatsCommand(BaseCommand):
                 "type": "array",
                 "length": len(data),
                 "item_types": list(
-                    set(type(item).__name__ for item in data[:10])
+                    {type(item).__name__ for item in data[:10]}
                 ),  # 最初の10個のみ
                 "sample": self._analyze_structure(data[0], max_depth, current_depth + 1)
                 if data
@@ -432,11 +432,11 @@ class JSONStatsCommand(BaseCommand):
         """値の統計を計算"""
         stats = {
             "count": len(values),
-            "types": list(set(type(v).__name__ for v in values)),
+            "types": list({type(v).__name__ for v in values}),
         }
 
         # 数値統計
-        numeric_values = [v for v in values if isinstance(v, (int, float))]
+        numeric_values = [v for v in values if isinstance(v, int | float)]
         if numeric_values:
             stats["numeric"] = {
                 "count": len(numeric_values),

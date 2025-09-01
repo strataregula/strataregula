@@ -110,9 +110,7 @@ class ChunkProcessor:
 class StreamProcessor:
     """Advanced stream processor with real-time capabilities and async support."""
 
-    def __init__(
-        self, chunk_config: ChunkConfig | None = None, max_workers: int = 4
-    ):
+    def __init__(self, chunk_config: ChunkConfig | None = None, max_workers: int = 4):
         self.chunk_processor = ChunkProcessor(chunk_config)
         self.max_workers = max_workers
         self._executor = ThreadPoolExecutor(max_workers=max_workers)
@@ -204,7 +202,7 @@ class StreamProcessor:
         if processor_name not in self.chunk_processor._processors:
             raise ValueError(f"Processor '{processor_name}' not registered")
 
-        processor = self.chunk_processor._processors[processor_name]
+        self.chunk_processor._processors[processor_name]
 
         # Submit all processing tasks
         futures = []

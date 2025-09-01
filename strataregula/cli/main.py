@@ -9,17 +9,6 @@ import warnings
 # Early compatibility check before heavy imports
 def check_basic_compatibility():
     """Basic compatibility check before importing heavy dependencies."""
-    if sys.version_info < (3, 8):
-        print(
-            f"❌ Error: Python {sys.version_info[0]}.{sys.version_info[1]} is not supported."
-        )
-        print("   Strataregula requires Python 3.8 or newer.")
-        if "pyenv" in sys.executable:
-            print("   💡 Detected pyenv. Try:")
-            print("      pyenv install 3.9.16")
-            print("      pyenv global 3.9.16")
-            print("      pip install --upgrade strataregula")
-        sys.exit(1)
 
 
 check_basic_compatibility()
@@ -35,7 +24,7 @@ try:
 
     RICH_AVAILABLE = True
 except ImportError:
-    warnings.warn("Rich not available. Using basic console output.", RuntimeWarning)
+    warnings.warn("Rich not available. Using basic console output.", RuntimeWarning, stacklevel=2)
     RICH_AVAILABLE = False
 
     # Fallback console class

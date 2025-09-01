@@ -4,9 +4,10 @@ import importlib
 import json
 import os
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from .base import IndexProvider
+if TYPE_CHECKING:
+    from .base import IndexProvider
 
 
 def _load_by_string(name: str) -> IndexProvider:

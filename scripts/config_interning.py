@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Config Interning v2: freeze + hash-consing + weak pool + optional float quantization.
 
@@ -12,9 +11,18 @@ Library:
 """
 
 from __future__ import annotations
-import argparse, sys, json, hashlib, weakref, math, sys as pysys, io, os
-from typing import Any, Mapping, Sequence, Tuple
+
+import argparse
+import hashlib
+import io
+import json
+import math
+import os
+import sys
+import sys as pysys
+from collections.abc import Mapping, Sequence
 from types import MappingProxyType
+from typing import Any
 
 try:
     import yaml  # pyyaml
@@ -25,18 +33,24 @@ except Exception:
 # Note: WeakValueDictionary doesn't support MappingProxyType, using regular dict
 _pool: dict[str, Any] = {}
 
+
 class Stats:
-    __slots__ = ("nodes", "hits", "misses", "unique")
+    __slots__ = ("hits", "misses", "nodes", "unique")
+
     def __init__(self) -> None:
         self.nodes = 0
         self.hits = 0
         self.misses = 0
         self.unique = 0
 
+
 def _qf(x: float, q: float | None) -> float:
-    if q is None: return x
-    if x == 0.0: return 0.0
+    if q is None:
+        return x
+    if x == 0.0:
+        return 0.0
     return round(x / q) * q
+
 
 def _freeze(x: Any, qfloat: float | None, stats: Stats | None) -> Any:
     # normalize primitives
@@ -45,7 +59,7 @@ def _freeze(x: Any, qfloat: float | None, stats: Stats | None) -> Any:
         return pysys.intern(x)
     if isinstance(x, bool) or x is None:
         return x
-    if isinstance(x, (int,)):
+    if isinstance(x, int):
         return x
     if isinstance(x, float):
         if not math.isfinite(x):
@@ -55,31 +69,45 @@ def _freeze(x: Any, qfloat: float | None, stats: Stats | None) -> Any:
     # recursively freeze containers
     if isinstance(x, Mapping):
         # sort keys for stability
-        items = tuple((pysys.intern(str(k)), _freeze(v, qfloat, stats)) for k, v in sorted(x.items(), key=lambda kv: str(kv[0])))
-        if stats: stats.nodes += 1  # count dict nodes
+        items = tuple(
+            (pysys.intern(str(k)), _freeze(v, qfloat, stats))
+            for k, v in sorted(x.items(), key=lambda kv: str(kv[0]))
+        )
+        if stats:
+            stats.nodes += 1  # count dict nodes
         return ("__dict__", items)
-    if isinstance(x, Sequence) and not isinstance(x, (bytes, bytearray)):
+    if isinstance(x, Sequence) and not isinstance(x, bytes | bytearray):
         items = tuple(_freeze(v, qfloat, stats) for v in x)
-        if stats: stats.nodes += 1  # count list nodes
+        if stats:
+            stats.nodes += 1  # count list nodes
         return ("__list__", items)
     if isinstance(x, set):
         items = tuple(sorted((_freeze(v, qfloat, stats) for v in x), key=repr))
-        if stats: stats.nodes += 1  # count set nodes
+        if stats:
+            stats.nodes += 1  # count set nodes
         return ("__set__", items)
     return x  # others
 
+
 def _key(frozen: Any) -> str:
-    s = json.dumps(frozen, ensure_ascii=False, separators=(",", ":"), sort_keys=True, default=str)
+    s = json.dumps(
+        frozen, ensure_ascii=False, separators=(",", ":"), sort_keys=True, default=str
+    )
     return hashlib.blake2b(s.encode("utf-8"), digest_size=16).hexdigest()
 
-def intern(value: Any, *, qfloat: float | None = None, stats: Stats | None = None) -> Any:
+
+def intern(
+    value: Any, *, qfloat: float | None = None, stats: Stats | None = None
+) -> Any:
     """Return a canonical, immutable, shared instance for semantically equal values."""
-    if stats: stats.nodes += 1
+    if stats:
+        stats.nodes += 1
     frozen = _freeze(value, qfloat, stats)
     k = _key(frozen)
     obj = _pool.get(k)
     if obj is not None:
-        if stats: stats.hits += 1
+        if stats:
+            stats.hits += 1
         return obj
 
     # materialize immutable view
@@ -99,10 +127,14 @@ def intern(value: Any, *, qfloat: float | None = None, stats: Stats | None = Non
         stats.unique += 1
     return materialized
 
-def intern_tree(obj: Any, *, qfloat: float | None = None, stats: Stats | None = None) -> Any:
+
+def intern_tree(
+    obj: Any, *, qfloat: float | None = None, stats: Stats | None = None
+) -> Any:
     """Intern recursively: walk the tree and replace subtrees with pooled immutable instances."""
     # NOTE: intern() already freezes recursively; this function is an alias for clarity
     return intern(obj, qfloat=qfloat, stats=stats)
+
 
 def thaw(obj: Any) -> Any:
     """Convert immutable interned structures back to mutable for serialization."""
@@ -125,6 +157,7 @@ def thaw(obj: Any) -> Any:
     else:
         return obj
 
+
 # ---------- CLI ----------
 def _load(path: str) -> Any:
     with open(path, "rb") as f:
@@ -137,10 +170,13 @@ def _load(path: str) -> Any:
         return yaml.safe_load(io.BytesIO(data))
     return json.loads(data.decode("utf-8"))
 
+
 def _dump(data: Any, path: str | None) -> None:
     if path is None:
         # write JSON to stdout
-        sys.stdout.write(json.dumps(data, ensure_ascii=False, indent=2, default=str) + "\n")
+        sys.stdout.write(
+            json.dumps(data, ensure_ascii=False, indent=2, default=str) + "\n"
+        )
     else:
         ext = os.path.splitext(path)[1].lower()
         if ext in (".yaml", ".yml") and yaml is not None:
@@ -150,12 +186,22 @@ def _dump(data: Any, path: str | None) -> None:
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2, default=str)
 
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", "-i", required=True, help="Input YAML/JSON")
-    ap.add_argument("--out", "-o", help="Output path (.yaml/.json); omit to print JSON to stdout")
-    ap.add_argument("--qfloat", type=float, default=None, help="Optional float quantization (e.g., 1e-9)")
-    ap.add_argument("--stats", action="store_true", help="Print interning stats to stderr")
+    ap.add_argument(
+        "--out", "-o", help="Output path (.yaml/.json); omit to print JSON to stdout"
+    )
+    ap.add_argument(
+        "--qfloat",
+        type=float,
+        default=None,
+        help="Optional float quantization (e.g., 1e-9)",
+    )
+    ap.add_argument(
+        "--stats", action="store_true", help="Print interning stats to stderr"
+    )
     args = ap.parse_args(argv)
 
     raw = _load(args.input)
@@ -170,8 +216,12 @@ def main(argv: list[str] | None = None) -> int:
         nodes = st.nodes
         misses = st.misses
         rate = (hits / max(1, hits + misses)) * 100.0
-        print(f"[intern-stats] nodes={nodes} unique={uniq} hits={hits} misses={misses} hit_rate={rate:.2f}%", file=sys.stderr)
+        print(
+            f"[intern-stats] nodes={nodes} unique={uniq} hits={hits} misses={misses} hit_rate={rate:.2f}%",
+            file=sys.stderr,
+        )
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

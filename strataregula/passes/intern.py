@@ -20,7 +20,7 @@ from config_interning import Stats, intern_tree  # type: ignore[import-not-found
 class InternPass:
     """
     Compile pass that applies value interning to reduce memory usage.
-    
+
     Uses hash-consing to ensure that equivalent values share the same
     memory reference, while maintaining immutability guarantees.
     """
@@ -35,10 +35,10 @@ class InternPass:
     def run(self, model: Mapping[str, Any]) -> Mapping[str, Any]:
         """
         Apply interning to the entire configuration model.
-        
+
         Args:
             model: Raw configuration data
-            
+
         Returns:
             Interned configuration with structural sharing
         """
@@ -46,11 +46,7 @@ class InternPass:
             self._stats.__init__()  # Reset stats for this run
 
         # Apply interning with optional float quantization
-        interned = intern_tree(
-            model,
-            qfloat=self.qfloat,
-            stats=self._stats
-        )
+        interned = intern_tree(model, qfloat=self.qfloat, stats=self._stats)
 
         # Log stats if collection is enabled
         if self._stats and self.collect_stats:
@@ -71,7 +67,7 @@ class InternPass:
         print(
             f"[intern] nodes={self._stats.nodes} unique={self._stats.unique} "
             f"hits={hits} misses={misses} hit_rate={hit_rate:.1f}%",
-            file=sys.stderr
+            file=sys.stderr,
         )
 
     def get_stats(self) -> dict[str, Any]:
@@ -89,5 +85,5 @@ class InternPass:
             "unique_values": self._stats.unique,
             "cache_hits": hits,
             "cache_misses": misses,
-            "hit_rate": hit_rate
+            "hit_rate": hit_rate,
         }

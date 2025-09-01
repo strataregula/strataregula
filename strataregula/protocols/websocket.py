@@ -4,6 +4,7 @@ Provides async WebSocket server and client implementations with stream processin
 """
 
 import asyncio
+import contextlib
 import json
 import logging
 import ssl
@@ -302,10 +303,8 @@ class WebSocketClient(WebSocketHandler):
         """Disconnect from WebSocket server."""
         if self._receive_task:
             self._receive_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._receive_task
-            except asyncio.CancelledError:
-                pass
 
         if self.websocket:
             logger.info("Disconnecting from WebSocket server")

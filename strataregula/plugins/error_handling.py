@@ -81,10 +81,7 @@ class ErrorRecoveryStrategy:
         # Check cooldown period
         last_attempt = self.last_attempt.get(plugin_name, 0)
         cooldown_period = self.backoff_factor**current_retries
-        if time.time() - last_attempt < cooldown_period:
-            return False
-
-        return True
+        return not time.time() - last_attempt < cooldown_period
 
     def record_attempt(self, plugin_name: str) -> None:
         """Record a retry attempt."""
@@ -323,11 +320,11 @@ class PluginErrorHandler:
             return ErrorCategory.PERMISSION_ERROR
         elif isinstance(exception, TimeoutError):
             return ErrorCategory.TIMEOUT_ERROR
-        elif isinstance(exception, (ConnectionError, OSError)):
+        elif isinstance(exception, ConnectionError | OSError):
             return ErrorCategory.NETWORK_ERROR
-        elif isinstance(exception, (MemoryError, OSError)):
+        elif isinstance(exception, MemoryError | OSError):
             return ErrorCategory.RESOURCE_ERROR
-        elif isinstance(exception, (ValueError, TypeError)):
+        elif isinstance(exception, ValueError | TypeError):
             return ErrorCategory.VALIDATION_ERROR
         else:
             return ErrorCategory.RUNTIME_ERROR
@@ -337,7 +334,7 @@ class PluginErrorHandler:
     ) -> ErrorSeverity:
         """Determine error severity."""
         # Critical errors
-        if isinstance(exception, (MemoryError, SystemExit)):
+        if isinstance(exception, MemoryError | SystemExit):
             return ErrorSeverity.CRITICAL
 
         # High severity errors

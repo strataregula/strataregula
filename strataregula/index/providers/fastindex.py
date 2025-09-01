@@ -5,9 +5,11 @@ import json
 import os
 import subprocess
 import time
-from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class Provider:
@@ -55,7 +57,8 @@ class Provider:
                             if os.name == "nt":  # Windows
                                 result = subprocess.run(
                                     ["tasklist", "/FI", f"PID eq {lock_pid}"],
-                                    check=False, capture_output=True,
+                                    check=False,
+                                    capture_output=True,
                                     text=True,
                                 )
                                 if str(lock_pid) not in result.stdout:

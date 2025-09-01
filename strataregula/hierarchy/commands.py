@@ -202,15 +202,15 @@ class HierarchyInfoCommand(BaseCommand):
         if isinstance(data, dict):
             total_keys = len(data)
             structure = "dict"
-            for key, value in data.items():
-                if isinstance(value, (dict, list)):
+            for _key, value in data.items():
+                if isinstance(value, dict | list):
                     child_info = self._analyze_hierarchy(value, depth + 1, max_depth)
                     total_keys += child_info["total_keys"]
         elif isinstance(data, list):
             total_keys = len(data)
             structure = "list"
             for item in data:
-                if isinstance(item, (dict, list)):
+                if isinstance(item, dict | list):
                     child_info = self._analyze_hierarchy(item, depth + 1, max_depth)
                     total_keys += child_info["total_keys"]
         else:

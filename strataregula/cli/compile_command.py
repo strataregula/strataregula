@@ -590,7 +590,7 @@ def _pattern_matches(pattern: str, expanded_key: str) -> bool:
         return False
 
     for pattern_part, key_part in zip(pattern_parts, key_parts, strict=False):
-        if pattern_part != "*" and pattern_part != key_part:
+        if pattern_part not in ("*", key_part):
             return False
 
     return True
@@ -614,7 +614,7 @@ COMPILED_CONFIG = {dump_data!r}
 
 # Quick Stats:
 # - Original patterns: {dump_data["metadata"]["total_patterns"]}
-# - Direct mappings: {dump_data["metadata"]["total_direct_mappings"]} 
+# - Direct mappings: {dump_data["metadata"]["total_direct_mappings"]}
 # - Component mappings: {dump_data["metadata"]["total_component_mappings"]}
 # - Expansion ratio: {dump_data["metadata"]["expansion_ratio"]:.2f}
 """

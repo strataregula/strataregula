@@ -231,7 +231,7 @@ class PluginLoader:
         """Load all discovered plugins."""
         results = []
 
-        for plugin_name in self._discovered_plugins.keys():
+        for plugin_name in self._discovered_plugins:
             result = self.load_plugin(plugin_name)
             results.append(result)
 
