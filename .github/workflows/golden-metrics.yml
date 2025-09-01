@@ -64,6 +64,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .
           pip install -r requirements.txt
+          pip install -e ".[test]"  # Install test dependencies including pytest
+          pip install -e ".[dev]"   # Install development dependencies
           pip install psutil  # Required for memory measurement
 
       - name: Verify golden baseline exists
@@ -75,6 +77,10 @@ jobs:
           fi
           echo "✅ Golden baseline found"
           cat tests/golden/baseline/metrics.json
+          
+      - name: Create reports directory
+        run: |
+          mkdir -p reports/junit
 
       - name: Run Golden Metrics Guard (Normal)
         if: github.event.inputs.strictness == 'normal' || github.event.inputs.strictness == ''
