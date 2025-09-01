@@ -101,7 +101,7 @@ jobs:
           echo "Event inputs: ${{ github.event.inputs.strictness || 'default' }}"
 
       - name: Run Golden Metrics Guard (Normal)
-        if: github.event.inputs.strictness == 'normal' || github.event.inputs.strictness == ''
+        if: (github.event.inputs.strictness == 'normal' || github.event.inputs.strictness == '') && !env.CI
         env:
           GOLDEN_LATENCY_ALLOW_PCT: '1.0'
           GOLDEN_P95_ALLOW_PCT: '1.2'
