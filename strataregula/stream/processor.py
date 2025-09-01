@@ -21,8 +21,8 @@ class ProcessingStats:
     bytes_processed: int = 0
     processing_time: float = 0.0
     errors: int = 0
-    start_time: float | None = None
-    end_time: float | None = None
+    start_time: Optional[float] = None
+    end_time: Optional[float] = None
 
     @property
     def throughput(self) -> float:
@@ -35,7 +35,7 @@ class ProcessingStats:
 class ChunkProcessor:
     """Processes data chunks with configurable processing functions."""
 
-    def __init__(self, chunk_config: ChunkConfig | None = None):
+    def __init__(self, chunk_config: Optional[ChunkConfig] = None):
         self.chunker = Chunker(chunk_config or ChunkConfig())
         self.stats = ProcessingStats()
         self._processors: dict[str, Callable] = {}
@@ -110,9 +110,7 @@ class ChunkProcessor:
 class StreamProcessor:
     """Advanced stream processor with real-time capabilities and async support."""
 
-    def __init__(
-        self, chunk_config: ChunkConfig | None = None, max_workers: int = 4
-    ):
+    def __init__(self, chunk_config: Optional[ChunkConfig] = None, max_workers: int = 4):
         self.chunk_processor = ChunkProcessor(chunk_config)
         self.max_workers = max_workers
         self._executor = ThreadPoolExecutor(max_workers=max_workers)
@@ -127,7 +125,7 @@ class StreamProcessor:
         self,
         data_stream: Iterator[Any],
         processor_name: str,
-        stream_id: str | None = None,
+        stream_id: Optional[str] = None,
         **kwargs,
     ) -> Iterator[Any]:
         """Process a data stream synchronously with chunks."""
@@ -160,7 +158,7 @@ class StreamProcessor:
         self,
         data_stream: AsyncIterator[Any],
         processor_name: str,
-        stream_id: str | None = None,
+        stream_id: Optional[str] = None,
         **kwargs,
     ) -> AsyncIterator[Any]:
         """Process an async data stream with chunks."""
@@ -204,7 +202,7 @@ class StreamProcessor:
         if processor_name not in self.chunk_processor._processors:
             raise ValueError(f"Processor '{processor_name}' not registered")
 
-        processor = self.chunk_processor._processors[processor_name]
+        self.chunk_processor._processors[processor_name]
 
         # Submit all processing tasks
         futures = []

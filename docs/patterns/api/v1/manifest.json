@@ -1,0 +1,90 @@
+{
+  "version": "1.0.0",
+  "updated": "2025-08-31T00:00:00Z",
+  "api_version": "v1",
+  "distribution": {
+    "base_url": "https://patterns.security-audit.io/api/v1",
+    "method": "github_pages",
+    "auto_update": true
+  },
+  "rulesets": {
+    "all": {
+      "name": "Complete Security Patterns",
+      "description": "All available security detection patterns",
+      "file": "rulesets/all.toml",
+      "patterns_count": 170,
+      "categories": ["secrets", "tokens", "credentials", "keys"],
+      "size": "26kb",
+      "checksum": "sha256:placeholder"
+    },
+    "secrets": {
+      "name": "General Secrets Detection",
+      "description": "Common secret patterns (API keys, tokens, passwords)",
+      "file": "rulesets/secrets.toml",
+      "patterns_count": 45,
+      "categories": ["api_keys", "tokens", "passwords"],
+      "size": "8kb",
+      "checksum": "sha256:placeholder"
+    },
+    "github": {
+      "name": "GitHub Patterns",
+      "description": "GitHub-specific tokens and credentials",
+      "file": "rulesets/github.toml",
+      "patterns_count": 20,
+      "categories": ["github_pat", "github_oauth", "github_app"],
+      "size": "4kb",
+      "checksum": "sha256:placeholder"
+    },
+    "aws": {
+      "name": "AWS Credentials",
+      "description": "Amazon Web Services authentication patterns",
+      "file": "rulesets/aws.toml",
+      "patterns_count": 15,
+      "categories": ["access_keys", "secret_keys", "session_tokens"],
+      "size": "3kb",
+      "checksum": "sha256:placeholder"
+    },
+    "openai": {
+      "name": "OpenAI API Keys",
+      "description": "OpenAI and AI service API keys",
+      "file": "rulesets/openai.toml",
+      "patterns_count": 8,
+      "categories": ["openai", "anthropic", "cohere"],
+      "size": "2kb",
+      "checksum": "sha256:placeholder"
+    }
+  },
+  "scripts": {
+    "secret_audit": {
+      "name": "PowerShell Secret Audit",
+      "description": "Cross-platform PowerShell secret detection script",
+      "file": "scripts/secret-audit.ps1",
+      "version": "1.0.0",
+      "platform": "cross-platform",
+      "size": "12kb",
+      "checksum": "sha256:placeholder"
+    },
+    "deploy": {
+      "name": "Deployment Script",
+      "description": "Automated deployment to projects",
+      "file": "scripts/deploy.sh",
+      "version": "1.0.0",
+      "platform": "unix",
+      "size": "4kb",
+      "checksum": "sha256:placeholder"
+    }
+  },
+  "compatibility": {
+    "gitleaks": ">=8.18.0",
+    "powershell": ">=7.0.0",
+    "github_actions": ">=2.0.0"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/strataregula/security-patterns",
+  "documentation": "https://patterns.security-audit.io",
+  "support": {
+    "issues": "https://github.com/strataregula/security-patterns/issues",
+    "email": "security@strataregula.com",
+    "discord": "https://discord.gg/strataregula"
+  }
+}

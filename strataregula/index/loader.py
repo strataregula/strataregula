@@ -4,9 +4,10 @@ import importlib
 import json
 import os
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from .base import IndexProvider
+if TYPE_CHECKING:
+    from .base import IndexProvider
 
 
 def _load_by_string(name: str) -> IndexProvider:
@@ -33,7 +34,7 @@ def _load_config_file() -> dict[str, Any] | None:
 
 
 def resolve_provider(
-    cli_arg: str | None = None, cfg: dict[str, Any] | None = None
+    cli_arg: Optional[str] = None, cfg: dict[str, Any] | None = None
 ) -> IndexProvider:
     """
     Resolve index provider with priority: CLI > env > config file > default

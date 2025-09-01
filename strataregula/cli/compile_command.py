@@ -86,10 +86,10 @@ logger = logging.getLogger(__name__)
 )
 def compile_cmd(
     traffic: Path,
-    prefectures: Path | None,
-    out: Path | None,
+    prefectures: Optional[Path],
+    out: Optional[Path],
     output_format: str,
-    template: Path | None,
+    template: Optional[Path],
     chunk_size: int,
     max_memory: int,
     no_metadata: bool,
@@ -99,7 +99,7 @@ def compile_cmd(
     plan: bool,
     stats: bool,
     validate_only: bool,
-    dump_compiled_config: Path | None,
+    dump_compiled_config: Optional[Path],
     dump_format: str,
 ):
     """
@@ -234,7 +234,7 @@ def compile_cmd(
         sys.exit(1)
 
 
-def _validate_files(traffic_file: Path, prefectures_file: Path | None) -> None:
+def _validate_files(traffic_file: Path, prefectures_file: Optional[Path]) -> None:
     """Validate input configuration files."""
     click.echo("Validating configuration files...", err=True)
 
@@ -295,7 +295,7 @@ def _validate_files(traffic_file: Path, prefectures_file: Path | None) -> None:
 
 
 def _show_compilation_plan(
-    traffic_file: Path, prefectures_file: Path | None, config: CompilationConfig
+    traffic_file: Path, prefectures_file: Optional[Path], config: CompilationConfig
 ) -> None:
     """Show compilation plan without executing."""
     click.echo("=== Compilation Plan ===", err=True)
@@ -413,7 +413,7 @@ def _estimate_processing_time(pattern_count: int) -> float:
 def _dump_compiled_configuration(
     compiler: ConfigCompiler,
     traffic_file: Path,
-    prefectures_file: Path | None,
+    prefectures_file: Optional[Path],
     dump_path: Path,
     dump_format: str,
     verbose: bool,
@@ -590,7 +590,7 @@ def _pattern_matches(pattern: str, expanded_key: str) -> bool:
         return False
 
     for pattern_part, key_part in zip(pattern_parts, key_parts, strict=False):
-        if pattern_part != "*" and pattern_part != key_part:
+        if pattern_part not in ("*", key_part):
             return False
 
     return True
@@ -614,7 +614,7 @@ COMPILED_CONFIG = {dump_data!r}
 
 # Quick Stats:
 # - Original patterns: {dump_data["metadata"]["total_patterns"]}
-# - Direct mappings: {dump_data["metadata"]["total_direct_mappings"]} 
+# - Direct mappings: {dump_data["metadata"]["total_direct_mappings"]}
 # - Component mappings: {dump_data["metadata"]["total_component_mappings"]}
 # - Expansion ratio: {dump_data["metadata"]["expansion_ratio"]:.2f}
 """

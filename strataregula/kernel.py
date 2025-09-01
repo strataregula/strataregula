@@ -19,6 +19,13 @@ from types import MappingProxyType
 from typing import Any, Protocol
 
 
+@dataclass(frozen=True)
+class CompiledConfig:
+    """事前コンパイル済みの設定を表す軽量型"""
+    data: Mapping[str, Any]
+    # オプション：ハッシュや指紋を持たせるならここに fingerprint:str を置く
+
+
 class Pass(Protocol):
     """Protocol for compile passes that transform config data."""
 
@@ -147,6 +154,20 @@ class Kernel:
             model = pass_instance.run(model)
         return model
 
+    # --- Compatibility adapter for callers expecting Kernel.compile(...) ---
+    def compile(self, raw_cfg: Mapping[str, Any]) -> Mapping[str, Any]:
+        """
+        Public wrapper for internal _compile().
+        Note:
+          - Kernel は本来 pull-based（query(view, params, raw_cfg)）だが、
+            互換性のため compile() を公開する。
+          - 返り値が dict の場合は MappingProxyType で immutability を担保。
+        """
+        compiled = self._compile(raw_cfg)
+        if isinstance(compiled, dict):
+            return MappingProxyType(compiled)
+        return compiled
+
     def _generate_cache_key(
         self, view_key: str, params: dict[str, Any], raw_cfg: Any
     ) -> str:
@@ -162,7 +183,7 @@ class Kernel:
         return generate_content_address(cache_data, algorithm="blake2b")
 
     def query(
-        self, view_key: str, params: dict[str, Any], raw_cfg: Mapping[str, Any]
+        self, view_key: str, params: dict[str, Any], cfg: Mapping[str, Any] | CompiledConfig
     ) -> Any:
         """
         Query a specific view with parameters.
@@ -170,7 +191,7 @@ class Kernel:
         Args:
             view_key: The view identifier (must exist in self.views)
             params: Parameters to pass to the view's materialize method
-            raw_cfg: Raw configuration data
+            cfg: Raw configuration data or pre-compiled configuration
 
         Returns:
             Materialized view data (immutable where possible)
@@ -181,8 +202,14 @@ class Kernel:
         """
         self.stats.total_queries += 1
 
+        # cfg が CompiledConfig なら再コンパイルせず使う
+        if isinstance(cfg, CompiledConfig):
+            compiled_cfg = cfg.data
+        else:
+            compiled_cfg = self._compile(cfg)  # 従来互換
+
         # Generate cache key based on all inputs
-        cache_key = self._generate_cache_key(view_key, params, raw_cfg)
+        cache_key = self._generate_cache_key(view_key, params, compiled_cfg)
 
         # Check cache backend first
         cached_result = self.cache_backend.get(cache_key)
@@ -202,11 +229,11 @@ class Kernel:
         view = self.views[view_key]
 
         try:
-            # Compile the config through all passes
-            compiled = self._compile(raw_cfg)
+            # Compile the config through all passes (既にcompiled_cfgに格納済み)
+            # compiled = self._compile(raw_cfg)  # 削除
 
             # Materialize the view
-            result = view.materialize(compiled, **params)
+            result = view.materialize(compiled_cfg, **params)
 
             # Make result immutable if it's a dict (prevents accidental mutation)
             if isinstance(result, dict):
@@ -223,6 +250,11 @@ class Kernel:
     def register_pass(self, pass_instance: Pass) -> None:
         """Register a new compile pass."""
         self.passes.append(pass_instance)
+
+    def precompile(self, raw_cfg: Mapping[str, Any]) -> CompiledConfig:
+        """事前コンパイルAPI（推奨ルート）"""
+        compiled = self._compile(raw_cfg)
+        return CompiledConfig(compiled)
 
     def register_view(self, view: View) -> None:
         """Register a new view."""

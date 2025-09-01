@@ -70,7 +70,7 @@ jobs:
       run: bandit -r strataregula/ -f json -o bandit-report.json
       
     - name: Upload security report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: bandit-security-report
@@ -109,7 +109,7 @@ jobs:
         name: codecov-umbrella
         
     - name: Upload coverage report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: matrix.python-version == '3.9'
       with:
         name: coverage-report

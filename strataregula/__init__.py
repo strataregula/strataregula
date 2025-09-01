@@ -1,4 +1,5 @@
 from contextlib import suppress
+from typing import Any, Optional, Union, Callable
 
 """
 Strataregula - Layered Configuration Management with Strata Rules Architecture.
@@ -36,9 +37,9 @@ with suppress(ImportError):
     from .passes import InternPass
 
 __all__ = [
-    # Version info
-    "__version__",
+    "InternPass",
     # v0.3.0 New Architecture
     "Kernel",
-    "InternPass",
+    # Version info
+    "__version__",
 ]

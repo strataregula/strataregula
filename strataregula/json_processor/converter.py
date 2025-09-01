@@ -49,8 +49,8 @@ class ConversionResult:
 
     success: bool
     data: Any = None
-    format: str | None = None
-    error: str | None = None
+    format: Optional[str] = None
+    error: Optional[str] = None
     metadata: dict[str, Any] | None = None
 
     def __post_init__(self):
@@ -203,7 +203,7 @@ class FormatConverter:
 
         if isinstance(data, dict) and len(data) == 1:
             # 単一のルート要素がある場合
-            root_name = list(data.keys())[0]
+            root_name = next(iter(data.keys()))
             data = data[root_name]
 
         root = ET.Element(root_name)
@@ -282,7 +282,7 @@ class FormatConverter:
         else:
             writer = csv.writer(output, delimiter=delimiter)
             for row in data:
-                if isinstance(row, (list, tuple)):
+                if isinstance(row, list | tuple):
                     writer.writerow(row)
                 else:
                     writer.writerow([row])
@@ -293,8 +293,8 @@ class FormatConverter:
         self,
         input_file: str | Path,
         output_file: str | Path,
-        from_format: str | None = None,
-        to_format: str | None = None,
+        from_format: Optional[str] = None,
+        to_format: Optional[str] = None,
         **options,
     ) -> ConversionResult:
         """ファイル間の形式変換"""

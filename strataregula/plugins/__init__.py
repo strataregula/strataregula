@@ -36,32 +36,32 @@ from .loader import PluginEntryPoint, PluginLoader, PluginLoadResult
 from .manager import EnhancedPluginManager, PluginConfig, PluginContext, PluginState
 
 __all__ = [
-    # Core interfaces
-    "PatternPlugin",
-    "PluginInfo",
-    "PluginManager",
-    # Advanced system
-    "PluginLoader",
-    "PluginEntryPoint",
-    "PluginLoadResult",
-    "EnhancedPluginManager",
-    "PluginState",
-    "PluginContext",
-    "PluginConfig",
-    # Configuration
-    "PluginConfigManager",
-    "PluginConfigEntry",
-    "GlobalPluginConfig",
+    "CircuitBreaker",
     "ConfigValidator",
-    "JSONSchemaValidator",
-    # Error handling
-    "PluginErrorHandler",
-    "PluginError",
-    "ErrorSeverity",
+    "EnhancedPluginManager",
     "ErrorCategory",
     "ErrorRecoveryStrategy",
-    "CircuitBreaker",
+    "ErrorSeverity",
     "FallbackHandler",
+    "GlobalPluginConfig",
+    "JSONSchemaValidator",
+    # Core interfaces
+    "PatternPlugin",
+    "PluginConfig",
+    "PluginConfigEntry",
+    # Configuration
+    "PluginConfigManager",
+    "PluginContext",
+    "PluginEntryPoint",
+    "PluginError",
+    # Error handling
+    "PluginErrorHandler",
+    "PluginInfo",
+    "PluginLoadResult",
+    # Advanced system
+    "PluginLoader",
+    "PluginManager",
+    "PluginState",
     # Built-in
     "SimulationPlugins",
 ]

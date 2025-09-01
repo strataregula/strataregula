@@ -1,0 +1,179 @@
+# ============================================
+# 🔒 SECURITY: TOKEN & CREDENTIAL PROTECTION
+# ============================================
+# Prevent accidental commit of secrets, tokens, and credentials
+
+# Environment and configuration files
+.env
+.env.*
+.envrc
+env
+env.*
+
+# Secret and credential files
+*.pem
+*.key
+*.crt
+*.pfx
+*.p12
+*.asc
+*.gpg
+*.p8
+secrets.json
+secret.json
+token.json
+tokens.json
+auth.json
+credentials.json
+config/secrets.yaml
+config/credentials.yaml
+
+# SSH and crypto keys
+id_rsa
+id_rsa.pub
+id_dsa
+id_dsa.pub
+id_ecdsa
+id_ecdsa.pub
+id_ed25519
+id_ed25519.pub
+.ssh/
+authorized_keys
+known_hosts
+
+# Cloud provider credentials
+.aws/credentials
+.aws/config
+.gcp/
+gcloud/
+.azure/
+azure.json
+
+# Database and service connections
+.my.cnf
+.pgpass
+database.json
+db_config.json
+
+# API keys and tokens (pattern-based)
+*apikey*
+*api-key*
+*api_key*
+*token*
+*secret*
+*password*
+*passwd*
+# But allow legitimate files
+!*token*.md
+!*secret*.md
+!password_requirements.md
+
+# ============================================
+# 🔒 END SECURITY SECTION
+# ============================================
+
+# MCP and development environment
+mcp-servers.json
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pywz
+.pytest_cache
+.vscode
+.DS_Store
+.idea
+node_modules
+package-lock.json
+package.json
+.claude
+.claude-history*
+.benchmarks
+
+# Golden Metrics reports (throw-away artifacts)
+reports/current/
+reports/diff/
+reports/junit/
+reports/history/
+# Keep golden baseline for reference
+!reports/golden/
+!reports/.gitkeep
+!reports/README.md
+
+# Python package build artifacts
+*.egg-info/
+*.egg
+build/
+dist/
+*.whl
+*.tar.gz
+
+# Auto-generated package directories
+yaml_config_compiler/
+
+# Test output files (development artifacts)
+test_output.py
+test_output.json
+metrics_report.json
+
+# Benchmark results (auto-generated)
+benchmark_results.json
+benchmark_dashboard.png
+performance_trend.png
+
+# SuperClaude development artifacts
+superclaude/
+
+# Development folders
+testscli/
+testsintegration/ 
+testsperformance/
+
+# Python virtual environments
+venv/
+env/
+ENV/
+
+# IDE and editor files
+*.swp
+*.swo
+*~
+idea/                    # Future concepts and brainstorming - NOT FOR RELEASE
+experiments/            # Technical experiments and prototypes  
+research/               # R&D documentation and findings
+TO_DELETE/
+
+# Development test files (created during conversations)
+test_performance.py
+security_review.py  
+test_doc_examples.py
+quickstart_test.py
+demo.yaml
+
+# Coverage reports and UML diagrams (development artifacts)
+htmlcov/
+htmlcov_core/
+uml_diagrams/
+
+# Root-level documentation duplicates (moved to docs/)
+API_REFERENCE.md
+CLI_REFERENCE.md
+PLUGIN_QUICKSTART.md
+RELEASE_SCOPE.md
+
+# Development test files and artifacts
+.coverage
+coverage.json
+dump.json
+test_*.yaml
+
+# Development scripts and test files
+*_test.py
+*_review.py
+quickstart*.py
+generate_*.py
+demo_*.py
+sample_*.py

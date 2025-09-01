@@ -41,7 +41,7 @@ class PluginContext:
     last_used: float
     use_count: int = 0
     error_count: int = 0
-    last_error: str | None = None
+    last_error: Optional[str] = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def update_usage(self) -> None:
@@ -72,7 +72,7 @@ class EnhancedPluginManager:
 
     def __init__(
         self,
-        config: PluginConfig | None = None,
+        config: Optional[PluginConfig] = None,
         plugin_group: str = "strataregula.plugins",
     ):
         self.config = config or PluginConfig()
@@ -130,13 +130,12 @@ class EnhancedPluginManager:
             if context.state == PluginState.LOADED and not force:
                 return True
 
-            if context.state == PluginState.FAILED and not force:
-                if (
-                    context.last_error
-                    and time.time() - context.load_time < self.config.error_cooldown
-                ):
-                    logger.debug(f"Plugin '{name}' in cooldown period")
-                    return False
+            if context.state == PluginState.FAILED and not force and (
+                context.last_error
+                and time.time() - context.load_time < self.config.error_cooldown
+            ):
+                logger.debug(f"Plugin '{name}' in cooldown period")
+                return False
 
             # Update state to loading
             self._update_plugin_state(name, PluginState.LOADING)

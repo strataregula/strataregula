@@ -116,7 +116,7 @@ def check_environment_compatibility() -> dict[str, Any]:
     return compatibility_report
 
 
-def safe_import_with_fallback(package: str, fallback_package: str | None = None):
+def safe_import_with_fallback(package: str, fallback_package: Optional[str] = None):
     """
     Safely import a package with optional fallback.
 
@@ -138,7 +138,7 @@ def safe_import_with_fallback(package: str, fallback_package: str | None = None)
 
         warnings.warn(
             f"Could not import {package}. Some features may be unavailable.",
-            RuntimeWarning,
+            RuntimeWarning, stacklevel=2,
         )
         return None
 
@@ -158,7 +158,7 @@ def safe_import_psutil():
         warnings.warn(
             "psutil not available. Memory/CPU monitoring features disabled. "
             "Install with: pip install 'strataregula[performance]'",
-            RuntimeWarning,
+            RuntimeWarning, stacklevel=2,
         )
         return None
 
@@ -198,7 +198,7 @@ def get_compatible_rich_console():
 
     except (ImportError, Exception):
         # Fallback to basic console
-        warnings.warn("Rich console not available. Using basic output.", RuntimeWarning)
+        warnings.warn("Rich console not available. Using basic output.", RuntimeWarning, stacklevel=2)
         return None
 
 

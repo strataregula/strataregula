@@ -159,7 +159,7 @@ class PatternCompiler:
 
         # Parse pattern to find wildcard positions
         pattern_parts = pattern.split(".")
-        template_parts = template.split(".")
+        template.split(".")
 
         # Find wildcard indices
         wildcard_indices = []

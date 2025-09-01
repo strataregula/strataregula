@@ -27,6 +27,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `LRUCacheBackend`: Configurable caching with automatic eviction
 - Performance monitoring APIs: `get_stats_visualization()`, `log_stats_summary()`
 
+### Added - Golden Metrics Guard System (Phase A: Fixed Thresholds)
+- **Performance Regression Detection**: Automated baseline comparison for kernel metrics
+- **Fixed Thresholds**: Configurable performance thresholds in `pyproject.toml`
+- **CI Integration**: GitHub Actions workflow with three strictness levels (normal/strict/CI-relaxed)
+- **Comprehensive Reports**: Markdown diff reports, JUnit XML for CI, artifact uploads
+- **PR Integration**: Automatic performance regression comments on pull requests
+
+### Added - Golden Metrics Guard System (Phase B: Adaptive Thresholds v0.4.0)
+- **Historical Data Collection**: JSONL-based metrics storage with automatic cleanup
+- **Statistical Analysis**: Confidence intervals, percentiles, trend analysis, outlier detection
+- **Adaptive Threshold Strategies**: 4 calculation methods (CI, percentile, moving average, trend-adjusted)
+- **Sensitivity Levels**: Strict/Normal/Relaxed modes with configurable confidence levels
+- **Smart Mode Switching**: Automatic fallback from adaptive to fixed when insufficient data
+- **Per-Metric Configuration**: Individual threshold strategies and sensitivity per metric
+
+### Added - Backward Compatibility Layer
+- **Legacy API Support**: Full v0.2.x compatibility with deprecation warnings
+- `strataregula.legacy` module: Engine, ConfigLoader, TemplateEngine classes
+- **Migration Timeline**: Structured deprecation path through v1.0.0 removal
+- **Comprehensive Testing**: 25+ compatibility tests ensuring smooth migration
+- **Migration Documentation**: Detailed guide with step-by-step instructions
+
 ### Performance Improvements
 - **Memory Usage**: 90-98% reduction through structural sharing
 - **Query Latency**: 10x faster with intelligent caching (5-50ms vs 100-500ms)
@@ -73,6 +95,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Plugin Integration**: All core components now support plugin hooks
 - **Memory Management**: Improved memory efficiency with streaming
+
+### Deprecated - Migration Path to v1.0.0
+- **Engine Class**: Use `strataregula.kernel.Kernel` instead
+- **ConfigLoader Class**: Use `strataregula.core.config_compiler.ConfigCompiler` instead  
+- **TemplateEngine Class**: Templates now auto-discovered and integrated
+- **service_time() Method**: Use dedicated performance benchmarks instead
+- **Legacy Functions**: `cli_run()`, `compile_config()`, `load_yaml()` functions
+
+#### Deprecation Timeline
+- **v0.3.0**: Full compatibility with DeprecationWarnings (current)
+- **v0.4.0**: Compatibility maintained with stronger warnings
+- **v0.5.0**: Legacy imports require explicit opt-in flag
+- **v1.0.0**: Complete removal of deprecated APIs
 - **Error Handling**: Enhanced error messages and recovery
 - **CLI Interface**: Richer output with better formatting
 - **Performance**: Optimized processing with caching improvements

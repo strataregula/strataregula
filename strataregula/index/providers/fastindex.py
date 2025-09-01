@@ -5,9 +5,11 @@ import json
 import os
 import subprocess
 import time
-from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class Provider:
@@ -21,8 +23,8 @@ class Provider:
 
     def __init__(self) -> None:
         self._last_stats: dict[str, Any] = {}
-        self._cache_dir: Path | None = None
-        self._lock_file: Path | None = None
+        self._cache_dir: Optional[Path] = None
+        self._lock_file: Optional[Path] = None
 
     # no-op
     def build(self, entries: Iterable[Path] | None = None) -> None:
@@ -55,7 +57,8 @@ class Provider:
                             if os.name == "nt":  # Windows
                                 result = subprocess.run(
                                     ["tasklist", "/FI", f"PID eq {lock_pid}"],
-                                    check=False, capture_output=True,
+                                    check=False,
+                                    capture_output=True,
                                     text=True,
                                 )
                                 if str(lock_pid) not in result.stdout:
@@ -175,7 +178,7 @@ class Provider:
 
     def changed_py(
         self,
-        base: str | None,
+        base: Optional[str],
         roots: list[str],
         repo_root: Path,
         verbose: bool = False,

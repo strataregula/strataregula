@@ -9,23 +9,27 @@ import os
 import sys
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
 
 # Import the existing config interning functionality
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
-from config_interning import Stats, intern_tree  # type: ignore[import-not-found]
+try:
+    from scripts.config_interning import Stats, intern_tree
+except ImportError:
+    # Fallback to relative import if scripts module not available
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
+    from config_interning import Stats, intern_tree
 
 
 @dataclass
 class InternPass:
     """
     Compile pass that applies value interning to reduce memory usage.
-    
+
     Uses hash-consing to ensure that equivalent values share the same
     memory reference, while maintaining immutability guarantees.
     """
 
-    qfloat: float | None = None
+    qfloat: Optional[float] = None
     collect_stats: bool = False
 
     def __post_init__(self) -> None:
@@ -35,22 +39,23 @@ class InternPass:
     def run(self, model: Mapping[str, Any]) -> Mapping[str, Any]:
         """
         Apply interning to the entire configuration model.
-        
+
         Args:
             model: Raw configuration data
-            
+
         Returns:
             Interned configuration with structural sharing
         """
+        print(f"🔍 InternPass.run() called with model size: {len(str(model))}")
+        
         if self._stats:
             self._stats.__init__()  # Reset stats for this run
+            print("📊 Stats collection enabled and reset")
 
         # Apply interning with optional float quantization
-        interned = intern_tree(
-            model,
-            qfloat=self.qfloat,
-            stats=self._stats
-        )
+        print("🔄 Calling intern_tree...")
+        interned = intern_tree(model, qfloat=self.qfloat, stats=self._stats)
+        print(f"✅ intern_tree completed, result size: {len(str(interned))}")
 
         # Log stats if collection is enabled
         if self._stats and self.collect_stats:
@@ -71,7 +76,7 @@ class InternPass:
         print(
             f"[intern] nodes={self._stats.nodes} unique={self._stats.unique} "
             f"hits={hits} misses={misses} hit_rate={hit_rate:.1f}%",
-            file=sys.stderr
+            file=sys.stderr,
         )
 
     def get_stats(self) -> dict[str, Any]:
@@ -89,5 +94,5 @@ class InternPass:
             "unique_values": self._stats.unique,
             "cache_hits": hits,
             "cache_misses": misses,
-            "hit_rate": hit_rate
+            "hit_rate": hit_rate,
         }

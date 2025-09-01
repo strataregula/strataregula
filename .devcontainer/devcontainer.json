@@ -1,0 +1,32 @@
+{
+  "name": "StrataRegula CI Environment",
+  "image": "python:3.11-slim",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "extensions": [
+    "ms-python.python",
+    "ms-python.pylint",
+    "ms-python.black-formatter",
+    "ms-python.ruff"
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "/usr/local/bin/python",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.ruffEnabled": true,
+    "python.formatting.provider": "ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "postCreateCommand": "pip install --upgrade pip && pip install -e '.[dev,test]'",
+  "customizations": {
+    "vscode": {
+      "python.defaultInterpreterPath": "/usr/local/bin/python"
+    }
+  },
+  "remoteUser": "root"
+}

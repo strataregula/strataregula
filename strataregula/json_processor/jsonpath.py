@@ -27,8 +27,8 @@ class JSONPathResult:
     data: Any = None
     matches: list[Any] = None
     count: int = 0
-    path: str | None = None
-    error: str | None = None
+    path: Optional[str] = None
+    error: Optional[str] = None
 
     def __post_init__(self):
         if self.matches is None:
@@ -202,9 +202,9 @@ class JSONPathProcessor:
 
         try:
             if operation == "sum":
-                return sum(v for v in values if isinstance(v, (int, float)))
-            elif operation == "avg" or operation == "average":
-                numeric_values = [v for v in values if isinstance(v, (int, float))]
+                return sum(v for v in values if isinstance(v, int | float))
+            elif operation in {"avg", "average"}:
+                numeric_values = [v for v in values if isinstance(v, int | float)]
                 return (
                     sum(numeric_values) / len(numeric_values)
                     if numeric_values

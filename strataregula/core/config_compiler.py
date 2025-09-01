@@ -16,7 +16,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Union, Optional, Callable
 
 import yaml
 
@@ -48,7 +48,7 @@ class CompilationConfig:
 
     input_format: str = "yaml"  # yaml, json
     output_format: str = "python"  # python, json, yaml
-    template_path: Path | None = None
+    template_path: Optional[Path] = None
     include_metadata: bool = True
     include_provenance: bool = True
     optimize_lookups: bool = True
@@ -60,9 +60,7 @@ class CompilationConfig:
 class ProvenanceInfo:
     """Compilation provenance information."""
 
-    timestamp: str = field(
-        default_factory=lambda: datetime.now(UTC).isoformat()
-    )
+    timestamp: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
     version: str = "0.1.0"
     input_files: list[str] = field(default_factory=list)
     compilation_config: dict[str, Any] = field(default_factory=dict)
@@ -105,7 +103,7 @@ import re
 # Direct mapping for simple lookups
 DIRECT_MAPPING = {direct_mapping_code}
 
-# Component mapping for hierarchical lookups  
+# Component mapping for hierarchical lookups
 COMPONENT_MAPPING = {component_mapping_code}
 
 # Metadata and provenance
@@ -117,17 +115,17 @@ def get_service_time(service_name: str, default: float = 0.0) -> float:
     # Try direct mapping first
     if service_name in DIRECT_MAPPING:
         return DIRECT_MAPPING[service_name]
-    
+
     # Try component mapping
     if service_name in COMPONENT_MAPPING:
         return COMPONENT_MAPPING[service_name]
-    
+
     return default
 
 def get_service_info(service_name: str) -> Dict[str, Any]:
     """Get comprehensive service information."""
     service_time = get_service_time(service_name)
-    
+
     return {{
         "service_name": service_name,
         "service_time": service_time,
@@ -143,19 +141,19 @@ def get_services_by_pattern(pattern: str) -> Dict[str, float]:
     """Get services matching a pattern."""
     regex_pattern = pattern.replace('.', r'\\.').replace('*', r'[^.]*')
     compiled_regex = re.compile(f"^{{regex_pattern}}$")
-    
+
     result = {{}}
-    
+
     # Search direct mapping
     for service, time_val in DIRECT_MAPPING.items():
         if compiled_regex.match(service):
             result[service] = time_val
-    
+
     # Search component mapping
     for service, time_val in COMPONENT_MAPPING.items():
         if compiled_regex.match(service):
             result[service] = time_val
-    
+
     return result
 
 # Regional and hierarchical lookup functions
@@ -205,7 +203,7 @@ metadata:
 class ConfigCompiler:
     """Main configuration compiler."""
 
-    def __init__(self, config: CompilationConfig = None, use_plugins: bool = True):
+    def __init__(self, config: Optional[CompilationConfig] = None, use_plugins: bool = True):
         self.config = config or CompilationConfig()
 
         # Initialize plugin system if enabled
@@ -234,8 +232,8 @@ class ConfigCompiler:
     def compile_traffic_config(
         self,
         traffic_file: Path,
-        prefectures_file: Path | None = None,
-        output_file: Path = None,
+        prefectures_file: Optional[Path] = None,
+        output_file: Optional[Path] = None,
     ) -> str:
         """Compile traffic configuration - main entry point matching config_compiler.py."""
         start_time = time.time()
@@ -317,7 +315,7 @@ class ConfigCompiler:
         self,
         input_file: Path,
         output_file: Path,
-        progress_callback: callable | None = None,
+        progress_callback: Optional[Callable] = None,
     ) -> None:
         """Compile large configuration files with streaming."""
         start_time = time.time()
@@ -389,7 +387,9 @@ class ConfigCompiler:
         if "prefectures" in config_data:
             if isinstance(config_data["prefectures"], list):
                 # List of prefectures - use default region mapping
-                hierarchy.prefectures = dict.fromkeys(config_data["prefectures"], "default")
+                hierarchy.prefectures = dict.fromkeys(
+                    config_data["prefectures"], "default"
+                )
             elif isinstance(config_data["prefectures"], dict):
                 # Prefecture to region mapping
                 hierarchy.prefectures = config_data["prefectures"]
@@ -421,7 +421,7 @@ class ConfigCompiler:
             return data
 
     def _generate_provenance(
-        self, input_files: list[Path], start_time: float
+        self, input_files: list[Optional[Path]], start_time: float
     ) -> ProvenanceInfo:
         """Generate compilation provenance information."""
         end_time = time.time()
@@ -543,22 +543,22 @@ def get_services_by_region(region: str) -> Dict[str, float]:
     """Get all services in a specific region."""
     result = {}
     region_prefectures = {region_prefectures_map}
-    
+
     for service, time_val in COMPONENT_MAPPING.items():
         parts = service.split('.')
         if len(parts) >= 2 and parts[1] in region_prefectures.get(region, []):
             result[service] = time_val
-    
+
     return result
 
 def get_services_by_prefecture(prefecture: str) -> Dict[str, float]:
     """Get all services in a specific prefecture."""
     result = {}
-    
+
     for service, time_val in COMPONENT_MAPPING.items():
         if f'.{prefecture}.' in service:
             result[service] = time_val
-    
+
     return result
 '''.replace("{region_prefectures_map}", str(self._get_region_prefecture_map()))
 
@@ -574,7 +574,7 @@ def get_services_by_prefecture(prefecture: str) -> Dict[str, float]:
 
 # CLI compatibility functions
 def compile_config(
-    traffic_file: str, prefectures_file: str = None, output_file: str = None
+    traffic_file: str, prefectures_file: Optional[str] = None, output_file: Optional[str] = None
 ) -> str:
     """CLI-compatible config compilation function."""
     compiler = ConfigCompiler()

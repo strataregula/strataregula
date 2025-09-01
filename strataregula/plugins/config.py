@@ -401,7 +401,7 @@ class PluginConfigManager:
             reverse=True,
         )
 
-    def save_configuration(self, config_path: Path | None = None) -> bool:
+    def save_configuration(self, config_path: Optional[Path] = None) -> bool:
         """Save current configuration to file."""
         if config_path is None:
             # Use first writable path from config_paths

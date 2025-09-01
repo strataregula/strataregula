@@ -1,0 +1,46 @@
+# GitHub Security Patterns
+# Distribution URL: https://patterns.security-audit.io/api/v1/rulesets/github.toml
+# Version: 1.0.0
+# Focus: GitHub-specific tokens and credentials
+
+title = "GitHub Security Patterns"
+
+# GitHub Personal Access Tokens
+[[rules]]
+id = "github-pat"
+description = "GitHub Personal Access Token"
+regex = '''ghp_[A-Za-z0-9_]{36}'''
+tags = ["github", "token", "pat"]
+
+[[rules]]
+id = "github-oauth"
+description = "GitHub OAuth Token"
+regex = '''gho_[A-Za-z0-9_]{36}'''
+tags = ["github", "oauth", "token"]
+
+[[rules]]
+id = "github-user-to-server"
+description = "GitHub User-to-Server Token"
+regex = '''ghu_[A-Za-z0-9_]{36}'''
+tags = ["github", "user-to-server", "token"]
+
+[[rules]]
+id = "github-server-to-server"
+description = "GitHub Server-to-Server Token"
+regex = '''ghs_[A-Za-z0-9_]{36}'''
+tags = ["github", "server-to-server", "token"]
+
+[[rules]]
+id = "github-app-token"
+description = "GitHub App Token"
+regex = '''gha_[A-Za-z0-9_]{36}'''
+tags = ["github", "app", "token"]
+
+# GitHub-specific allowlist
+[[allowlist]]
+description = "GitHub Actions legitimate usage"
+regexes = [
+    '''secrets\.GITHUB_TOKEN''',
+    '''secrets\.GITHUB_PAT''',
+    '''\$\{\{ secrets\.GITHUB_TOKEN \}\}''',
+]

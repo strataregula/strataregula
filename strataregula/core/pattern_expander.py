@@ -426,7 +426,6 @@ class EnhancedPatternExpander:
     ) -> dict[str, Any]:
         """Expand pattern using enhanced rule with hierarchical support."""
         data_source = rule.data_source
-        template = rule.template
 
         # Get data items based on data source
         data_items = self._get_data_items(data_source)
@@ -571,7 +570,7 @@ class EnhancedPatternExpander:
 
             elif transform == "add_latency_factor":
                 # Add latency factor based on distance from Tokyo
-                if isinstance(result, (int, float)):
+                if isinstance(result, int | float):
                     latency_factors = {
                         "tokyo": 0.001,
                         "kanagawa": 0.002,

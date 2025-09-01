@@ -35,7 +35,7 @@ class HierarchyMerger:
         elif isinstance(base, list) and isinstance(override, list):
             return self._merge_lists(base, override)
         else:
-            # 基本型の場合はオーバーライド（ディープコピー）
+            # 基本型の場合はオーバーライド(ディープコピー)
             logger.debug("Basic type override with deep copy")
             return copy.deepcopy(override)
 
@@ -44,7 +44,7 @@ class HierarchyMerger:
         result = copy.deepcopy(base)
 
         for key, value in override.items():
-            if key in result and isinstance(result[key], (dict, list)):
+            if key in result and isinstance(result[key], dict | list):
                 # 同名の階層がある場合は再帰的にマージ
                 logger.debug(f"Recursive merge for key: {key}")
                 result[key] = self.merge(result[key], value)
@@ -84,7 +84,7 @@ class HierarchyMerger:
         for i, item in enumerate(override):
             if i < len(result):
                 # 既存のインデックスがある場合はマージ
-                if isinstance(result[i], (dict, list)):
+                if isinstance(result[i], dict | list):
                     result[i] = self.merge(result[i], item)
                 else:
                     result[i] = copy.deepcopy(item)
@@ -95,7 +95,7 @@ class HierarchyMerger:
         return result
 
     def _smart_list_merge(self, base: list, override: list) -> list:
-        """スマートなリストマージ（データ型に応じて自動選択）"""
+        """スマートなリストマージ(データ型に応じて自動選択)"""
         # リストの内容を分析して最適な戦略を選択
         if self._are_simple_types(base) and self._are_simple_types(override):
             # 基本型のリストの場合は置き換え
@@ -115,11 +115,11 @@ class HierarchyMerger:
     def _are_simple_types(self, items: list) -> bool:
         """リストが基本型のみで構成されているかチェック"""
         return all(
-            isinstance(item, (str, int, float, bool, type(None))) for item in items
+            isinstance(item, str | int | float | bool | type(None)) for item in items
         )
 
     def _are_config_objects(self, items: list) -> bool:
-        """リストが設定オブジェクト（辞書）で構成されているかチェック"""
+        """リストが設定オブジェクト(辞書)で構成されているかチェック"""
         return all(isinstance(item, dict) for item in items)
 
     def merge_multiple(self, configs: list[dict]) -> dict:
@@ -150,7 +150,7 @@ class HierarchyMerger:
             return copy.deepcopy(base)
 
     def resolve_conflicts(
-        self, base: dict, conflicts: list[dict], priority_order: list[str] = None
+        self, base: dict, conflicts: list[dict], priority_order: list[str] | None = None
     ) -> dict:
         """競合する設定を解決"""
         if not conflicts:

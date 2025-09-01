@@ -1,0 +1,51 @@
+{
+  "run": {
+    "run_id": "20250901T052257Z",
+    "timestamp": "2025-09-01T05:22:59.644269Z",
+    "profile": "github-hosted",
+    "project": "strataregula",
+    "git_sha": "fae9312"
+  },
+  "env": {
+    "os": "Windows-11-10.0.26100-SP0",
+    "python": "3.13.7",
+    "cpus": 16,
+    "hostname": "MSI",
+    "architecture": "AMD64"
+  },
+  "params": {
+    "warmup": 1,
+    "repeats": 5
+  },
+  "metrics": {
+    "compiled": {
+      "p50_ms": 0.08240000170189887,
+      "p95_ms": 0.10130000009667128,
+      "hits": 5,
+      "rebuilds": 0
+    },
+    "fallback": {
+      "p50_ms": 1.2369000032776967,
+      "p95_ms": 1.720000000204891,
+      "hits": 5,
+      "regex": 0
+    },
+    "speedup_p50": 14.4520692164019,
+    "speedup_p95": 13.729465755581804,
+    "absolute_p95_ms": 0.10130000009667128,
+    "cv": 0.2639580767489963,
+    "n_samples": 5
+  },
+  "gate": {
+    "p50x": 15,
+    "p95x": 12,
+    "absolute_ms": 35,
+    "verdict": "PENDING",
+    "headroom_pct": 0.0
+  },
+  "docs": {
+    "vision": "docs/history/performance_acceleration_lecture.md",
+    "guard": "docs/GOLDEN_METRICS_GUARD.md",
+    "bench": "docs/bench/bench_guard_origin.md"
+  }
+}

@@ -31,10 +31,33 @@ jobs:
         pip install pytest pytest-cov psutil
     
     - name: Run benchmarks
+      working-directory: ${{ github.workspace }}
       run: |
         python scripts/run_benchmarks.py
-    
+
+    - name: Debug workspace
+      run: |
+        echo "PWD=$(pwd)"
+        echo "Workspace=$GITHUB_WORKSPACE"
+        echo "Repo files (top 2 levels):"
+        find . -maxdepth 2 -type f | sort
+        echo "Confirm target:"
+        test -f scripts/generate_benchmark_images.py && echo "FOUND" || echo "MISSING"
+
+    - name: Assert files exist
+      working-directory: ${{ github.workspace }}
+      run: |
+        test -f scripts/generate_benchmark_images.py || {
+          echo "::error file=scripts/generate_benchmark_images.py::file not found"
+          exit 1
+        }
+        test -f scripts/run_benchmarks.py || {
+          echo "::error file=scripts/run_benchmarks.py::file not found"
+          exit 1
+        }
+
     - name: Generate visualizations
+      working-directory: ${{ github.workspace }}
       run: |
         python scripts/generate_benchmark_images.py
     
@@ -44,7 +67,7 @@ jobs:
       continue-on-error: true
     
     - name: Upload benchmark artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: benchmark-results
         path: |

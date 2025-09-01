@@ -91,11 +91,10 @@ def stats_command(args: argparse.Namespace) -> int:
 
     # Run changed_py to populate stats
     try:
-        files = provider.changed_py(base, roots, repo_root, verbose=args.verbose)
+        provider.changed_py(base, roots, repo_root, verbose=args.verbose)
     except Exception as e:
         if args.verbose:
             print(f"Error getting changed files: {e}", file=sys.stderr)
-        files = []
 
     # Get stats
     stats = provider.stats()
@@ -226,7 +225,7 @@ def main():
     )
 
     # Config command
-    config_parser = subparsers.add_parser(
+    subparsers.add_parser(
         "config", help="Show configuration with priority"
     )
 
