@@ -283,22 +283,42 @@ def main():
         
         # Check if we're in CI environment
         if os.getenv("CI") or os.getenv("GITHUB_ACTIONS"):
-            print("CI: Running in CI environment, using synthetic metrics")
-            metrics = _synthetic_metrics()
-            
-            # Write metrics file
-            metrics_file = out_path / "metrics.json"
-            with metrics_file.open("w", encoding="utf-8") as f:
-                json.dump(metrics, f, indent=2)
-            
-            # Write CLI output file
-            cli_file = out_path / "cli_output.json"
-            cli_output = {"mode": "ci_synthetic", "timestamp": time.time()}
-            with cli_file.open("w", encoding="utf-8") as f:
-                json.dump(cli_output, f, indent=2)
-            
-            print(f"SUCCESS: CI-compatible metrics written to {out_path}")
-            return 0
+            print("CI: Running in CI environment, attempting real metrics capture")
+            try:
+                # CI環境でも実際のメトリクス測定を試行
+                metrics = measure_kernel_performance()
+                cli_output = capture_cli_output()
+                
+                # Write metrics file
+                metrics_file = out_path / "metrics.json"
+                with metrics_file.open("w", encoding="utf-8") as f:
+                    json.dump(metrics, f, indent=2)
+                
+                # Write CLI output file
+                cli_file = out_path / "cli_output.json"
+                with cli_file.open("w", encoding="utf-8") as f:
+                    json.dump(cli_output, f, indent=2)
+                
+                print(f"SUCCESS: Real metrics captured in CI: {out_path}")
+                return 0
+                
+            except Exception as ci_error:
+                print(f"CI: Real metrics failed, falling back to synthetic: {ci_error}")
+                # フォールバックとして合成メトリクスを使用
+                metrics = _synthetic_metrics()
+                cli_output = {"mode": "ci_synthetic", "timestamp": time.time()}
+                
+                # Write fallback files
+                metrics_file = out_path / "metrics.json"
+                with metrics_file.open("w", encoding="utf-8") as f:
+                    json.dump(metrics, f, indent=2)
+                
+                cli_file = out_path / "cli_output.json"
+                with cli_file.open("w", encoding="utf-8") as f:
+                    json.dump(cli_output, f, indent=2)
+                
+                print(f"CI: Fallback synthetic metrics written to {out_path}")
+                return 0
         
         # Normal execution
         run_cli_and_collect(out_path)

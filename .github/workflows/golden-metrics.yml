@@ -67,6 +67,15 @@ jobs:
           pip install -e ".[test]"  # Install test dependencies including pytest
           pip install -e ".[dev]"   # Install development dependencies
           pip install psutil  # Required for memory measurement
+          
+          # Ensure all required packages are available
+          python -c "
+          import strataregula
+          import psutil
+          print('✅ All dependencies installed successfully')
+          print(f'StrataRegula version: {strataregula.__version__}')
+          print(f'psutil version: {psutil.__version__}')
+          "
 
       - name: Verify golden baseline exists
         run: |
