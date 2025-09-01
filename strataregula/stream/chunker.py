@@ -15,7 +15,7 @@ class ChunkConfig:
 
     chunk_size: int = 8192  # Default 8KB chunks
     overlap_size: int = 0  # Overlap between chunks for context preservation
-    encoding: str | None = None  # Text encoding, None for binary
+    encoding: Optional[str] = None  # Text encoding, None for binary
     line_based: bool = False  # Split on line boundaries for text processing
     preserve_boundaries: bool = True  # Don't split in middle of boundaries
 
@@ -23,11 +23,11 @@ class ChunkConfig:
 class Chunker:
     """Handles chunking of data streams with various strategies."""
 
-    def __init__(self, config: ChunkConfig | None = None):
+    def __init__(self, config: Optional[ChunkConfig] = None):
         self.config = config or ChunkConfig()
 
     def chunk_bytes(
-        self, data: bytes | BinaryIO, chunk_size: int | None = None
+        self, data: bytes | BinaryIO, chunk_size: Optional[int] = None
     ) -> Iterator[bytes]:
         """Chunk binary data into fixed-size pieces."""
         size = chunk_size or self.config.chunk_size
@@ -45,7 +45,7 @@ class Chunker:
                 yield chunk
 
     def chunk_text(
-        self, data: str | TextIO, chunk_size: int | None = None
+        self, data: str | TextIO, chunk_size: Optional[int] = None
     ) -> Iterator[str]:
         """Chunk text data with optional line boundary preservation."""
         size = chunk_size or self.config.chunk_size
@@ -81,7 +81,7 @@ class Chunker:
                 yield from self.chunk_bytes(f)
 
     def chunk_with_overlap(
-        self, data: str | bytes, chunk_size: int | None = None
+        self, data: str | bytes, chunk_size: Optional[int] = None
     ) -> Iterator[str | bytes]:
         """Chunk data with overlap between chunks for context preservation."""
         size = chunk_size or self.config.chunk_size
@@ -150,13 +150,13 @@ class Chunker:
         if current_chunk:
             yield "".join(current_chunk)
 
-    def estimate_chunks(self, data_size: int, chunk_size: int | None = None) -> int:
+    def estimate_chunks(self, data_size: int, chunk_size: Optional[int] = None) -> int:
         """Estimate the number of chunks for given data size."""
         size = chunk_size or self.config.chunk_size
         return (data_size + size - 1) // size  # Ceiling division
 
     def chunk_iterable(
-        self, iterable: Iterator[Any], chunk_size: int | None = None
+        self, iterable: Iterator[Any], chunk_size: Optional[int] = None
     ) -> Iterator[list[Any]]:
         """Chunk any iterable into lists of specified size."""
         size = chunk_size or self.config.chunk_size

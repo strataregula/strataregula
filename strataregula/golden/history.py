@@ -29,7 +29,7 @@ class MetricsSnapshot:
 
     timestamp: str
     version: str
-    commit_hash: str | None
+    commit_hash: Optional[str]
     branch: str
     metrics: dict[str, float]
     environment: dict[str, str]
@@ -107,7 +107,7 @@ class HistoryManager:
         self.append(snapshot)
         return snapshot
 
-    def load_history(self, limit: int | None = None) -> list[MetricsSnapshot]:
+    def load_history(self, limit: Optional[int] = None) -> list[MetricsSnapshot]:
         """Load historical snapshots.
 
         Args:

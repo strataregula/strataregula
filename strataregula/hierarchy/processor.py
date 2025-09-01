@@ -20,7 +20,7 @@ class HierarchyProcessor:
     def __init__(self, default_strategy: MergeStrategy = MergeStrategy.SMART):
         self.merger = HierarchyMerger(default_strategy)
         self.environment_configs: dict[str, dict] = {}
-        self.base_config: dict | None = None
+        self.base_config: Optional[dict] = None
         logger.info(
             f"Initialized HierarchyProcessor with strategy: {default_strategy.value}"
         )
@@ -104,7 +104,7 @@ class HierarchyProcessor:
         return False
 
     def get_merged_config(
-        self, target_env: str | None = None, strategy: MergeStrategy = None
+        self, target_env: Optional[str] = None, strategy: MergeStrategy = None
     ) -> dict | None:
         """マージされた設定を取得"""
         if not self.base_config:

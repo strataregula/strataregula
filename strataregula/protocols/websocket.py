@@ -36,12 +36,12 @@ class WebSocketConfig:
     host: str = "localhost"
     port: int = 8765
     path: str = "/"
-    ping_interval: float | None = 20.0
-    ping_timeout: float | None = 20.0
-    close_timeout: float | None = 10.0
-    max_size: int | None = 2**20  # 1MB
-    max_queue: int | None = 32
-    compression: str | None = None
+    ping_interval: Optional[float] = 20.0
+    ping_timeout: Optional[float] = 20.0
+    close_timeout: Optional[float] = 10.0
+    max_size: Optional[int] = 2**20  # 1MB
+    max_queue: Optional[int] = 32
+    compression: Optional[str] = None
     ssl_context: ssl.SSLContext | None = None
     extra_headers: dict[str, str] = field(default_factory=dict)
 
@@ -53,7 +53,7 @@ class WebSocketMessage:
     data: str | bytes
     message_type: str = "text"  # text, binary, json
     timestamp: float = field(default_factory=time.time)
-    client_id: str | None = None
+    client_id: Optional[str] = None
 
     def to_json(self) -> str:
         """Convert message to JSON string."""
@@ -75,7 +75,7 @@ class WebSocketMessage:
 class WebSocketHandler:
     """Base WebSocket handler with stream processing integration."""
 
-    def __init__(self, config: WebSocketConfig | None = None):
+    def __init__(self, config: Optional[WebSocketConfig] = None):
         self.config = config or WebSocketConfig()
         self.clients: set = set()
         self._message_handlers: dict[str, Callable] = {}
@@ -159,7 +159,7 @@ class WebSocketHandler:
         }
         await self.send_to_client(websocket, error_data)
 
-    async def broadcast(self, data: Any, exclude: set | None = None) -> None:
+    async def broadcast(self, data: Any, exclude: Optional[set] = None) -> None:
         """Broadcast data to all connected clients."""
         exclude = exclude or set()
         disconnected = set()
@@ -181,7 +181,7 @@ class WebSocketHandler:
 class WebSocketServer(WebSocketHandler):
     """WebSocket server implementation."""
 
-    def __init__(self, config: WebSocketConfig | None = None):
+    def __init__(self, config: Optional[WebSocketConfig] = None):
         super().__init__(config)
         self.server = None
 
@@ -259,7 +259,7 @@ class WebSocketServer(WebSocketHandler):
 class WebSocketClient(WebSocketHandler):
     """WebSocket client implementation."""
 
-    def __init__(self, uri: str, config: WebSocketConfig | None = None):
+    def __init__(self, uri: str, config: Optional[WebSocketConfig] = None):
         super().__init__(config)
         self.uri = uri
         self.websocket: Optional = None

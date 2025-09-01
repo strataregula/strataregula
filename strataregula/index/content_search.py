@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 def search_content(
     pattern: str,
     files: list[Path],
-    provider: object | None = None,
+    provider: Optional[object] = None,
     verbose: bool = False,
 ) -> list[str]:
     """

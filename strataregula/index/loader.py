@@ -34,7 +34,7 @@ def _load_config_file() -> dict[str, Any] | None:
 
 
 def resolve_provider(
-    cli_arg: str | None = None, cfg: dict[str, Any] | None = None
+    cli_arg: Optional[str] = None, cfg: dict[str, Any] | None = None
 ) -> IndexProvider:
     """
     Resolve index provider with priority: CLI > env > config file > default

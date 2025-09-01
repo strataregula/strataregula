@@ -333,24 +333,7 @@ known-first-party = ["strataregula"]
 force-single-line = false
 combine-as-imports = true
 
-# Black compatibility (if needed)
-[tool.black]
-line-length = 88
-target-version = ['py38']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
+# Black compatibility removed - using ruff format only
 
 # Golden Metrics Guard configuration
 [tool.strataregula.golden-metrics]

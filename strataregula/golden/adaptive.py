@@ -88,7 +88,7 @@ class AdaptiveThresholdCalculator:
         threshold_type: str,  # 'upper' or 'lower'
         strategy: ThresholdStrategy = ThresholdStrategy.CONFIDENCE_INTERVAL,
         sensitivity: SensitivityLevel = SensitivityLevel.NORMAL,
-        window_size: int | None = None,
+        window_size: Optional[int] = None,
     ) -> AdaptiveThreshold | None:
         """Calculate adaptive threshold for a metric.
 

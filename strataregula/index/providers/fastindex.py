@@ -23,8 +23,8 @@ class Provider:
 
     def __init__(self) -> None:
         self._last_stats: dict[str, Any] = {}
-        self._cache_dir: Path | None = None
-        self._lock_file: Path | None = None
+        self._cache_dir: Optional[Path] = None
+        self._lock_file: Optional[Path] = None
 
     # no-op
     def build(self, entries: Iterable[Path] | None = None) -> None:
@@ -178,7 +178,7 @@ class Provider:
 
     def changed_py(
         self,
-        base: str | None,
+        base: Optional[str],
         roots: list[str],
         repo_root: Path,
         verbose: bool = False,

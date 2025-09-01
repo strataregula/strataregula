@@ -27,8 +27,8 @@ class ValidationResult:
     valid: bool
     message: str
     errors: list[str] = None
-    path: str | None = None
-    schema_name: str | None = None
+    path: Optional[str] = None
+    schema_name: Optional[str] = None
 
     def __post_init__(self):
         if self.errors is None:
@@ -111,7 +111,7 @@ class JSONValidator:
             logger.error(f"Invalid JSON in schema string: {e}")
             return False
 
-    def validate(self, data: Any, schema_name: str | None = None) -> ValidationResult:
+    def validate(self, data: Any, schema_name: Optional[str] = None) -> ValidationResult:
         """データをスキーマで検証"""
         if not JSONSCHEMA_AVAILABLE:
             return ValidationResult(
@@ -149,7 +149,7 @@ class JSONValidator:
             )
 
     def validate_file(
-        self, file_path: str | Path, schema_name: str | None = None
+        self, file_path: str | Path, schema_name: Optional[str] = None
     ) -> ValidationResult:
         """ファイルの内容を検証"""
         try:

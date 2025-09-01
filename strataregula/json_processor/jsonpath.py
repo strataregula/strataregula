@@ -27,8 +27,8 @@ class JSONPathResult:
     data: Any = None
     matches: list[Any] = None
     count: int = 0
-    path: str | None = None
-    error: str | None = None
+    path: Optional[str] = None
+    error: Optional[str] = None
 
     def __post_init__(self):
         if self.matches is None:

@@ -21,7 +21,7 @@ class IndexProvider(Protocol):
     def build(self, entries: Iterable[Path] | None = None) -> None: ...
     def changed_py(
         self,
-        base: str | None,
+        base: Optional[str],
         roots: list[str],
         repo_root: Path,
         verbose: bool = False,

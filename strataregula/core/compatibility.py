@@ -116,7 +116,7 @@ def check_environment_compatibility() -> dict[str, Any]:
     return compatibility_report
 
 
-def safe_import_with_fallback(package: str, fallback_package: str | None = None):
+def safe_import_with_fallback(package: str, fallback_package: Optional[str] = None):
     """
     Safely import a package with optional fallback.
 

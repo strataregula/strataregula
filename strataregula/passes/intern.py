@@ -25,7 +25,7 @@ class InternPass:
     memory reference, while maintaining immutability guarantees.
     """
 
-    qfloat: float | None = None
+    qfloat: Optional[float] = None
     collect_stats: bool = False
 
     def __post_init__(self) -> None:

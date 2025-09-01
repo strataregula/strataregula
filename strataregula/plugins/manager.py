@@ -41,7 +41,7 @@ class PluginContext:
     last_used: float
     use_count: int = 0
     error_count: int = 0
-    last_error: str | None = None
+    last_error: Optional[str] = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def update_usage(self) -> None:
@@ -72,7 +72,7 @@ class EnhancedPluginManager:
 
     def __init__(
         self,
-        config: PluginConfig | None = None,
+        config: Optional[PluginConfig] = None,
         plugin_group: str = "strataregula.plugins",
     ):
         self.config = config or PluginConfig()

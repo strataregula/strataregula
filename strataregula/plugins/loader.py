@@ -24,7 +24,7 @@ class PluginEntryPoint:
     group: str
     module_name: str
     attr_name: str
-    dist_name: str | None = None
+    dist_name: Optional[str] = None
 
     def load(self) -> type[PatternPlugin]:
         """Load the plugin class from the entry point."""
@@ -53,9 +53,9 @@ class PluginLoadResult:
     """Result of plugin loading operation."""
 
     success: bool
-    plugin: PatternPlugin | None = None
-    error: str | None = None
-    entry_point: PluginEntryPoint | None = None
+    plugin: Optional[PatternPlugin] = None
+    error: Optional[str] = None
+    entry_point: Optional[PluginEntryPoint] = None
 
 
 class PluginLoader:

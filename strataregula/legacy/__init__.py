@@ -35,7 +35,7 @@ from ..core.pattern_expander import PatternExpander
 from ..kernel import Kernel
 
 
-def deprecated(since: str, removed_in: str, alternative: str | None = None):
+def deprecated(since: str, removed_in: str, alternative: Optional[str] = None):
     """Decorator to mark functions/classes as deprecated."""
 
     def decorator(func):
@@ -66,7 +66,7 @@ class Engine:
     def __init__(
         self,
         config_path: str | Path | None = None,
-        template_dir: str | None = None,
+        template_dir: Optional[str] = None,
         output_format: str = "yaml",
         **kwargs,
     ):
@@ -108,7 +108,7 @@ class Engine:
             )
 
     @deprecated(since="0.3.0", removed_in="1.0.0", alternative="Kernel.compile()")
-    def compile(self, config_override: dict | None = None) -> dict[str, Any]:
+    def compile(self, config_override: Optional[dict] = None) -> dict[str, Any]:
         """
         Compile configuration using v0.2.x API.
 
@@ -141,7 +141,7 @@ class Engine:
             raise ValueError("No configuration provided")
 
     @deprecated(since="0.3.0", removed_in="1.0.0", alternative="Kernel.expand()")
-    def expand_pattern(self, pattern: str, context: dict | None = None) -> list[str]:
+    def expand_pattern(self, pattern: str, context: Optional[dict] = None) -> list[str]:
         """
         Expand pattern using v0.2.x API.
 
@@ -260,7 +260,7 @@ class TemplateEngine:
     DEPRECATED: Template functionality is now integrated into Kernel.
     """
 
-    def __init__(self, template_dir: str | None = None):
+    def __init__(self, template_dir: Optional[str] = None):
         """Initialize legacy TemplateEngine."""
         warnings.warn(
             "TemplateEngine is deprecated since v0.3.0. "

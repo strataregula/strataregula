@@ -49,8 +49,8 @@ class ConversionResult:
 
     success: bool
     data: Any = None
-    format: str | None = None
-    error: str | None = None
+    format: Optional[str] = None
+    error: Optional[str] = None
     metadata: dict[str, Any] | None = None
 
     def __post_init__(self):
@@ -293,8 +293,8 @@ class FormatConverter:
         self,
         input_file: str | Path,
         output_file: str | Path,
-        from_format: str | None = None,
-        to_format: str | None = None,
+        from_format: Optional[str] = None,
+        to_format: Optional[str] = None,
         **options,
     ) -> ConversionResult:
         """ファイル間の形式変換"""

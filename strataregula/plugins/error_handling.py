@@ -45,10 +45,10 @@ class PluginError:
     category: ErrorCategory
     severity: ErrorSeverity
     message: str
-    exception: Exception | None = None
+    exception: Optional[Exception] = None
     timestamp: float = field(default_factory=time.time)
     context: dict[str, Any] = field(default_factory=dict)
-    stack_trace: str | None = None
+    stack_trace: Optional[str] = None
 
     def __post_init__(self):
         if self.exception and self.stack_trace is None:
