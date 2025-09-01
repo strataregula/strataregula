@@ -147,6 +147,20 @@ class Kernel:
             model = pass_instance.run(model)
         return model
 
+    # --- Compatibility adapter for callers expecting Kernel.compile(...) ---
+    def compile(self, raw_cfg: Mapping[str, Any]) -> Mapping[str, Any]:
+        """
+        Public wrapper for internal _compile().
+        Note:
+          - Kernel は本来 pull-based（query(view, params, raw_cfg)）だが、
+            互換性のため compile() を公開する。
+          - 返り値が dict の場合は MappingProxyType で immutability を担保。
+        """
+        compiled = self._compile(raw_cfg)
+        if isinstance(compiled, dict):
+            return MappingProxyType(compiled)
+        return compiled
+
     def _generate_cache_key(
         self, view_key: str, params: dict[str, Any], raw_cfg: Any
     ) -> str:

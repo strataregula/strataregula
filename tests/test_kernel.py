@@ -217,3 +217,20 @@ class TestKernel:
 
 if __name__ == "__main__":
     pytest.main([__file__])
+
+
+def test_kernel_compile_exists_and_runs():
+    """compile() 互換ラッパーの存在と正常動作を確認"""
+    from types import MappingProxyType
+    kernel = Kernel()
+
+    class NoopPass:
+        def run(self, m):  # 何もしないパス
+            d = dict(m)
+            d["_ok"] = True
+            return d
+
+    kernel.register_pass(NoopPass())
+    out = kernel.compile({"x": 1})
+    assert isinstance(out, (dict, MappingProxyType))
+    assert out["_ok"] is True

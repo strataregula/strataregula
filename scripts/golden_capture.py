@@ -36,14 +36,30 @@ def measure_kernel_performance() -> dict[str, Any]:
         import gc
         import psutil
 
+        # Check if typing modules are available
+        try:
+            from typing import Optional, Union, Callable
+            print("✅ Typing imports successful")
+        except ImportError as typing_error:
+            print(f"Warning: Typing imports failed: {typing_error}")
+            print("Using synthetic metrics for testing")
+            return _synthetic_metrics()
+
+        print("🔄 Attempting to import strataregula...")
         from strataregula import Kernel
+        print("✅ Kernel import successful")
         from strataregula.passes import InternPass
+        print("✅ InternPass import successful")
     except ImportError as e:
         print(f"Warning: StrataRegula imports failed: {e}")
         print("Using synthetic metrics for testing")
         return _synthetic_metrics()
     except Exception as e:
         print(f"Warning: Unexpected error during import: {e}")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Error details: {str(e)}")
+        import traceback
+        traceback.print_exc()
         print("Falling back to synthetic metrics for CI compatibility")
         return _synthetic_metrics()
 
@@ -70,7 +86,7 @@ def measure_kernel_performance() -> dict[str, Any]:
     # Initialize kernel with interning
     kernel = Kernel()
     intern_pass = InternPass(collect_stats=True)
-    kernel.register_pass("intern", intern_pass)
+    kernel.register_pass(intern_pass)
 
     # Warm-up runs
     for _ in range(10):
