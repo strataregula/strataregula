@@ -31,7 +31,7 @@ jobs:
         pip install pytest pytest-cov psutil
     
     - name: Run benchmarks
-      working-directory: ./strataregula
+      working-directory: ${{ github.workspace }}
       run: |
         python scripts/run_benchmarks.py
 
@@ -45,7 +45,7 @@ jobs:
         test -f scripts/generate_benchmark_images.py && echo "FOUND" || echo "MISSING"
 
     - name: Assert files exist
-      working-directory: ./strataregula
+      working-directory: ${{ github.workspace }}
       run: |
         test -f scripts/generate_benchmark_images.py || {
           echo "::error file=scripts/generate_benchmark_images.py::file not found"
@@ -57,7 +57,7 @@ jobs:
         }
 
     - name: Generate visualizations
-      working-directory: ./strataregula
+      working-directory: ${{ github.workspace }}
       run: |
         python scripts/generate_benchmark_images.py
     
