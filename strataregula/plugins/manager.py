@@ -9,7 +9,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
+from typing import Any, Optional
 
 from ..hooks.base import HookManager
 from .base import PatternPlugin

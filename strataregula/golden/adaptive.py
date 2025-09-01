@@ -18,7 +18,7 @@ from dataclasses import asdict, dataclass
 from datetime import UTC
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from .history import HistoryManager, StatisticalAnalyzer
 

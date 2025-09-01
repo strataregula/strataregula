@@ -7,7 +7,7 @@ import sys
 import warnings
 from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version
-from typing import Any
+from typing import Any, Optional
 
 
 def get_python_info() -> dict[str, Any]:
