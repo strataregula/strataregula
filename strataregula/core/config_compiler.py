@@ -16,7 +16,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Union, Optional, Callable
 
 import yaml
 
@@ -48,7 +48,7 @@ class CompilationConfig:
 
     input_format: str = "yaml"  # yaml, json
     output_format: str = "python"  # python, json, yaml
-    template_path: Path | None = None
+    template_path: Optional[Path] = None
     include_metadata: bool = True
     include_provenance: bool = True
     optimize_lookups: bool = True
@@ -203,7 +203,7 @@ metadata:
 class ConfigCompiler:
     """Main configuration compiler."""
 
-    def __init__(self, config: CompilationConfig = None, use_plugins: bool = True):
+    def __init__(self, config: Optional[CompilationConfig] = None, use_plugins: bool = True):
         self.config = config or CompilationConfig()
 
         # Initialize plugin system if enabled
@@ -232,8 +232,8 @@ class ConfigCompiler:
     def compile_traffic_config(
         self,
         traffic_file: Path,
-        prefectures_file: Path | None = None,
-        output_file: Path | None = None,
+        prefectures_file: Optional[Path] = None,
+        output_file: Optional[Path] = None,
     ) -> str:
         """Compile traffic configuration - main entry point matching config_compiler.py."""
         start_time = time.time()
@@ -315,7 +315,7 @@ class ConfigCompiler:
         self,
         input_file: Path,
         output_file: Path,
-        progress_callback: callable | None = None,
+        progress_callback: Optional[Callable] = None,
     ) -> None:
         """Compile large configuration files with streaming."""
         start_time = time.time()
@@ -421,7 +421,7 @@ class ConfigCompiler:
             return data
 
     def _generate_provenance(
-        self, input_files: list[Path], start_time: float
+        self, input_files: list[Optional[Path]], start_time: float
     ) -> ProvenanceInfo:
         """Generate compilation provenance information."""
         end_time = time.time()
@@ -527,7 +527,7 @@ class ConfigCompiler:
             comma = "," if i < len(items) - 1 else ""
             if isinstance(value, str):
                 lines.append(f'{" " * indent}"{key}": "{value}"{comma}')
-            elif isinstance(value, int | float):
+            elif isinstance(value, (int, float)):
                 lines.append(f'{" " * indent}"{key}": {value}{comma}')
             else:
                 value_str = json.dumps(value)
@@ -574,7 +574,7 @@ def get_services_by_prefecture(prefecture: str) -> Dict[str, float]:
 
 # CLI compatibility functions
 def compile_config(
-    traffic_file: str, prefectures_file: str | None = None, output_file: str | None = None
+    traffic_file: str, prefectures_file: Optional[str] = None, output_file: Optional[str] = None
 ) -> str:
     """CLI-compatible config compilation function."""
     compiler = ConfigCompiler()
