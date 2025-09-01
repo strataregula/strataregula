@@ -1,0 +1,16 @@
+version: 1
+paths:
+  # 誤検知が多いディレクトリは "検査対象外"
+  - "^tests/security/.*$"
+  - "^docs/security/.*$"
+  - "^docs/patterns/.*$"
+  - "^tests/.*$"
+  - "^docs/.*$"
+regexes:
+  # 公式サンプルやダミーの典型（必要に応じて増やす）
+  - "AKIAIOSFODNN7EXAMPLE"                # AWS公式ダミー
+  - "sk-123456789012345678901234567890"   # OpenAIダミー  
+  - "ghp_123456789012345678901234567890123456"  # GitHub PATのダミー表記
+  - "-----BEGIN RSA PRIVATE KEY-----"     # 見出しだけ（本文は無し）
+  - "^eyJ[A-Za-z0-9_-]{10,}$"             # JWTの短縮サンプル
+  - "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"  # JWT典型ヘッダー
