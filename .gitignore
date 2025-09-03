@@ -126,6 +126,19 @@ coverage.json
 dump.json
 test_*.yaml
 
+
+# AI development artifacts
+.serena
+
+# Temporary CI artifacts
+temp_metrics/
+
+# Temporary execution results
+docs/run/
+
+# CI artifacts and baseline reports
+reports/baseline/
+
 # Development scripts and test files (move to idea/dev/)
 *_test.py
 *_review.py

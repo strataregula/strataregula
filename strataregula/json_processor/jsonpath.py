@@ -4,7 +4,7 @@ JSONPath Processor - JSONPath query processing for strataregula.
 
 import logging
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
 
 try:
     from jsonpath_ng import parse as jsonpath_parse

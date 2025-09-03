@@ -1,0 +1,27 @@
+# Strataregula Docker Compose Configuration
+# 開発環境のみ
+
+services:
+  dev:
+    build: .
+    container_name: "strataregula-dev"
+    volumes:
+      - .:/workspace
+      - ~/.ssh:/home/uraka/.ssh:ro
+      - "C:/Users/uraka/OneDrive/Documents/Obsidian Vault:/obsidian:ro"
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    ports:
+      - "8001:8000"
+      - "3001:3000" 
+      - "5001:5000"
+    environment:
+      - HOME=/home/uraka
+      - STRATAREGULA_ENV=development
+      - PAGER=cat
+      - PS1=$ 
+      - TERM=xterm
+      - PATH=/usr/local/bin:/usr/bin:/bin:$PATH
+      - DOCKER_HOST=unix:///run/user/1000/docker.sock
+    command: /bin/bash

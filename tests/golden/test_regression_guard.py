@@ -17,6 +17,8 @@ import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 JST = timezone(timedelta(hours=9))
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
@@ -242,7 +244,7 @@ def test_golden_metrics_regression_guard():
     """
     _ensure_dirs()
     _run_capture()
-    
+
     # CI環境での特別な処理
     if os.getenv("CI") or os.getenv("GITHUB_ACTIONS"):
         print("CI: Running Golden Metrics Guard in CI environment")

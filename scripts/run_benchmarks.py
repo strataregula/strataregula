@@ -12,16 +12,16 @@ from pathlib import Path
 def run_basic_benchmarks():
     """Run basic performance benchmarks."""
     print("🧪 Running basic benchmarks...")
-    
+
     # Basic timing tests
     start_time = time.time()
-    
+
     # Simulate some work
     time.sleep(0.1)
-    
+
     end_time = time.time()
     duration = end_time - start_time
-    
+
     # Generate basic benchmark results
     results = {
         "timestamp": time.time(),
@@ -37,14 +37,14 @@ def run_basic_benchmarks():
             "failed": 0
         }
     }
-    
+
     # Save results
     with open("benchmark_results.json", "w") as f:
         json.dump(results, f, indent=2)
-    
+
     print(f"✅ Benchmarks completed in {duration*1000:.2f}ms")
     print("📊 Results saved to benchmark_results.json")
-    
+
     return results
 
 def main():

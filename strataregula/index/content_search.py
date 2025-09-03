@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from pathlib import Path

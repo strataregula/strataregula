@@ -8,7 +8,7 @@ import time
 from collections.abc import AsyncIterator, Callable, Iterator
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
 
 from .chunker import ChunkConfig, Chunker
 

@@ -6,7 +6,7 @@ Provides memory-efficient processing of large files and real-time data streams.
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, BinaryIO, TextIO
+from typing import Any, BinaryIO, Optional, TextIO
 
 
 @dataclass

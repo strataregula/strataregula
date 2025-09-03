@@ -160,8 +160,14 @@ class Engine:
             List of expanded values
         """
         # Use internal pattern expander
-        expander = PatternExpander()
-        return expander.expand(pattern, context or {})
+        from ..core.pattern_expander import EnhancedPatternExpander
+        expander = EnhancedPatternExpander()
+        # EnhancedPatternExpander uses expand_pattern_stream, need to adapt
+        patterns = {pattern: 1.0}  # Default value
+        result = []
+        for expanded_key, _ in expander.expand_pattern_stream(patterns):
+            result.append(expanded_key)
+        return result
 
     @deprecated(since="0.3.0", removed_in="1.0.0", alternative="Kernel.validate()")
     def validate(self, strict: bool = False) -> bool:
