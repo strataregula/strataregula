@@ -24,7 +24,9 @@ try:
 
     RICH_AVAILABLE = True
 except ImportError:
-    warnings.warn("Rich not available. Using basic console output.", RuntimeWarning, stacklevel=2)
+    warnings.warn(
+        "Rich not available. Using basic console output.", RuntimeWarning, stacklevel=2
+    )
     RICH_AVAILABLE = False
 
     # Fallback console class

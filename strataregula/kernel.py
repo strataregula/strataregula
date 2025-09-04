@@ -26,6 +26,7 @@ _IMMUTABLE_CFG = os.getenv("SR_IMMUTABLE_CONFIG", "0") == "1"
 @dataclass(frozen=True)
 class CompiledConfig:
     """事前コンパイル済みの設定を表す軽量型"""
+
     data: Mapping[str, Any]
     # オプション：ハッシュや指紋を持たせるならここに fingerprint:str を置く
 
@@ -196,7 +197,10 @@ class Kernel:
         return generate_content_address(cache_data, algorithm="blake2b")
 
     def query(
-        self, view_key: str, params: dict[str, Any], cfg: Mapping[str, Any] | CompiledConfig
+        self,
+        view_key: str,
+        params: dict[str, Any],
+        cfg: Mapping[str, Any] | CompiledConfig,
     ) -> Any:
         """
         Query a specific view with parameters.

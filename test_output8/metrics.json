@@ -1,0 +1,13 @@
+{
+  "latency_ms": 0.15,
+  "p95_ms": 0.19,
+  "throughput_rps": 6787.8,
+  "mem_bytes": 0,
+  "hit_ratio": 0.0,
+  "measurement_info": {
+    "iterations": 1000,
+    "config_size_services": 50,
+    "config_size_routes": 100,
+    "timestamp": 1756733358.7181256
+  }
+}

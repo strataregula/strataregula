@@ -112,9 +112,12 @@ class Algorithm:
 
 # ========== FUNCTIONAL PATTERNS ==========
 
+
 # 11. Currying
 def curry(f):
     return lambda a: lambda b: f(a, b)
+
+
 add = curry(lambda x, y: x + y)
 
 # 12. Partial Application

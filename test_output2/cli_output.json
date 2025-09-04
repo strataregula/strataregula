@@ -1,0 +1,4 @@
+{
+  "error": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 189, in _run_module_as_main\n  File \"<frozen runpy>\", line 112, in _get_module_details\n  File \"/workspaces/strataregula/strataregula/__init__.py\", line 36, in <module>\n    from .passes import InternPass\n  File \"/workspaces/strataregula/strataregula/passes/__init__.py\", line 8, in <module>\n    from .intern import InternPass\n  File \"/workspaces/strataregula/strataregula/passes/intern.py\", line 20, in <module>\n    class InternPass:\n  File \"/workspaces/strataregula/strataregula/passes/intern.py\", line 28, in InternPass\n    qfloat: Optional[float] = None\n            ^^^^^^^^\nNameError: name 'Optional' is not defined\n",
+  "returncode": 1
+}

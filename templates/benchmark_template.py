@@ -240,7 +240,9 @@ class CustomBenchmark:
         print(f"📊 Running scalability tests for {self.component_name}...")
 
         test_functions = self.define_test_functions()
-        primary_function = next(iter(test_functions.values()))  # Use first function for scalability
+        primary_function = next(
+            iter(test_functions.values())
+        )  # Use first function for scalability
 
         scalability_results = {}
         sizes = [100, 500, 1000, 5000, 10000]
@@ -302,7 +304,9 @@ class CustomBenchmark:
 
         # Memory scaling analysis
         memory_usage = [successful_results[size]["memory_mb"] for size in sizes]
-        memory_per_item = [memory / size for memory, size in zip(memory_usage, sizes, strict=False)]
+        memory_per_item = [
+            memory / size for memory, size in zip(memory_usage, sizes, strict=False)
+        ]
 
         return {
             "max_successful_size": max(sizes),

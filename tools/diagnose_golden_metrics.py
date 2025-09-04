@@ -120,7 +120,9 @@ def measure_cli_only():
         "json",
     ]
 
-    result = subprocess.run(cmd, check=False, capture_output=True, text=True, timeout=30)
+    result = subprocess.run(
+        cmd, check=False, capture_output=True, text=True, timeout=30
+    )
 
     with contextlib.suppress(builtins.BaseException):
         Path(temp_config).unlink()

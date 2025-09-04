@@ -9,6 +9,7 @@ import time
 import sys
 from pathlib import Path
 
+
 def run_basic_benchmarks():
     """Run basic performance benchmarks."""
     print("🧪 Running basic benchmarks...")
@@ -26,26 +27,20 @@ def run_basic_benchmarks():
     results = {
         "timestamp": time.time(),
         "benchmarks": {
-            "basic_timing": {
-                "duration_ms": duration * 1000,
-                "status": "passed"
-            }
+            "basic_timing": {"duration_ms": duration * 1000, "status": "passed"}
         },
-        "summary": {
-            "total_benchmarks": 1,
-            "passed": 1,
-            "failed": 0
-        }
+        "summary": {"total_benchmarks": 1, "passed": 1, "failed": 0},
     }
 
     # Save results
     with open("benchmark_results.json", "w") as f:
         json.dump(results, f, indent=2)
 
-    print(f"✅ Benchmarks completed in {duration*1000:.2f}ms")
+    print(f"✅ Benchmarks completed in {duration * 1000:.2f}ms")
     print("📊 Results saved to benchmark_results.json")
 
     return results
+
 
 def main():
     """Main benchmark runner."""
@@ -56,6 +51,7 @@ def main():
     except Exception as e:
         print(f"❌ Benchmark failed: {e}")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -111,7 +111,9 @@ class JSONValidator:
             logger.error(f"Invalid JSON in schema string: {e}")
             return False
 
-    def validate(self, data: Any, schema_name: Optional[str] = None) -> ValidationResult:
+    def validate(
+        self, data: Any, schema_name: Optional[str] = None
+    ) -> ValidationResult:
         """データをスキーマで検証"""
         if not JSONSCHEMA_AVAILABLE:
             return ValidationResult(

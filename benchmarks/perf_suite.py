@@ -620,7 +620,8 @@ class CrossLanguageBenchmark:
         try:
             result = subprocess.run(
                 ["pwsh", "-Command", ps_benchmark_script],
-                check=False, capture_output=True,
+                check=False,
+                capture_output=True,
                 text=True,
                 timeout=300,  # 5 minute timeout
             )
@@ -850,7 +851,9 @@ class HistoricalTracker:
         x_mean = statistics.mean(x_values)
         y_mean = statistics.mean(times)
 
-        numerator = sum((x - x_mean) * (y - y_mean) for x, y in zip(x_values, times, strict=False))
+        numerator = sum(
+            (x - x_mean) * (y - y_mean) for x, y in zip(x_values, times, strict=False)
+        )
         denominator = sum((x - x_mean) ** 2 for x in x_values)
 
         if denominator == 0:

@@ -331,9 +331,7 @@ class JSONFilterCommand(BaseCommand):
                 )
             elif operator == "contains":
                 results.append(
-                    value in item_value
-                    if isinstance(item_value, str | list)
-                    else False
+                    value in item_value if isinstance(item_value, str | list) else False
                 )
             elif operator == "exists":
                 results.append(item_value is not None)

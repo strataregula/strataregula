@@ -225,9 +225,7 @@ def main():
     )
 
     # Config command
-    subparsers.add_parser(
-        "config", help="Show configuration with priority"
-    )
+    subparsers.add_parser("config", help="Show configuration with priority")
 
     args = parser.parse_args()
 

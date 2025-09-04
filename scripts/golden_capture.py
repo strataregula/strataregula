@@ -59,6 +59,7 @@ def measure_kernel_performance() -> dict[str, Any]:
         print(f"Error type: {type(e).__name__}")
         print(f"Error details: {e!s}")
         import traceback
+
         traceback.print_exc()
         print("Falling back to synthetic metrics for CI compatibility")
         return _synthetic_metrics()
@@ -100,7 +101,9 @@ def measure_kernel_performance() -> dict[str, Any]:
     # Warm-up runs (キャッシュを温める)
     for _ in range(5000):  # 10 → 5000
         try:
-            kernel.query("basic_view", {"region": "test", "service": "web"}, compiled_config)
+            kernel.query(
+                "basic_view", {"region": "test", "service": "web"}, compiled_config
+            )
         except Exception:
             pass  # View might not exist yet, that's OK for metrics
 
@@ -209,11 +212,23 @@ def _synthetic_metrics() -> dict[str, Any]:
         base_hit_ratio = 0.923  # Matches baseline exactly
     else:
         # Local developmentでは少し変動を許容
-        base_latency = 8.43 + (hashlib.md5(seed_source.encode()).hexdigest()[0:2] == "00") * 0.1
-        base_p95 = 15.27 + (hashlib.md5(seed_source.encode()).hexdigest()[2:4] == "00") * 0.2
-        base_throughput = 11847.2 + (hashlib.md5(seed_source.encode()).hexdigest()[4:6] == "00") * 10
-        base_memory = 28_567_392 + (hashlib.md5(seed_source.encode()).hexdigest()[6:8] == "00") * 1000
-        base_hit_ratio = 0.923 + (hashlib.md5(seed_source.encode()).hexdigest()[8:10] == "00") * 0.001
+        base_latency = (
+            8.43 + (hashlib.md5(seed_source.encode()).hexdigest()[0:2] == "00") * 0.1
+        )
+        base_p95 = (
+            15.27 + (hashlib.md5(seed_source.encode()).hexdigest()[2:4] == "00") * 0.2
+        )
+        base_throughput = (
+            11847.2 + (hashlib.md5(seed_source.encode()).hexdigest()[4:6] == "00") * 10
+        )
+        base_memory = (
+            28_567_392
+            + (hashlib.md5(seed_source.encode()).hexdigest()[6:8] == "00") * 1000
+        )
+        base_hit_ratio = (
+            0.923
+            + (hashlib.md5(seed_source.encode()).hexdigest()[8:10] == "00") * 0.001
+        )
 
     return {
         "latency_ms": round(base_latency, 2),
@@ -262,7 +277,9 @@ routes:
                 "--format",
                 "json",
             ]
-            result = subprocess.run(cmd, check=False, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(
+                cmd, check=False, capture_output=True, text=True, timeout=30
+            )
 
             if result.returncode == 0:
                 try:
@@ -399,6 +416,7 @@ def main():
         print(f"\nERROR: Error capturing golden metrics: {e}")
         if args.verbose:
             import traceback
+
             traceback.print_exc()
 
         # In CI, don't fail completely - write fallback data
