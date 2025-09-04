@@ -24,3 +24,4 @@
 ## 6) API 形状（速度のための型）
 - 推奨フロー: `precompile(raw_cfg) → query(view, params, CompiledConfig)`。
 - `compile(raw_cfg)` は互換のため残すが **Deprecated**（次のメジャーで除去方針）。
+

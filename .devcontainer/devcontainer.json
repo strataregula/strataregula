@@ -1,6 +1,9 @@
 {
-  "name": "StrataRegula CI Environment",
-  "image": "python:3.11-slim",
+  "name": "Strataregula Development Environment",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
   "features": {
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
@@ -20,13 +23,19 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"
-    }
+    },
+    "terminal.integrated.defaultProfile.linux": "bash"
   },
-  "postCreateCommand": "pip install --upgrade pip && pip install -e '.[dev,test]'",
+  "postCreateCommand": "pip install --upgrade pip && pip install -e '.[dev,test,docs,performance,plugins,api]'",
   "customizations": {
     "vscode": {
       "python.defaultInterpreterPath": "/usr/local/bin/python"
     }
   },
-  "remoteUser": "root"
+  "remoteUser": "uraka",
+  "workspaceFolder": "/workspace",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.ssh,target=/home/uraka/.ssh,type=bind,consistency=cached"
+  ]
 }

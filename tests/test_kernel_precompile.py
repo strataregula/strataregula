@@ -80,3 +80,4 @@ def test_compile_is_deprecated():
         _ = k.compile({"x": 1})
         assert any(issubclass(m.category, DeprecationWarning) for m in w), \
             "DeprecationWarning not raised by Kernel.compile"
+
