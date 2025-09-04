@@ -20,7 +20,9 @@ def test_precompile_then_query_hit_ratio_recovers():
             return {"region": params.get("region")}
     k.register_view(BasicView())
     compiled = k.precompile({"region": "tokyo"})
-    for _ in range(1000): k.query("basic_view", {"region": "tokyo"}, compiled)
-    for _ in range(1000): k.query("basic_view", {"region": "tokyo"}, compiled)
+    for _ in range(1000):
+        k.query("basic_view", {"region": "tokyo"}, compiled)
+    for _ in range(1000):
+        k.query("basic_view", {"region": "tokyo"}, compiled)
     stats = getattr(k, "cache_stats", lambda: {"ratio": 1.0})()
     assert stats["ratio"] >= 0.8

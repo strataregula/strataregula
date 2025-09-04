@@ -18,8 +18,8 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any, Protocol
 import os
+import warnings
 
-_RAW_QUERY_WARNED = False
 _IMMUTABLE_CFG = os.getenv("SR_IMMUTABLE_CONFIG", "0") == "1"
 
 
@@ -164,7 +164,7 @@ class Kernel:
         """
         DEPRECATED: Use `precompile(raw_cfg)` and pass `CompiledConfig` to `query`.
         This wrapper remains for backward compatibility and will be removed in a future major version.
-        
+
         Note:
           - Kernel は本来 pull-based（query(view, params, raw_cfg)）だが、
             互換性のため compile() を公開する。
@@ -225,14 +225,14 @@ class Kernel:
         else:
             # Legacy slow path（互換維持）。警告は一度だけ。
             compiled_cfg = self._compile(cfg)
-            global _RAW_QUERY_WARNED
-            if not _RAW_QUERY_WARNED:
+            # Warn only once per Kernel instance (no module-level globals).
+            if not getattr(self, "_raw_query_warned", False):
                 warnings.warn(
                     "Kernel.query() received raw cfg; prefer precompile() + query(compiled).",
                     DeprecationWarning,
                     stacklevel=2,
                 )
-                _RAW_QUERY_WARNED = True
+                self._raw_query_warned = True
 
         # Generate cache key based on all inputs
         cache_key = self._generate_cache_key(view_key, params, compiled_cfg)
