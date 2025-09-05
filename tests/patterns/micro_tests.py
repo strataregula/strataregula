@@ -76,8 +76,10 @@ def test_observer_pattern():
 
 def test_strategy_pattern():
     """Test Strategy pattern with different algorithms"""
+
     def bubble_sort(data):
         return sorted(data)
+
     def quick_sort(data):
         return sorted(data, reverse=True)
 

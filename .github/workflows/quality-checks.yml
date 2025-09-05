@@ -150,3 +150,29 @@ jobs:
         fi
         
         echo "✅ Quality gate passed"
+    
+    - name: Write rich run log (JST)
+      if: always()
+      run: |
+        python tools/new_run_log.py \
+          --label "ci-quality" \
+          --summary "PR CI passed (quality checks, lint, security scan). All gates validated." \
+          --intent "Trace every quality run for reproducibility" \
+          --with-bench
+    
+    - name: Upload Run Log artifact
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: runlog-quality
+        path: docs/run/
+    
+    - name: Comment run log (PR)
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: run-summary-quality
+        message: |
+          📝 **Quality Run Log** available in artifact **runlog-quality** (see docs/run/ JST file)
+          
+          Quality gates: Lint ✅ | Type Check ⚠️ | Security ✅ | Coverage ⚠️

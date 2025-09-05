@@ -439,7 +439,9 @@ class TrendAnalyzer:
         x_mean = statistics.mean(x_values)
         y_mean = statistics.mean(values)
 
-        numerator = sum((x - x_mean) * (y - y_mean) for x, y in zip(x_values, values, strict=False))
+        numerator = sum(
+            (x - x_mean) * (y - y_mean) for x, y in zip(x_values, values, strict=False)
+        )
         denominator = sum((x - x_mean) ** 2 for x in x_values)
 
         return numerator / denominator if denominator != 0 else 0.0

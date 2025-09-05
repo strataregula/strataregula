@@ -17,11 +17,16 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any, Protocol
+import os
+import warnings
+
+_IMMUTABLE_CFG = os.getenv("SR_IMMUTABLE_CONFIG", "0") == "1"
 
 
 @dataclass(frozen=True)
 class CompiledConfig:
     """事前コンパイル済みの設定を表す軽量型"""
+
     data: Mapping[str, Any]
     # オプション：ハッシュや指紋を持たせるならここに fingerprint:str を置く
 
@@ -157,14 +162,23 @@ class Kernel:
     # --- Compatibility adapter for callers expecting Kernel.compile(...) ---
     def compile(self, raw_cfg: Mapping[str, Any]) -> Mapping[str, Any]:
         """
-        Public wrapper for internal _compile().
+        DEPRECATED: Use `precompile(raw_cfg)` and pass `CompiledConfig` to `query`.
+        This wrapper remains for backward compatibility and will be removed in a future major version.
+
         Note:
           - Kernel は本来 pull-based（query(view, params, raw_cfg)）だが、
             互換性のため compile() を公開する。
           - 返り値が dict の場合は MappingProxyType で immutability を担保。
         """
+        import warnings
+        warnings.warn(
+            "Kernel.compile(raw_cfg) is deprecated; use Kernel.precompile(raw_cfg) "
+            "and pass the returned CompiledConfig to Kernel.query(..., compiled).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         compiled = self._compile(raw_cfg)
-        if isinstance(compiled, dict):
+        if _IMMUTABLE_CFG and isinstance(compiled, dict):
             return MappingProxyType(compiled)
         return compiled
 
@@ -183,7 +197,10 @@ class Kernel:
         return generate_content_address(cache_data, algorithm="blake2b")
 
     def query(
-        self, view_key: str, params: dict[str, Any], cfg: Mapping[str, Any] | CompiledConfig
+        self,
+        view_key: str,
+        params: dict[str, Any],
+        cfg: Mapping[str, Any] | CompiledConfig,
     ) -> Any:
         """
         Query a specific view with parameters.
@@ -206,7 +223,16 @@ class Kernel:
         if isinstance(cfg, CompiledConfig):
             compiled_cfg = cfg.data
         else:
-            compiled_cfg = self._compile(cfg)  # 従来互換
+            # Legacy slow path（互換維持）。警告は一度だけ。
+            compiled_cfg = self._compile(cfg)
+            # Warn only once per Kernel instance (no module-level globals).
+            if not getattr(self, "_raw_query_warned", False):
+                warnings.warn(
+                    "Kernel.query() received raw cfg; prefer precompile() + query(compiled).",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+                self._raw_query_warned = True
 
         # Generate cache key based on all inputs
         cache_key = self._generate_cache_key(view_key, params, compiled_cfg)
@@ -236,7 +262,7 @@ class Kernel:
             result = view.materialize(compiled_cfg, **params)
 
             # Make result immutable if it's a dict (prevents accidental mutation)
-            if isinstance(result, dict):
+            if _IMMUTABLE_CFG and isinstance(result, dict):
                 result = MappingProxyType(result)
 
             # Cache the result in backend
@@ -254,6 +280,8 @@ class Kernel:
     def precompile(self, raw_cfg: Mapping[str, Any]) -> CompiledConfig:
         """事前コンパイルAPI（推奨ルート）"""
         compiled = self._compile(raw_cfg)
+        if _IMMUTABLE_CFG and isinstance(compiled, dict):
+            compiled = MappingProxyType(compiled)
         return CompiledConfig(compiled)
 
     def register_view(self, view: View) -> None:

@@ -8,7 +8,7 @@ for custom plugin development.
 import datetime
 import os
 import re
-from typing import Any
+from typing import Any, Dict
 
 from .base import PatternPlugin, PluginInfo
 
@@ -16,17 +16,25 @@ from .base import PatternPlugin, PluginInfo
 class TimestampPlugin(PatternPlugin):
     """Plugin that expands @timestamp patterns with current timestamp."""
 
-    @property
-    def info(self) -> PluginInfo:
-        return PluginInfo(
+    def __init__(self):
+        info = PluginInfo(
             name="timestamp-plugin",
             version="1.0.0",
             description="Expands @timestamp patterns with configurable formats",
         )
+        super().__init__(info)
 
     def can_handle(self, pattern: str) -> bool:
         """Handle patterns containing @timestamp."""
         return "@timestamp" in pattern
+
+    async def process(self, pattern: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Process a pattern with timestamp expansion."""
+        if not self.can_handle(pattern):
+            return {}
+
+        expanded_patterns = self.expand(pattern, data)
+        return expanded_patterns
 
     def expand(self, pattern: str, context: dict[str, Any]) -> dict[str, Any]:
         """Expand @timestamp with current timestamp."""
@@ -59,17 +67,25 @@ class TimestampPlugin(PatternPlugin):
 class EnvironmentPlugin(PatternPlugin):
     """Plugin that expands environment variable patterns."""
 
-    @property
-    def info(self) -> PluginInfo:
-        return PluginInfo(
+    def __init__(self):
+        info = PluginInfo(
             name="environment-plugin",
             version="1.0.0",
             description="Expands $ENV_VAR patterns with environment variables",
         )
+        super().__init__(info)
 
     def can_handle(self, pattern: str) -> bool:
         """Handle patterns starting with $ (environment variables)."""
         return bool(re.search(r"\$[A-Z_][A-Z0-9_]*", pattern))
+
+    async def process(self, pattern: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Process a pattern with environment variable expansion."""
+        if not self.can_handle(pattern):
+            return {}
+
+        expanded_patterns = self.expand(pattern, data)
+        return expanded_patterns
 
     def expand(self, pattern: str, context: dict[str, Any]) -> dict[str, Any]:
         """Expand environment variables in pattern."""
@@ -174,17 +190,25 @@ class ConditionalPlugin(PatternPlugin):
 class PrefixPlugin(PatternPlugin):
     """Plugin that adds configurable prefixes to patterns."""
 
-    @property
-    def info(self) -> PluginInfo:
-        return PluginInfo(
+    def __init__(self):
+        info = PluginInfo(
             name="prefix-plugin",
             version="1.0.0",
             description="Adds configurable prefixes to patterns",
         )
+        super().__init__(info)
 
     def can_handle(self, pattern: str) -> bool:
         """Handle patterns starting with @prefix:"""
         return pattern.startswith("@prefix:")
+
+    async def process(self, pattern: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Process a pattern with prefix addition."""
+        if not self.can_handle(pattern):
+            return {}
+
+        expanded_patterns = self.expand(pattern, data)
+        return expanded_patterns
 
     def expand(self, pattern: str, context: dict[str, Any]) -> dict[str, Any]:
         """Add prefix to pattern."""

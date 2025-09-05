@@ -38,7 +38,7 @@ classifiers = [
     "Topic :: Text Processing :: Markup",
     "Typing :: Typed"
 ]
-requires-python = "==3.11.*"
+requires-python = ">=3.11"
 dependencies = [
     "click>=7.0.0",          # より広い互換性
     "rich>=10.0.0",          # 2021年初期版から対応

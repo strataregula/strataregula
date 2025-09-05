@@ -119,7 +119,13 @@ class Engine:
             Compiled configuration dictionary
         """
         if self._config_path:
-            return self._kernel.compile(str(self._config_path))
+            # Load config file and pass to kernel
+            import yaml
+            with open(self._config_path, 'r', encoding='utf-8') as f:
+                config_data = yaml.safe_load(f)
+            result = self._kernel.compile(config_data)
+            # Return as dict for v0.2.x compatibility
+            return dict(result)
         elif config_override:
             # Handle inline config (v0.2.x feature)
             import tempfile
@@ -132,7 +138,8 @@ class Engine:
                 yaml.dump(config_override, f)
                 temp_path = f.name
             try:
-                return self._kernel.compile(temp_path)
+                result = self._kernel.compile(config_override)
+                return dict(result)
             finally:
                 import os
 
@@ -153,8 +160,14 @@ class Engine:
             List of expanded values
         """
         # Use internal pattern expander
-        expander = PatternExpander()
-        return expander.expand(pattern, context or {})
+        from ..core.pattern_expander import EnhancedPatternExpander
+        expander = EnhancedPatternExpander()
+        # EnhancedPatternExpander uses expand_pattern_stream, need to adapt
+        patterns = {pattern: 1.0}  # Default value
+        result = []
+        for expanded_key, _ in expander.expand_pattern_stream(patterns):
+            result.append(expanded_key)
+        return result
 
     @deprecated(since="0.3.0", removed_in="1.0.0", alternative="Kernel.validate()")
     def validate(self, strict: bool = False) -> bool:

@@ -8,7 +8,7 @@ import time
 from collections.abc import AsyncIterator, Callable, Iterator
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
 
 from .chunker import ChunkConfig, Chunker
 
@@ -110,7 +110,9 @@ class ChunkProcessor:
 class StreamProcessor:
     """Advanced stream processor with real-time capabilities and async support."""
 
-    def __init__(self, chunk_config: Optional[ChunkConfig] = None, max_workers: int = 4):
+    def __init__(
+        self, chunk_config: Optional[ChunkConfig] = None, max_workers: int = 4
+    ):
         self.chunk_processor = ChunkProcessor(chunk_config)
         self.max_workers = max_workers
         self._executor = ThreadPoolExecutor(max_workers=max_workers)

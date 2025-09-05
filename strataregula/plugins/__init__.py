@@ -12,8 +12,8 @@ This plugin system provides:
 # Core plugin interfaces
 from .base import PatternPlugin, PluginInfo, PluginManager
 
-# Built-in plugins
-from .builtin import SimulationPlugins
+# Built-in plugins - not available in v0.3.0
+# from .builtin import SimulationPlugins
 from .config import (
     ConfigValidator,
     GlobalPluginConfig,

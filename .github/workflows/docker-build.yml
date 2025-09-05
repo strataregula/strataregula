@@ -1,0 +1,174 @@
+# GitHub Actions: Docker Build and Push to Container Registry
+# Strataregula の Docker イメージを自動ビルド・プッシュ
+
+name: Docker Build and Push
+
+on:
+  push:
+    branches: [ main, release/* ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      meta_json: ${{ steps.meta.outputs.json }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        # PR のときは push しない（fork PR 権限問題を回避）
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Generate SBOM
+      if: ${{ github.event_name != 'pull_request' }}
+      uses: anchore/sbom-action@v0
+      with:
+        image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+        format: spdx-json
+        output-file: sbom.spdx.json
+
+    - name: Upload SBOM
+      if: ${{ github.event_name != 'pull_request' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: sbom
+        path: sbom.spdx.json
+
+    # PR用の代替セキュリティスキャン（ソースコードベース）
+    - name: Generate SBOM for PR (source directory)
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: anchore/sbom-action@v0
+      with:
+        path: .
+        format: spdx-json
+        output-file: sbom-pr.spdx.json
+
+    - name: Run Trivy security scan for PR (filesystem)
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-pr-results.sarif'
+
+    - name: Upload PR security artifacts
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-scan-pr
+        path: |
+          sbom-pr.spdx.json
+          trivy-pr-results.sarif
+        retention-days: 30
+
+    - name: Generate security summary for PR
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        echo "## 🛡️ Security Scan Results" > security-summary.md
+        echo "" >> security-summary.md
+        
+        # SBOM summary
+        if [ -f "sbom-pr.spdx.json" ]; then
+          COMPONENT_COUNT=$(jq '.packages | length' sbom-pr.spdx.json 2>/dev/null || echo "N/A")
+          echo "### 📦 Software Bill of Materials (SBOM)" >> security-summary.md
+          echo "- **Components analyzed**: $COMPONENT_COUNT" >> security-summary.md
+          echo "- **Format**: SPDX JSON" >> security-summary.md
+          echo "- **Scan type**: Source directory analysis" >> security-summary.md
+          echo "" >> security-summary.md
+        fi
+        
+        # Trivy summary  
+        if [ -f "trivy-pr-results.sarif" ]; then
+          VULN_COUNT=$(jq '.runs[0].results | length' trivy-pr-results.sarif 2>/dev/null || echo "0")
+          echo "### 🔍 Vulnerability Analysis" >> security-summary.md
+          echo "- **Vulnerabilities found**: $VULN_COUNT" >> security-summary.md
+          echo "- **Scan type**: Filesystem analysis" >> security-summary.md
+          echo "- **Tool**: Trivy security scanner" >> security-summary.md
+          echo "" >> security-summary.md
+        fi
+        
+        echo "### 📥 Detailed Results" >> security-summary.md
+        echo "Download the \`security-scan-pr\` artifact from this workflow run to view:" >> security-summary.md
+        echo "- Full SBOM (SPDX format)" >> security-summary.md
+        echo "- Detailed vulnerability report (SARIF format)" >> security-summary.md
+        echo "" >> security-summary.md
+        echo "*🔒 Note: This is a source-code based security scan for PRs. Push/release events include container image scanning.*" >> security-summary.md
+
+    - name: Comment security summary on PR
+      if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false }}
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        header: security-scan-summary
+        path: security-summary.md
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push'
+
+    steps:
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ fromJSON(needs.build-and-push.outputs.meta_json).tags[0] }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'trivy-results.sarif'
+      continue-on-error: true  # Don't fail on permission issues
+      
+    - name: Upload security scan artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-scan-results
+        path: |
+          trivy-results.sarif
+        retention-days: 30
+

@@ -8,7 +8,7 @@ import os
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import jsonschema
 import yaml

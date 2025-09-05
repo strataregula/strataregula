@@ -4,7 +4,7 @@ Integration tests for the plugin system with core components.
 
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 import yaml
 
@@ -24,16 +24,24 @@ from strataregula.plugins.samples import (
 class TestPlugin(PatternPlugin):
     """Simple test plugin for integration testing."""
 
-    @property
-    def info(self) -> PluginInfo:
-        return PluginInfo(
+    def __init__(self):
+        info = PluginInfo(
             name="test-plugin",
             version="1.0.0",
             description="Test plugin for integration testing",
         )
+        super().__init__(info)
 
     def can_handle(self, pattern: str) -> bool:
         return pattern.startswith("test:")
+
+    async def process(self, pattern: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Process a pattern with given data."""
+        if not pattern.startswith("test:"):
+            return {}
+
+        base_pattern = pattern[5:]  # Remove 'test:' prefix
+        return {f"processed.{base_pattern}": data.get("value", "default")}
 
     def expand(self, pattern: str, context: dict[str, Any]) -> dict[str, Any]:
         base_pattern = pattern[5:]  # Remove 'test:' prefix
@@ -185,16 +193,19 @@ class TestPluginSystemIntegration:
         """Test plugin error handling and fallbacks."""
 
         class FailingPlugin(PatternPlugin):
-            @property
-            def info(self) -> PluginInfo:
-                return PluginInfo(
+            def __init__(self):
+                info = PluginInfo(
                     name="failing-plugin",
                     version="1.0.0",
                     description="Plugin that always fails",
                 )
+                super().__init__(info)
 
             def can_handle(self, pattern: str) -> bool:
                 return pattern.startswith("fail:")
+
+            async def process(self, pattern: str, data: Dict[str, Any]) -> Dict[str, Any]:
+                raise ValueError("Plugin intentionally failing")
 
             def expand(self, pattern: str, context: dict[str, Any]) -> dict[str, Any]:
                 raise ValueError("Plugin intentionally failing")

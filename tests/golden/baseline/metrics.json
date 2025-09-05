@@ -1,16 +1,1 @@
-{
-  "latency_ms": 8.43,
-  "p95_ms": 15.27,
-  "throughput_rps": 11847.2,
-  "mem_bytes": 28567392,
-  "hit_ratio": 0.923,
-  "measurement_info": {
-    "iterations": 1000,
-    "config_size_services": 50,
-    "config_size_routes": 100,
-    "timestamp": 1724942400.0,
-    "baseline_version": "v0.3.0",
-    "kernel_architecture": "pass_view",
-    "interning_enabled": true
-  }
-}
+{"hit_ratio":0.85,"latency_ms":0.2,"measurement_info":{"config_size_routes":100,"config_size_services":50,"iterations":1000,"timestamp":1756770116.4675539},"mem_bytes":159744,"p95_ms":0.34,"throughput_rps":4969.2}

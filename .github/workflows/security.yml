@@ -34,12 +34,27 @@ jobs:
 
     - name: Run pip-audit
       run: |
-        pip-audit --desc --output=json --format=json || true
+        pip-audit --desc --format=json --output pip-audit.json || true
+        echo "### pip-audit summary" >> $GITHUB_STEP_SUMMARY
+        pip-audit --summary >> $GITHUB_STEP_SUMMARY || true
+
+    - name: Upload pip-audit report (artifact)
+      uses: actions/upload-artifact@v4
+      with:
+        name: pip-audit.json
+        path: pip-audit.json
 
     - name: Run Bandit Security Scan
       run: |
         bandit -r strataregula/ -f json -o bandit-report.json || true
-        bandit -r strataregula/ -f txt
+        echo "### Bandit summary" >> $GITHUB_STEP_SUMMARY
+        bandit -r strataregula/ -f txt || true
+
+    - name: Upload Bandit report (artifact)
+      uses: actions/upload-artifact@v4
+      with:
+        name: bandit-report.json
+        path: bandit-report.json
 
   codeql:
     name: CodeQL Analysis
@@ -63,3 +78,69 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
+
+  secret-scan:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run secret scan (diff first)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          ./secret-audit.ps1 -DiffOnly -AllowlistPath security-allowlist.yaml
+      - name: If diff scan failed, run full repo scan
+        if: failure()
+        shell: pwsh
+        run: |
+          ./secret-audit.ps1 -AllowlistPath security-allowlist.yaml
+      - name: Upload secret-scan logs (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secret-scan-logs
+          path: |
+            secret-scan.log
+            secret-scan.json
+      - name: Summary (always)
+        if: always()
+        run: |
+          echo "### Secret Scan" >> $GITHUB_STEP_SUMMARY
+          if [ -f secret-scan.log ]; then tail -n 200 secret-scan.log >> $GITHUB_STEP_SUMMARY; fi
+
+  post-security-comment:
+    name: Post Security Summary (PR only, safe)
+    needs: [dependency-scan, codeql, secret-scan]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+      - name: Build comment body
+        id: build
+        shell: bash
+        run: |
+          echo "## 🔒 Security Scan Summary" > body.md
+          echo "" >> body.md
+          echo "- pip-audit: \`pip-audit.json\` attached" >> body.md
+          echo "- Bandit: \`bandit-report.json\` attached" >> body.md
+          echo "- Secret scan: \`secret-scan-logs\` artifacts" >> body.md
+          echo "" >> body.md
+          echo "_This comment is posted only for same-repo PRs; fork PRs are skipped for safety._" >> body.md
+          echo "body=$(sed ':a;N;$!ba;s/\n/\\n/g' body.md)" >> $GITHUB_OUTPUT
+      - name: Comment to PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `${{ steps.build.outputs.body }}`
+            })

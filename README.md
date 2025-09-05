@@ -2,11 +2,19 @@
 
 [![PyPI version](https://badge.fury.io/py/strataregula.svg)](https://badge.fury.io/py/strataregula)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
 **StrataRegula** (strata + regula) is a YAML Configuration Pattern Compiler for hierarchical configuration management with wildcard pattern expansion, designed for enterprise-scale configuration processing.
 
 ## Features
+
+### Philosophy
+**StrataRegula** follows the principle of **"Speed Without Surprises"**:
+- **Hot path is O(1)**: Lookups resolved by direct map (hash/dict)
+- **Pre-compile then query**: Heavy work done once, fast queries always
+- **Immutable configs**: CompiledConfig ensures consistency and performance
+
+See: [`docs/patterns/STRATAREGULA_PHILOSOPHY.md`](docs/patterns/STRATAREGULA_PHILOSOPHY.md)
 
 ### Core Features
 - **Pattern Expansion**: Expand wildcard patterns in configuration structures (100K+ patterns/sec)
@@ -67,7 +75,39 @@ strataregula doctor --fix-suggestions
 - **Rich display issues**: The CLI works with basic output if Rich is unavailable
 - **pyenv compatibility**: Older pyenv Python versions may need package updates
 
+## 🚀 New Contributors
+
+**First time here?** Follow our [30-minute onboarding guide](docs/ONBOARDING.md) to get started.
+
+- 📚 [Complete Onboarding](docs/ONBOARDING.md) — 30min to contribution-ready
+- 🛠️ [Environment Setup](docs/environment/SETUP.md) — 15min quick start
+- 🔧 [Troubleshooting](docs/environment/TROUBLESHOOTING.md) — When things go wrong
+
 ## Quick Start
+
+### Minimal Usage (precompile → query)
+```python
+from strataregula import Kernel
+
+# Define a lightweight view (example)
+class BasicView:
+    key = "basic_view"
+    def materialize(self, model, **params):
+        return {"region": params.get("region"), "service": params.get("service")}
+
+k = Kernel()
+k.register_view(BasicView())
+
+raw_cfg = {"region": "tokyo", "service": "web"}
+compiled = k.precompile(raw_cfg)                 # compile once
+
+# Warm-up (optional but recommended before measuring)
+for _ in range(1000):
+    k.query("basic_view", {"region": "tokyo", "service": "web"}, compiled)
+
+result = k.query("basic_view", {"region": "tokyo", "service": "web"}, compiled)
+print(result)  # {'region': 'tokyo', 'service': 'web'}
+```
 
 ### Try it in 30 seconds! 
 

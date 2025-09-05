@@ -31,7 +31,7 @@ with suppress(ImportError):
 
 # v0.3.0 New Architecture
 with suppress(ImportError):
-    from .kernel import CacheStats, Kernel, LRUCacheBackend
+    from .kernel import CacheStats, Kernel, LRUCacheBackend, CompiledConfig
 
 with suppress(ImportError):
     from .passes import InternPass
@@ -40,6 +40,7 @@ __all__ = [
     "InternPass",
     # v0.3.0 New Architecture
     "Kernel",
+    "CompiledConfig",
     # Version info
     "__version__",
 ]
