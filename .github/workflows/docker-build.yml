@@ -20,6 +20,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      meta_json: ${{ steps.meta.outputs.json }}
 
     steps:
     - name: Checkout repository
@@ -52,13 +54,15 @@ jobs:
       with:
         context: .
         platforms: linux/amd64,linux/arm64
-        push: true
+        # PR のときは push しない（fork PR 権限問題を回避）
+        push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
     - name: Generate SBOM
+      if: ${{ github.event_name != 'pull_request' }}
       uses: anchore/sbom-action@v0
       with:
         image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
@@ -66,6 +70,7 @@ jobs:
         output-file: sbom.spdx.json
 
     - name: Upload SBOM
+      if: ${{ github.event_name != 'pull_request' }}
       uses: actions/upload-artifact@v4
       with:
         name: sbom
@@ -80,7 +85,7 @@ jobs:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:release-v0.3.0
+        image-ref: ${{ fromJSON(needs.build-and-push.outputs.meta_json).tags[0] }}
         format: 'sarif'
         output: 'trivy-results.sarif'
 
