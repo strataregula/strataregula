@@ -41,12 +41,12 @@ def get_git_diff_summary():
     stdout, stderr, code = run_cmd("git diff --stat HEAD")
     if code == 0 and stdout.strip():
         return stdout
-    
+
     # Try staged changes if no working tree changes
     stdout, stderr, code = run_cmd("git diff --stat --cached")
     if code == 0 and stdout.strip():
         return stdout
-        
+
     return "No changes detected"
 
 
@@ -88,11 +88,11 @@ def run_bench(with_bench=False):
     """Run benchmark if requested"""
     if not with_bench:
         return "Benchmarks skipped (use --with-bench to enable)"
-    
+
     bench_script = Path("scripts/bench_service_time.py")
     if not bench_script.exists():
         return "Benchmark script not found: scripts/bench_service_time.py"
-    
+
     stdout, stderr, code = run_cmd("python scripts/bench_service_time.py", timeout=300)
     return f"Exit code: {code}\n\nSTDOUT:\n{stdout}\n\nSTDERR:\n{stderr}"
 
@@ -111,42 +111,42 @@ def get_pr_info():
 
 def create_run_log(label, summary, intent, with_bench=False, out_dir="docs/run"):
     """Create comprehensive run log"""
-    
+
     if not summary:
         print("ERROR: --summary is required")
         sys.exit(1)
-    
+
     # Ensure output directory exists
     Path(out_dir).mkdir(parents=True, exist_ok=True)
-    
+
     # Generate filename
     timestamp = get_jst_timestamp()
     if label:
         filename = f"{timestamp}-JST-{label}.md"
     else:
         filename = f"{timestamp}-JST.md"
-    
+
     filepath = Path(out_dir) / filename
-    
+
     # Gather information
     print("DEBUG: Gathering run information...")
     git_diff = get_git_diff_summary()
     git_status = get_git_status()
     recent_commits = get_recent_commits()
     pr_info = get_pr_info()
-    
+
     print("DEBUG: Running tests...")
     pytest_quick = run_pytest_quick()
-    
+
     print("DEBUG: Running coverage...")
     pytest_coverage = run_pytest_coverage()
-    
+
     print("DEBUG: Testing CLI...")
     cli_output = run_cli_command()
-    
+
     print("DEBUG: Running benchmarks..." if with_bench else "DEBUG: Skipping benchmarks...")
     bench_output = run_bench(with_bench)
-    
+
     # Generate run log content
     content = f"""# Run Log - {label or 'session'}
 - When: {datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime('%Y-%m-%dT%H-%M')}JST
@@ -221,7 +221,7 @@ def create_run_log(label, summary, intent, with_bench=False, out_dir="docs/run")
     # Write the file
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(content)
-    
+
     print(f"SUCCESS: Run log created: {filepath}")
     return filepath
 
@@ -233,9 +233,9 @@ def main():
     parser.add_argument("--intent", help="Intent/purpose of the session")
     parser.add_argument("--with-bench", action="store_true", help="Include benchmark results")
     parser.add_argument("--out-dir", default="docs/run", help="Output directory")
-    
+
     args = parser.parse_args()
-    
+
     filepath = create_run_log(
         label=args.label,
         summary=args.summary,
@@ -243,9 +243,9 @@ def main():
         with_bench=args.with_bench,
         out_dir=args.out_dir
     )
-    
+
     print(f"\nCOMPLETE: Run log ready: {filepath}")
-    
+
 
 if __name__ == "__main__":
     main()

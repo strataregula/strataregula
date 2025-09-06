@@ -1,0 +1,77 @@
+{
+  "timestamp": "2025-09-06T08:28:36.828864",
+  "data_size": 1000,
+  "core_benchmarks": {
+    "pattern_compilation": {
+      "function": "pattern_compilation",
+      "iterations": 1000,
+      "timestamp": "2025-09-06T08:28:35.066616",
+      "mean_us": 703.4865997266024,
+      "median_us": 656.6999945789576,
+      "p95_us": 974.0999666973948,
+      "p99_us": 1280.6999729946256,
+      "min_us": 609.2999828979373,
+      "max_us": 1762.8000350669026,
+      "std_us": 134.14743942005222,
+      "ops_per_second": 1421.491184606263,
+      "memory_delta_mb": 5.7421875,
+      "memory_per_op_bytes": 6021.12,
+      "performance_class": "slow",
+      "coefficient_of_variation": 0.19068940257310693
+    },
+    "pattern_expansion": {
+      "function": "pattern_expansion",
+      "iterations": 1000,
+      "timestamp": "2025-09-06T08:28:35.658450",
+      "mean_us": 530.5224001640454,
+      "median_us": 502.7999868616462,
+      "p95_us": 719.7000086307526,
+      "p99_us": 896.3999571278691,
+      "min_us": 448.3999218791723,
+      "max_us": 1320.6000439822674,
+      "std_us": 89.67599560414615,
+      "ops_per_second": 1884.9345469499217,
+      "memory_delta_mb": -0.93359375,
+      "memory_per_op_bytes": -978.944,
+      "performance_class": "slow",
+      "coefficient_of_variation": 0.16903338214638441
+    },
+    "json_processing": {
+      "error": "Warmup failed: cannot import name 'JsonProcessor' from 'strataregula.json_processor.commands' (C:\\Users\\uraka\\project\\strataregula\\strataregula\\json_processor\\commands.py)",
+      "function": "json_processing"
+    },
+    "index_search": {
+      "error": "Warmup failed: cannot import name 'ContentSearch' from 'strataregula.index.content_search' (C:\\Users\\uraka\\project\\strataregula\\strataregula\\index\\content_search.py)",
+      "function": "index_search"
+    }
+  },
+  "implementation_comparisons": {
+    "timestamp": "2025-09-06T08:28:36.828845",
+    "test_data_size": "100 items",
+    "implementations": {
+      "naive_implementation": {
+        "error": "Warmup failed: create_comparison_implementations.<locals>.naive_pattern_match() missing 1 required positional argument: 'target'",
+        "function": "naive_implementation"
+      },
+      "optimized_implementation": {
+        "error": "Warmup failed: create_comparison_implementations.<locals>.optimized_pattern_match() missing 1 required positional argument: 'target'",
+        "function": "optimized_implementation"
+      },
+      "regex_implementation": {
+        "error": "Warmup failed: create_comparison_implementations.<locals>.regex_pattern_match() missing 1 required positional argument: 'target'",
+        "function": "regex_implementation"
+      }
+    },
+    "summary": {
+      "error": "No valid results to compare"
+    }
+  },
+  "system_info": {
+    "python_version": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26100-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "architecture": "64bit",
+    "memory_total_gb": 15.710445404052734,
+    "cpu_count": 16
+  }
+}

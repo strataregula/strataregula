@@ -2,54 +2,76 @@
 Basic Hook Management System - Minimal implementation for v0.3.0
 """
 
+from __future__ import annotations
+from dataclasses import dataclass
+from typing import Callable, Dict, List, Any, Optional
 import logging
-from typing import Any, Callable, Dict, List
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class Hook:
+    name: str
+    callback: Callable
+    hook_type: str
 
 
 class HookManager:
     """Basic hook management for plugin system compatibility."""
 
-    def __init__(self):
-        self.hooks: Dict[str, List[Callable]] = {}
-        self.logger = logging.getLogger(f"{__name__}.HookManager")
+    def __init__(self, logger=None) -> None:
+        self.hooks: Dict[str, List[Hook]] = {}
+        self.logger = logger or logging.getLogger(f"{__name__}.HookManager")
 
-    def register_hook(self, hook_name: str, callback: Callable) -> bool:
+    def register_hook(self, hook_name: str, callback: Callable, name: Optional[str] = None) -> bool:
         """Register a hook callback."""
         if hook_name not in self.hooks:
             self.hooks[hook_name] = []
-
-        self.hooks[hook_name].append(callback)
-        self.logger.debug(f"Registered hook: {hook_name}")
+        hook = Hook(name=name or f"hook_{len(self.hooks[hook_name])}", callback=callback, hook_type=hook_name)
+        self.hooks[hook_name].append(hook)
+        if self.logger:
+            self.logger.debug(f"Registered hook: {hook_name} as {hook.name}")
         return True
 
+    # 旧名互換
     def register(self, hook_name: str, callback: Callable, name: str = None) -> bool:
         """Register a hook callback (alternative interface)."""
-        return self.register_hook(hook_name, callback)
+        return self.register_hook(hook_name, callback, name)
 
     def unregister_hook(self, hook_name: str, callback: Callable) -> bool:
         """Unregister a hook callback."""
-        if hook_name in self.hooks and callback in self.hooks[hook_name]:
-            self.hooks[hook_name].remove(callback)
-            self.logger.debug(f"Unregistered hook: {hook_name}")
-            return True
-        return False
+        if hook_name not in self.hooks:
+            return False
+        before = len(self.hooks[hook_name])
+        self.hooks[hook_name] = [h for h in self.hooks[hook_name] if h.callback is not callback]
+        return len(self.hooks[hook_name]) < before
 
     def execute_hook(self, hook_name: str, *args, **kwargs) -> List[Any]:
         """Execute all callbacks for a hook."""
         results = []
-        if hook_name in self.hooks:
-            for callback in self.hooks[hook_name]:
-                try:
-                    result = callback(*args, **kwargs)
-                    results.append(result)
-                except Exception as e:
+        for hook in self.hooks.get(hook_name, []):
+            try:
+                results.append(hook.callback(*args, **kwargs))
+            except Exception as e:
+                if self.logger:
                     self.logger.error(f"Hook {hook_name} callback failed: {e}")
         return results
 
-    def list_hooks(self, hook_name: str = None) -> List[str]:
-        """List all registered hook names or callbacks for a specific hook."""
-        if hook_name:
-            return [cb.__name__ if hasattr(cb, '__name__') else str(cb) for cb in self.hooks.get(hook_name, [])]
+    # Alias for compatibility
+    def run_hook(self, hook_name: str, *args, **kwargs) -> List[Any]:
+        """Execute all callbacks for a hook."""
+        return self.execute_hook(hook_name, *args, **kwargs)
+
+    def list_hooks(self, hook_type: str = None) -> List[Hook]:
+        """List hooks, optionally filtered by type."""
+        if hook_type:
+            return self.hooks.get(hook_type, [])
+        all_hooks: List[Hook] = []
+        for hs in self.hooks.values():
+            all_hooks.extend(hs)
+        return all_hooks
+
+    def list_hook_names(self) -> List[str]:
+        """List all registered hook type names."""
         return list(self.hooks.keys())

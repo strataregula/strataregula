@@ -1,1 +1,1 @@
-{"hit_ratio":0.85,"latency_ms":0.2,"measurement_info":{"config_size_routes":100,"config_size_services":50,"iterations":1000,"timestamp":1756770116.4675539},"mem_bytes":159744,"p95_ms":0.34,"throughput_rps":4969.2}
+{"hit_ratio":0.85,"latency_ms":0.14,"measurement_info":{"config_size_routes":100,"config_size_services":50,"iterations":1000,"timestamp":1757116893.6363533},"mem_bytes":-712704,"p95_ms":0.23,"throughput_rps":6916.2}

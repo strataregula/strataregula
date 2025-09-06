@@ -285,8 +285,12 @@ class TestMigrationPath:
             warnings.simplefilter("always")
 
             # New pattern - should have NO deprecation warnings
+            import yaml
+            with open(config_file, 'r', encoding='utf-8') as f:
+                config_data = yaml.safe_load(f)
+            
             kernel = Kernel()
-            kernel.compile(str(config_file))
+            compiled = kernel.precompile(config_data)
 
             # Check no deprecation warnings from new API
             deprecation_warnings = [

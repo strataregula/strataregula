@@ -141,6 +141,10 @@ def compile_cmd(
         # Dump in tree format for hierarchical visualization
         sr compile --traffic traffic.yaml --dump-compiled-config - --dump-format tree
     """
+    # Import unified output utilities
+    from .output_utils import (
+        status_message, output_content, progress_message, compilation_banner
+    )
 
     # Set up logging
     log_level = logging.DEBUG if verbose else logging.INFO
@@ -174,20 +178,17 @@ def compile_cmd(
         # Set up progress callback for large files
         def progress_callback(current: int, total: int):
             if verbose:
-                percentage = (current / total) * 100 if total > 0 else 0
-                click.echo(
-                    f"Processing: {current}/{total} chunks ({percentage:.1f}%)",
-                    err=True,
-                )
+                progress_message("Processing", current, total)
 
         # Compile configuration
-        click.echo("Starting compilation...", err=True)
+        compilation_banner("Starting compilation")
 
         if _is_large_file(traffic):
             # Use streaming compilation for large files
             if not out:
-                click.echo(
-                    "Error: Output file required for large file compilation", err=True
+                status_message(
+                    "Error: Output file required for large file compilation",
+                    level="error"
                 )
                 sys.exit(1)
 
@@ -202,11 +203,11 @@ def compile_cmd(
                 traffic, prefectures, out
             )
 
-        # Output results
+        # Output results using unified system
         if not out and compiled_content:
-            click.echo(compiled_content)
+            output_content(compiled_content)
         elif out:
-            click.echo(f"Compilation successful. Output written to: {out}", err=True)
+            status_message(f"Compilation successful. Output written to: {out}", level="success")
 
         # Dump compiled configuration if requested
         if dump_compiled_config:
@@ -223,20 +224,21 @@ def compile_cmd(
         if stats:
             _show_compilation_stats(compiler)
 
-        click.echo("Compilation completed successfully.", err=True)
+        status_message("Compilation completed successfully", level="success")
 
     except Exception as e:
-        click.echo(f"Compilation failed: {e}", err=True)
+        status_message(f"Compilation failed: {e}", level="error")
         if verbose:
             import traceback
-
             traceback.print_exc()
         sys.exit(1)
 
 
 def _validate_files(traffic_file: Path, prefectures_file: Optional[Path]) -> None:
     """Validate input configuration files."""
-    click.echo("Validating configuration files...", err=True)
+    from .output_utils import status_message
+
+    status_message("Validating configuration files...")
 
     errors = []
 
@@ -253,8 +255,9 @@ def _validate_files(traffic_file: Path, prefectures_file: Optional[Path]) -> Non
                     f"No service patterns found in traffic file: {traffic_file}"
                 )
             else:
-                click.echo(
-                    f"✓ Traffic file valid: {len(patterns)} patterns found", err=True
+                status_message(
+                    f"Traffic file valid: {len(patterns)} patterns found",
+                    level="success"
                 )
 
     except Exception as e:
@@ -270,48 +273,50 @@ def _validate_files(traffic_file: Path, prefectures_file: Optional[Path]) -> Non
                     f"Prefectures file is empty or invalid: {prefectures_file}"
                 )
             else:
-                click.echo("✓ Prefectures file valid", err=True)
+                status_message("Prefectures file valid", level="success")
 
                 # Check for expected structure
                 if "prefectures" in pref_data:
                     pref_count = len(pref_data["prefectures"])
-                    click.echo(f"  - {pref_count} prefectures configured", err=True)
+                    status_message(f"  - {pref_count} prefectures configured")
 
                 if "regions" in pref_data:
                     region_count = len(pref_data["regions"])
-                    click.echo(f"  - {region_count} regions configured", err=True)
+                    status_message(f"  - {region_count} regions configured")
 
         except Exception as e:
             errors.append(f"Invalid prefectures file {prefectures_file}: {e}")
 
     # Report validation results
     if errors:
-        click.echo("Validation failed with errors:", err=True)
+        status_message("Validation failed with errors:", level="error")
         for error in errors:
-            click.echo(f"  ✗ {error}", err=True)
+            status_message(f"  {error}", level="error")
         sys.exit(1)
     else:
-        click.echo("✓ All files validated successfully", err=True)
+        status_message("All files validated successfully", level="success")
 
 
 def _show_compilation_plan(
     traffic_file: Path, prefectures_file: Optional[Path], config: CompilationConfig
 ) -> None:
     """Show compilation plan without executing."""
-    click.echo("=== Compilation Plan ===", err=True)
-    click.echo("Input files:", err=True)
-    click.echo(f"  Traffic: {traffic_file}", err=True)
-    click.echo(f"  Prefectures: {prefectures_file or 'Not provided'}", err=True)
-    click.echo("", err=True)
+    from .output_utils import status_message, compilation_banner
 
-    click.echo("Configuration:", err=True)
-    click.echo(f"  Output format: {config.output_format}", err=True)
-    click.echo(f"  Chunk size: {config.chunk_size}", err=True)
-    click.echo(f"  Max memory: {config.max_memory_mb} MB", err=True)
-    click.echo(f"  Include metadata: {config.include_metadata}", err=True)
-    click.echo(f"  Include provenance: {config.include_provenance}", err=True)
-    click.echo(f"  Optimize lookups: {config.optimize_lookups}", err=True)
-    click.echo("", err=True)
+    compilation_banner("Compilation Plan")
+    status_message("Input files:")
+    status_message(f"  Traffic: {traffic_file}")
+    status_message(f"  Prefectures: {prefectures_file or 'Not provided'}")
+    status_message("")
+
+    status_message("Configuration:")
+    status_message(f"  Output format: {config.output_format}")
+    status_message(f"  Chunk size: {config.chunk_size}")
+    status_message(f"  Max memory: {config.max_memory_mb} MB")
+    status_message(f"  Include metadata: {config.include_metadata}")
+    status_message(f"  Include provenance: {config.include_provenance}")
+    status_message(f"  Optimize lookups: {config.optimize_lookups}")
+    status_message("")
 
     # Analyze input files
     try:
@@ -319,8 +324,8 @@ def _show_compilation_plan(
         traffic_data = compiler._load_file(traffic_file)
         patterns = compiler._extract_service_patterns(traffic_data)
 
-        click.echo("Analysis:", err=True)
-        click.echo(f"  Service patterns: {len(patterns)}", err=True)
+        status_message("Analysis:")
+        status_message(f"  Service patterns: {len(patterns)}")
 
         # Estimate expansion
         expander = EnhancedPatternExpander()
@@ -343,55 +348,48 @@ def _show_compilation_plan(
 
         total_estimated = int(len(patterns) * expansion_ratio)
 
-        click.echo(f"  Estimated expanded mappings: {total_estimated}", err=True)
-        click.echo(
-            f"  Expected direct mappings: {int(total_estimated * 0.3)}", err=True
-        )
-        click.echo(
-            f"  Expected component mappings: {int(total_estimated * 0.7)}", err=True
-        )
-        click.echo("", err=True)
+        status_message(f"  Estimated expanded mappings: {total_estimated}")
+        status_message(f"  Expected direct mappings: {int(total_estimated * 0.3)}")
+        status_message(f"  Expected component mappings: {int(total_estimated * 0.7)}")
+        status_message("")
 
         # Memory estimation
         estimated_memory_mb = (total_estimated * 64) / (1024 * 1024)  # Rough estimate
         use_streaming = estimated_memory_mb > config.max_memory_mb
 
-        click.echo("Processing strategy:", err=True)
-        click.echo(f"  Estimated memory usage: {estimated_memory_mb:.1f} MB", err=True)
-        click.echo(f"  Use streaming: {use_streaming}", err=True)
-        click.echo(
-            f"  Estimated processing time: {_estimate_processing_time(len(patterns))} seconds",
-            err=True,
-        )
+        status_message("Processing strategy:")
+        status_message(f"  Estimated memory usage: {estimated_memory_mb:.1f} MB")
+        status_message(f"  Use streaming: {use_streaming}")
+        status_message(f"  Estimated processing time: {_estimate_processing_time(len(patterns))} seconds")
 
     except Exception as e:
-        click.echo(f"Unable to analyze input files: {e}", err=True)
+        status_message(f"Unable to analyze input files: {e}", level="error")
 
 
 def _show_compilation_stats(compiler: ConfigCompiler) -> None:
     """Show detailed compilation statistics."""
-    click.echo("\n=== Compilation Statistics ===", err=True)
+    from .output_utils import status_message, compilation_banner
+
+    compilation_banner("Compilation Statistics")
 
     try:
         # Get expansion stats
         expansion_stats = compiler.expander.get_expansion_stats()
 
-        click.echo("Pattern Expansion:", err=True)
-        click.echo(f"  Rules loaded: {expansion_stats['rules_count']}", err=True)
-        click.echo(f"  Cache entries: {expansion_stats['cache_size']}", err=True)
-        click.echo(f"  Cache max size: {expansion_stats['cache_max_size']}", err=True)
+        status_message("Pattern Expansion:")
+        status_message(f"  Rules loaded: {expansion_stats['rules_count']}")
+        status_message(f"  Cache entries: {expansion_stats['cache_size']}")
+        status_message(f"  Cache max size: {expansion_stats['cache_max_size']}")
 
-        click.echo("\nHierarchy Information:", err=True)
+        status_message("\nHierarchy Information:")
         hierarchy = expansion_stats["hierarchy_stats"]
         for key, value in hierarchy.items():
-            click.echo(f"  {key.capitalize()}: {value}", err=True)
+            status_message(f"  {key.capitalize()}: {value}")
 
-        click.echo(
-            f"\nData Sources: {', '.join(expansion_stats['data_sources'])}", err=True
-        )
+        status_message(f"\nData Sources: {', '.join(expansion_stats['data_sources'])}")
 
     except Exception as e:
-        click.echo(f"Unable to gather statistics: {e}", err=True)
+        status_message(f"Unable to gather statistics: {e}", level="error")
 
 
 def _is_large_file(file_path: Path) -> bool:
@@ -419,8 +417,10 @@ def _dump_compiled_configuration(
     verbose: bool,
 ) -> None:
     """Dump compiled configuration for inspection and debugging."""
+    from .output_utils import status_message, output_content
+
     try:
-        click.echo("Generating compiled configuration dump...", err=True)
+        status_message("Generating compiled configuration dump...")
 
         # Load and process the configuration
         traffic_data = compiler._load_file(traffic_file)
@@ -469,34 +469,29 @@ def _dump_compiled_configuration(
         # Format and output the dump
         formatted_output = _format_dump_output(dump_data, dump_format)
 
-        # Output to file or stdout
+        # Output to file or stdout using unified system
         if str(dump_path) == "-":
-            click.echo(formatted_output)
+            output_content(formatted_output)
         else:
-            with open(dump_path, "w", encoding="utf-8") as f:
-                f.write(formatted_output)
-
+            output_content(formatted_output, str(dump_path))
             file_size_kb = dump_path.stat().st_size / 1024
-            click.echo(
+            status_message(
                 f"Configuration dump written to: {dump_path} ({file_size_kb:.1f} KB)",
-                err=True,
+                level="success"
             )
 
         if verbose:
-            click.echo(
-                f"Dump contains {len(dump_data['compiled_mappings']['direct_mapping'])} direct mappings",
-                err=True,
+            status_message(
+                f"Dump contains {len(dump_data['compiled_mappings']['direct_mapping'])} direct mappings"
             )
-            click.echo(
-                f"Dump contains {len(dump_data['compiled_mappings']['component_mapping'])} component mappings",
-                err=True,
+            status_message(
+                f"Dump contains {len(dump_data['compiled_mappings']['component_mapping'])} component mappings"
             )
 
     except Exception as e:
-        click.echo(f"Failed to dump compiled configuration: {e}", err=True)
+        status_message(f"Failed to dump compiled configuration: {e}", level="error")
         if verbose:
             import traceback
-
             traceback.print_exc()
 
 

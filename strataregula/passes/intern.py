@@ -89,7 +89,12 @@ class InternPass:
 
         # モデルへ stats を埋め込まない（外に保持）。必要時のみ変換。
         print("[INFO] Calling intern_tree...")
-        interned = _intern_value(model, self._memo)
+        if self.collect_stats and self._stats:
+            # Use the stats-aware intern_tree function
+            interned = intern_tree(model, stats=self._stats)
+        else:
+            # Use the local optimized version
+            interned = _intern_value(model, self._memo)
         print(f"[OK] intern_tree completed, result size: {len(str(interned))}")
 
         # Log stats if collection is enabled

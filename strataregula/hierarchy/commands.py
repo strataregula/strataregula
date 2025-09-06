@@ -24,7 +24,7 @@ class MergeCommand(BaseCommand):
 
     async def execute(self, data: Any, *args, **kwargs) -> Any:
         """設定をマージ"""
-        merge_data = kwargs.get("with")
+        merge_data = kwargs.get("with") or kwargs.get("with_")
         strategy_name = kwargs.get("strategy", "smart")
 
         if merge_data is None:
@@ -43,12 +43,16 @@ class MergeCommand(BaseCommand):
         if isinstance(merge_data, str):
             # ファイルパスの場合
             if Path(merge_data).exists():
-                processor.load_base_config(merge_data)
+                if not processor.load_base_config(merge_data):
+                    raise ValueError(f"Failed to load config file: {merge_data}")
                 merge_data = processor.base_config
             else:
                 # YAML文字列として解析
                 try:
                     merge_data = yaml.safe_load(merge_data)
+                    # If it's still a string after YAML parsing, it's likely an invalid file path
+                    if isinstance(merge_data, str):
+                        raise ValueError(f"Invalid YAML string: {merge_data}")
                 except yaml.YAMLError:
                     raise ValueError(f"Invalid YAML string: {merge_data}")
 

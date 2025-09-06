@@ -134,6 +134,14 @@ class ConditionalPlugin(PatternPlugin):
         """Handle patterns with @if() conditional syntax."""
         return "@if(" in pattern and ")" in pattern
 
+    async def process(self, pattern: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Process a pattern with conditional expansion."""
+        if not self.can_handle(pattern):
+            return {}
+
+        expanded_patterns = self.expand(pattern, data)
+        return expanded_patterns
+
     def expand(self, pattern: str, context: dict[str, Any]) -> dict[str, Any]:
         """Expand conditional patterns."""
         try:
@@ -246,6 +254,14 @@ class MultiplicatorPlugin(PatternPlugin):
         """Handle patterns with @multi() syntax."""
         return "@multi(" in pattern and ")" in pattern
 
+    async def process(self, pattern: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Process a pattern with multiplication expansion."""
+        if not self.can_handle(pattern):
+            return {}
+
+        expanded_patterns = self.expand(pattern, data)
+        return expanded_patterns
+
     def expand(self, pattern: str, context: dict[str, Any]) -> dict[str, Any]:
         """Expand pattern to multiple variations."""
         try:
@@ -287,6 +303,14 @@ class ValidationPlugin(PatternPlugin):
         """Handle all patterns for validation."""
         # This plugin can validate any pattern, but should have low priority
         return True
+
+    async def process(self, pattern: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Process a pattern with validation."""
+        if not self.can_handle(pattern):
+            return {}
+
+        expanded_patterns = self.expand(pattern, data)
+        return expanded_patterns
 
     def expand(self, pattern: str, context: dict[str, Any]) -> dict[str, Any]:
         """Validate pattern and add metadata."""
